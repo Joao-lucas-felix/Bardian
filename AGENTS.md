@@ -33,7 +33,19 @@ Sempre que houver conflito entre velocidade de implementação e compreensão do
 
 # 3. Papel do usuário na implementação
 
-Sempre que possível, o próprio usuário deve realizar a implementação.
+O usuário pode implementar pessoalmente ou autorizar o agente a implementar. Sua participação deve ocorrer pela compreensão e aprovação das mudanças, sem obrigação de escrever o código manualmente.
+
+Antes de qualquer alteração no código, o agente deve:
+
+1. apresentar o código proposto e indicar os arquivos afetados;
+2. explicar a responsabilidade, o funcionamento e o motivo da alteração;
+3. explicar como verificar o comportamento, incluindo os testes propostos;
+4. perguntar explicitamente: "Posso implementar essa alteração?";
+5. aguardar a autorização do usuário antes de editar.
+
+A autorização vale apenas para a proposta apresentada, incluindo os testes e ajustes documentais descritos. Não é necessário pedir novamente para executar essa mesma proposta já autorizada. Novos incrementos ou mudanças fora desse escopo exigem nova apresentação e consulta.
+
+Mensagens como "vamos seguir" ou "continuar" solicitam a apresentação do próximo passo; não autorizam automaticamente novas alterações. A concordância com uma ideia de modelagem também não substitui a aprovação do código proposto.
 
 O agente deve preferir:
 
@@ -51,15 +63,7 @@ O agente deve preferir:
 
 O agente não deve transformar automaticamente uma discussão em uma grande implementação pronta.
 
-Código completo produzido pelo agente deve ser reservado para situações em que:
-
-- o usuário solicitar explicitamente;
-- a implementação for repetitiva ou mecânica;
-- o trecho já tiver sido discutido e compreendido;
-- o código servir como referência didática;
-- houver necessidade de destravar um problema específico.
-
-Mesmo nesses casos, o agente deve explicar o que foi produzido.
+O agente pode apresentar código completo para o pequeno incremento em discussão, acompanhado de explicações. Para aplicá-lo ao projeto, deve seguir a consulta prévia acima, inclusive em correções, testes, refatorações e tarefas repetitivas ou mecânicas.
 
 ---
 
@@ -92,9 +96,11 @@ discutir alternativas
         ↓
 escolher o próximo pequeno passo
         ↓
-explicar como implementar
+apresentar o código e explicar como implementar e verificar
         ↓
-usuário implementa sempre que possível
+perguntar se pode implementar e aguardar autorização
+        ↓
+agente implementa o escopo autorizado ou usuário implementa, se preferir
         ↓
 agente revisa
         ↓
@@ -1048,13 +1054,15 @@ Agente identifica dependências conceituais
         ↓
 Agente propõe o menor próximo passo
         ↓
-Agente explica como implementar
+Agente apresenta o código e explica como implementar e verificar
         ↓
-Usuário implementa sempre que possível
+Agente pergunta se pode implementar e aguarda autorização
+        ↓
+Agente implementa o escopo autorizado ou usuário implementa, se preferir
         ↓
 Agente revisa
         ↓
-Usuário corrige ou agente auxilia na correção
+Correções são propostas e autorizadas antes de o agente aplicá-las
         ↓
 Teste
         ↓
@@ -1075,7 +1083,7 @@ Em vez de:
 
 O agente deve preferir:
 
-> Para chegar às escalas, primeiro precisamos garantir que a representação de nota suporta as operações necessárias. Vamos analisar a estrutura atual de `Note`. Depois escolhemos uma operação pequena, como representar a distância entre duas notas. Você implementa a primeira versão e eu reviso com você.
+> Para chegar às escalas, primeiro precisamos garantir que a representação de nota suporta as operações necessárias. Vamos analisar a estrutura atual de `Note`. Depois escolhemos uma operação pequena, apresento o código proposto e explico seu funcionamento e verificação. Ao final, pergunto se posso implementá-lo.
 
 ---
 
@@ -1149,7 +1157,27 @@ Não é necessário antecipar todas as funcionalidades futuras.
 
 ---
 
-# 54. Regra final
+# 54. Comentários explicativos e documentação do código
+
+Todo código produzido pelo agente deve incluir comentários explicativos e documentação de classes, módulos, funções e métodos, conforme aplicável. Essa regra vale tanto para código inserido nos arquivos do projeto quanto para exemplos apresentados na conversa.
+
+A documentação deve explicar:
+
+- a responsabilidade do trecho;
+- os parâmetros de entrada e seus significados;
+- o retorno ou resultado esperado;
+- as regras musicais e convenções utilizadas, quando houver;
+- os erros, restrições e efeitos colaterais relevantes.
+
+Utilizar docstrings nas linguagens que oferecem esse recurso ou comentários de documentação equivalentes. Em Ruby, utilizar comentários com `#` imediatamente antes da definição documentada; em JavaScript, utilizar comentários no formato JSDoc quando aplicável.
+
+Os comentários explicativos devem ser escritos em português e ajudar o autor a compreender o raciocínio, as decisões e as partes menos evidentes do fluxo. Evitar comentários que apenas repitam literalmente o código, sem acrescentar informação.
+
+Ao modificar um trecho, atualizar também sua documentação e seus comentários para que permaneçam coerentes com o comportamento implementado. A explicação na conversa complementa, mas não substitui, a documentação no próprio código.
+
+---
+
+# 55. Regra final
 
 O agente deve ajudar o usuário a construir o projeto, mas o conhecimento sobre o projeto deve permanecer com o usuário.
 
