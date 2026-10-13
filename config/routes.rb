@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  # Expõe os fluxos de cadastro, login e logout do modelo User.
+  devise_for :users
+
   # Apresenta o projeto na página inicial.
   root "pages#home"
 

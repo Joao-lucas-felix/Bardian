@@ -24,6 +24,14 @@
   </head>
 
   <body>
+    <%# Mensagens de autenticação e navegação ficam disponíveis para o usuário. %>
+    <% if notice.present? || alert.present? %>
+      <div class="flash-messages" role="status">
+        <%= tag.p notice, class: "flash-message flash-notice" if notice.present? %>
+        <%= tag.p alert, class: "flash-message flash-alert" if alert.present? %>
+      </div>
+    <% end %>
+
     <%# Permite que a apresentação ocupe a tela, mantendo o padrão das demais páginas. %>
     <main class="<%= content_for?(:main_class) ? yield(:main_class) : "container mx-auto mt-28 px-5 flex" %>">
       <%= yield %>

@@ -26,6 +26,44 @@
 .presentation ::selection { background: #ead8c5; color: #352d27; }
 .bardian-story { isolation: isolate; }
 
+/* Mantém os formulários de autenticação simples, legíveis e compatíveis com o layout. */
+.auth-page {
+  min-height: 100svh;
+  margin: 0;
+  padding: 40px 20px;
+  display: grid;
+  place-items: center;
+  background: #f4f6f8;
+}
+.auth-card {
+  width: min(100%, 420px);
+  padding: 36px;
+  border: 1px solid #dbe3e7;
+  border-radius: 8px;
+  background: #fff;
+  color: #263640;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  box-shadow: 0 18px 45px rgba(31, 52, 62, .08);
+}
+.auth-kicker { margin: 0 0 10px; color: #2f6d7d; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.auth-card h1 { margin: 0; font-size: 30px; letter-spacing: -.03em; }
+.auth-description { margin: 8px 0 28px; color: #6b7b84; font-size: 14px; }
+.auth-form { display: grid; gap: 18px; }
+.auth-field { display: grid; gap: 7px; }
+.auth-field label { color: #40525b; font-size: 13px; font-weight: 650; }
+.auth-field input { width: 100%; min-height: 42px; padding: 9px 11px; border: 1px solid #cbd7dc; border-radius: 5px; color: #263640; font: inherit; }
+.auth-field input:focus { border-color: #2f6d7d; outline: 3px solid #e0f0f3; }
+.auth-field small { color: #7d8b91; font-size: 11px; }
+.auth-submit { min-height: 44px; border: 0; border-radius: 5px; background: #263640; color: #fff; cursor: pointer; font: 650 14px system-ui, sans-serif; }
+.auth-submit:hover { background: #2f6d7d; }
+.auth-secondary-action { margin: 24px 0 0; color: #6b7b84; font-size: 13px; text-align: center; }
+.auth-secondary-action a { color: #2f6d7d; font-weight: 650; }
+.auth-errors { padding: 12px 14px; border: 1px solid #e5b9b9; border-radius: 5px; background: #fff7f7; color: #8a3434; font-size: 13px; }
+.auth-errors ul { margin: 8px 0 0; padding-left: 18px; }
+.flash-messages { position: fixed; z-index: 20; top: 16px; right: 16px; width: min(360px, calc(100% - 32px)); }
+.flash-message { margin: 0 0 8px; padding: 12px 14px; border: 1px solid #cfe0e5; border-radius: 5px; background: #f7fbfc; color: #2f6d7d; font: 13px system-ui, sans-serif; }
+.flash-alert { border-color: #e5b9b9; background: #fff7f7; color: #8a3434; }
+
 .story-scene {
   --story-gutter: clamp(28px, 6vw, 96px);
   min-height: 100svh;
