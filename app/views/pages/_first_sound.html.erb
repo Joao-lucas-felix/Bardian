@@ -1,0 +1,27 @@
+<%# Cena do primeiro som com texto e piano interativo; não recebe locals. %>
+  <section
+    id="primeiro-som"
+    class="story-scene story-note"
+    data-music-story-target="cover"
+    aria-labelledby="note-title"
+  >
+    <%# Curvas de ressonância criam profundidade na margem oposta ao texto. %>
+    <svg class="piano-resonance" viewBox="0 0 700 600" aria-hidden="true" focusable="false">
+      <% [0, 30, 60, 90].each do |offset| %>
+        <path d="M <%= 260 + offset %> 590 C <%= 50 + offset %> 300 <%= 550 + offset %> 270 <%= 360 + offset %> 10" />
+      <% end %>
+    </svg>
+    <div class="story-copy">
+      <p class="story-caption">O primeiro som</p>
+      <h2 id="note-title">Uma nota abre<br>possibilidades.</h2>
+      <%# Apresenta o apoio à criação e a aprendizagem em linguagem acessível. %>
+      <p class="story-description">
+        Transforme suas ideias em música. No Bardian, você poderá experimentar
+        sons, receber sugestões e construir suas composições, aprendendo a
+        cada escolha enquanto cria — mesmo que esteja começando agora.
+      </p>
+    </div>
+
+    <%# Insere as duas oitavas tocáveis que acompanham a apresentação. %>
+    <%= render "pages/piano" %>
+  </section>

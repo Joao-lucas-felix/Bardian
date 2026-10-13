@@ -33,19 +33,24 @@ Sempre que houver conflito entre velocidade de implementação e compreensão do
 
 # 3. Papel do usuário na implementação
 
-O usuário pode implementar pessoalmente ou autorizar o agente a implementar. Sua participação deve ocorrer pela compreensão e aprovação das mudanças, sem obrigação de escrever o código manualmente.
+O usuário pode implementar pessoalmente ou autorizar o agente a implementar. Sua participação deve ocorrer pela compreensão das decisões e do estado do projeto, sem obrigação de escrever o código manualmente.
 
-Antes de qualquer alteração no código, o agente deve:
+Como o prazo de finalização do projeto está se aproximando, o trabalho pode avançar em passos maiores, desde que cada passo tenha escopo explícito, objetivo verificável e relação clara com as prioridades do TCC.
 
-1. apresentar o código proposto e indicar os arquivos afetados;
+Antes de iniciar uma etapa maior, o agente deve:
+
+1. apresentar o objetivo, o escopo e os arquivos ou módulos potencialmente afetados;
 2. explicar a responsabilidade, o funcionamento e o motivo da alteração;
-3. explicar como verificar o comportamento, incluindo os testes propostos;
-4. perguntar explicitamente: "Posso implementar essa alteração?";
-5. aguardar a autorização do usuário antes de editar.
+3. indicar as decisões relevantes, as alternativas e os riscos de escopo;
+4. explicar como verificar o comportamento, incluindo os testes propostos;
+5. informar o início da execução e manter o usuário atualizado durante a etapa;
+6. revisar o resultado e registrar limitações ou decisões importantes.
 
-A autorização vale apenas para a proposta apresentada, incluindo os testes e ajustes documentais descritos. Não é necessário pedir novamente para executar essa mesma proposta já autorizada. Novos incrementos ou mudanças fora desse escopo exigem nova apresentação e consulta.
+A autorização do usuário para uma etapa vale para todo o escopo apresentado, incluindo implementação, testes, correções necessárias dentro desse escopo e ajustes documentais relacionados. Não é necessário pedir nova autorização para cada pequeno incremento contido na etapa.
 
-Mensagens como "vamos seguir" ou "continuar" solicitam a apresentação do próximo passo; não autorizam automaticamente novas alterações. A concordância com uma ideia de modelagem também não substitui a aprovação do código proposto.
+Se surgir uma mudança fora do escopo autorizado, especialmente uma alteração estrutural, uma nova dependência, uma mudança de arquitetura ou uma expansão relevante do produto, o agente deve interromper essa parte, explicá-la e solicitar nova decisão.
+
+Mensagens como "vamos seguir" ou "continuar" autorizam o prosseguimento da etapa já delimitada quando houver uma autorização explícita anterior para ela. Fora desse caso, devem ser interpretadas como pedido de apresentação do próximo passo.
 
 O agente deve preferir:
 
@@ -67,23 +72,19 @@ O agente pode apresentar código completo para o pequeno incremento em discussã
 
 ---
 
-# 4. Regra de implementação incremental
+# 4. Regra de implementação por etapas
 
-Novas funcionalidades devem ser desenvolvidas em pequenas unidades.
+Novas funcionalidades devem ser desenvolvidas em etapas delimitadas. Na reta final do projeto, uma etapa pode atravessar múltiplas camadas quando isso for necessário para entregar um fluxo demonstrável e reduzir o risco de não conclusão.
 
-A unidade de trabalho padrão deve ser, conforme o caso:
+Cada etapa deve declarar:
 
-- uma estrutura de domínio;
-- uma classe;
-- uma função;
-- um método;
-- um componente;
-- um endpoint;
-- uma regra de negócio;
-- um teste;
-- um pequeno fluxo entre módulos.
+- o resultado esperado;
+- as partes do sistema envolvidas;
+- as decisões que permanecem abertas;
+- os testes ou verificações previstos;
+- as limitações que não serão resolvidas naquela etapa.
 
-Evitar implementar de uma só vez funcionalidades grandes que envolvam múltiplas camadas do sistema.
+As unidades menores continuam sendo úteis para organizar o trabalho, mas não exigem aprovação individual quando estiverem dentro de uma etapa previamente autorizada.
 
 O fluxo preferencial é:
 
@@ -94,15 +95,15 @@ delimitar a responsabilidade
         ↓
 discutir alternativas
         ↓
-escolher o próximo pequeno passo
+definir a próxima etapa concluível
         ↓
-apresentar o código e explicar como implementar e verificar
+apresentar escopo, código ou plano técnico e explicar como verificar
         ↓
-perguntar se pode implementar e aguardar autorização
+obter autorização para a etapa quando ela ainda não estiver autorizada
         ↓
-agente implementa o escopo autorizado ou usuário implementa, se preferir
+agente implementa a etapa autorizada ou usuário implementa, se preferir
         ↓
-agente revisa
+agente revisa o conjunto da etapa
         ↓
 testar
         ↓
@@ -920,7 +921,7 @@ Somente depois o fluxo deve ser transformado em código.
 
 # 42. Quando apresentar código
 
-Quando apresentar código, o agente deve preferir pequenos trechos focados no problema atual.
+Quando apresentar código, o agente deve preferir trechos compreensíveis e relacionados ao escopo da etapa atual. É permitido apresentar ou aplicar alterações que atravessem mais de um módulo quando isso for necessário para completar o fluxo autorizado, desde que as responsabilidades e os limites de cada parte sejam explicados.
 
 O código deve vir acompanhado de explicação sobre:
 
@@ -1019,6 +1020,8 @@ O agente pode:
 
 Essas ações não significam autorização para alterar o projeto.
 
+Depois que uma etapa maior for autorizada, o agente pode executar as alterações, testes, correções locais e atualizações documentais que estejam dentro do escopo dessa etapa sem solicitar aprovação a cada arquivo ou incremento intermediário.
+
 ---
 
 # 47. O que deve ser discutido antes de alterar
@@ -1052,17 +1055,17 @@ Agente relaciona o objetivo ao escopo do TCC
         ↓
 Agente identifica dependências conceituais
         ↓
-Agente propõe o menor próximo passo
+Agente propõe uma etapa concluível, compatível com o prazo
         ↓
-Agente apresenta o código e explica como implementar e verificar
+Agente apresenta escopo, abordagem, código ou plano técnico e explica como verificar
         ↓
-Agente pergunta se pode implementar e aguarda autorização
+Agente pergunta se pode implementar a etapa, quando ela ainda não estiver autorizada
         ↓
-Agente implementa o escopo autorizado ou usuário implementa, se preferir
+Agente implementa toda a etapa autorizada ou usuário implementa, se preferir
         ↓
-Agente revisa
+Agente revisa o conjunto das mudanças
         ↓
-Correções são propostas e autorizadas antes de o agente aplicá-las
+Correções dentro do escopo autorizado são aplicadas e registradas; mudanças fora dele exigem nova autorização
         ↓
 Teste
         ↓

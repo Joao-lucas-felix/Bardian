@@ -1,0 +1,50 @@
+<%# Apresenta a área principal como um painel acadêmico de experimentação.
+    Os cartões são estados visuais; ainda não consultam dados externos. %>
+<% content_for :title, "Bardian — Seu espaço musical" %>
+<% content_for :main_class, "dashboard-page" %>
+
+<div class="dashboard-shell">
+  <aside class="dashboard-sidebar" aria-label="Navegação principal">
+    <%= link_to root_path, class: "dashboard-logo", aria: { label: "Bardian — apresentação" } do %>
+      <span class="dashboard-logo-mark" aria-hidden="true">B</span>
+      <span>Bardian</span>
+    <% end %>
+
+    <p class="dashboard-eyebrow">Workspace</p>
+    <nav class="dashboard-nav" aria-label="Workspace">
+      <a class="dashboard-nav-link is-active" href="#visao-geral" aria-current="page">
+        <span class="dashboard-nav-icon dashboard-nav-icon-home" aria-hidden="true"></span>
+        Visão geral
+      </a>
+      <a class="dashboard-nav-link" href="#composicao">
+        <span class="dashboard-nav-icon dashboard-nav-icon-compose" aria-hidden="true"></span>
+        Composição
+      </a>
+    </nav>
+
+    <p class="dashboard-eyebrow dashboard-eyebrow-secondary">Conhecimento</p>
+    <nav class="dashboard-nav" aria-label="Conhecimento">
+      <a class="dashboard-nav-link" href="#aprendizagem">
+        <span class="dashboard-nav-icon dashboard-nav-icon-learning" aria-hidden="true"></span>
+        Aprendizagem
+      </a>
+    </nav>
+
+    <p class="dashboard-eyebrow dashboard-eyebrow-secondary">Pesquisa</p>
+    <nav class="dashboard-nav" aria-label="Pesquisa">
+      <a class="dashboard-nav-link" href="#experimentos">
+        <span class="dashboard-nav-icon dashboard-nav-icon-research" aria-hidden="true"></span>
+        Experimentos
+      </a>
+    </nav>
+
+    <div class="dashboard-sidebar-footer">
+      <span class="dashboard-status-dot" aria-hidden="true"></span>
+      <span>Protótipo acadêmico</span>
+    </div>
+  </aside>
+
+  <%# Área reservada para o próximo conteúdo definido para a dashboard. %>
+  <main class="dashboard-content" id="visao-geral" aria-label="Área de trabalho">
+  </main>
+</div>

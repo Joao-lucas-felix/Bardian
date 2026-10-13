@@ -1,0 +1,457 @@
+/* Fontes locais: o texto continua visível enquanto os arquivos carregam. */
+@font-face {
+  font-family: "Caveat";
+  src: url("/fonts/caveat.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Patrick Hand";
+  src: url("/fonts/patrick-hand.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* A escrita e o cobre unem as duas cenas sem acrescentar cores concorrentes. */
+.presentation {
+  background: #f4f6f8;
+  color: #29333b;
+  font-family: "Patrick Hand", system-ui, sans-serif;
+  font-size: 19px;
+}
+.presentation, .presentation * { box-sizing: border-box; }
+.presentation ::selection { background: #ead8c5; color: #352d27; }
+.bardian-story { isolation: isolate; }
+
+.story-scene {
+  --story-gutter: clamp(28px, 6vw, 96px);
+  min-height: 100svh;
+  padding: var(--story-gutter);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: #fbfcfd;
+}
+
+/* As ilustrações saem do fluxo e passam a ocupar a mesma cena que o texto. */
+.story-opening {
+  position: sticky;
+  top: 0;
+  overflow: hidden;
+  isolation: isolate;
+  padding-bottom: 96px;
+}
+.story-brand {
+  position: relative;
+  z-index: 2;
+  align-self: flex-start;
+  color: inherit;
+  text-decoration: none;
+  font: 600 32px "Caveat", cursive;
+}
+.story-copy { position: relative; z-index: 1; max-width: 780px; }
+.story-opening .story-copy { margin-block: auto; padding-block: 48px; }
+.story-caption { font-size: 16px; letter-spacing: 0.08em; text-transform: uppercase; color: #61717c; }
+.story-copy h1, .story-copy h2 {
+  margin-block: 20px 28px;
+  font: 500 clamp(52px, 7.5vw, 104px)/1.08 "Caveat", cursive;
+  letter-spacing: normal;
+}
+.story-title-final { position: relative; display: inline-block; }
+.title-flourish {
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 105%;
+  height: 24px;
+  fill: none;
+  stroke: #ad835e;
+  stroke-width: 1.4;
+  opacity: 0.38;
+  pointer-events: none;
+}
+.story-handwriting { font: clamp(24px, 3vw, 32px)/1.4 "Caveat", cursive; }
+.story-link {
+  display: inline-block;
+  margin-top: 28px;
+  padding-block: 8px;
+  color: #60452f;
+  text-decoration: underline;
+  text-decoration-color: #cbb49b;
+  text-underline-offset: 7px;
+  transition: color 180ms ease, text-decoration-color 180ms ease;
+}
+.story-link:hover { color: #292c30; text-decoration-color: currentColor; }
+/* Agrupa a entrada na plataforma e a continuação da leitura, com quebra no celular. */
+.story-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-top: 28px; }
+.story-actions .story-link, .story-actions .story-button { margin-top: 0; }
+/* O link mantém a semântica de navegação, com destaque visual de botão. */
+.story-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  margin-top: 28px;
+  padding: 10px 24px;
+  border: 1px solid #263c48;
+  border-radius: 6px;
+  background: #263c48;
+  color: #f6fafb;
+  text-decoration: none;
+  transition: background-color 180ms ease;
+}
+.story-button:hover { background: #1b2e38; }
+.story-button:focus-visible { outline: 2px solid #477f91; outline-offset: 5px; }
+.story-link:focus-visible, .story-brand:focus-visible, .music-toggle:focus-visible {
+  outline: 2px solid #60452f;
+  outline-offset: 6px;
+}
+
+/* O fundo não bloqueia os links; apenas cordas e controle recebem o ponteiro. */
+.story-music-band {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  color: #9a704b;
+  pointer-events: none;
+}
+.story-music {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* Atenua a decoração na região de leitura e preserva detalhes nas margens. */
+  mask-image: linear-gradient(100deg, #000 0%, #0007 22%, #0006 50%, #000 80%);
+}
+.music-staff { color: #b5a3d5; opacity: 0.28; }
+/* Pastéis alternados dão presença às notas sem aumentar o contraste do fundo. */
+.story-music > g:nth-child(3n + 2) { color: #ba98d6; }
+.story-music > g:nth-child(3n) { color: #7bb9ac; }
+.story-music > g:nth-child(3n + 4) { color: #e7ac8f; }
+
+/* Cada nota tem um período próprio e pausas visuais, sem travessia repetitiva da tela. */
+.ambient-note {
+  fill: currentColor;
+  opacity: 0.3;
+  animation: note-drift var(--duration) ease-in-out infinite;
+  animation-delay: var(--delay);
+  animation-play-state: paused;
+}
+.story-music-band[data-playing="true"] .ambient-note,
+.story-music-band[data-playing="true"] .instrument-string { animation-play-state: running; }
+@keyframes note-drift {
+  0%, 100% { opacity: 0.13; transform: translate(0, 0) rotate(-6deg); }
+  19% { opacity: 0.55; }
+  47% { opacity: 0.35; transform: translate(var(--drift-x), var(--drift-y)) rotate(7deg); }
+  73% { opacity: 0.08; }
+  88% { opacity: 0.25; }
+}
+.music-toggle {
+  position: absolute;
+  bottom: 24px;
+  right: var(--story-gutter);
+  padding: 8px 0;
+  pointer-events: auto;
+  color: #735f50;
+  font: inherit;
+  font-size: 17px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: #d2bdab;
+  text-underline-offset: 4px;
+}
+.music-toggle:hover { color: #352d27; }
+
+/* A boca fica imóvel no centro dos dois eixos, atrás das cordas diagonais. */
+.story-soundhole {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(240px, 32vw, 420px);
+  height: auto;
+  transform: translate(-50%, -50%);
+  opacity: 0.2;
+}
+.soundhole-center { fill: #e1d6ec; }
+.soundhole-ring { fill: none; stroke: #c5a6b2; stroke-width: 1.5; }
+.soundhole-detail { stroke: #dab99a; stroke-dasharray: 2 7; }
+
+/* As cordas cruzam o centro a 45 graus e desaparecem suavemente nas pontas. */
+.story-strings {
+  position: absolute;
+  /* Estende as cordas pela tela, mantendo o centro e o desvanecimento nas pontas. */
+  width: max(120vw, 120svh);
+  height: clamp(140px, 22vh, 200px);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  color: #c49578;
+  opacity: 0.3;
+  overflow: visible;
+  mask-image: linear-gradient(90deg, transparent 0%, #0004 15%, #000 35%, #000 65%, #0004 85%, transparent 100%);
+}
+.string-hit { fill: none; stroke: transparent; stroke-width: 20px; pointer-events: stroke; }
+.instrument-string {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.2px;
+  vector-effect: non-scaling-stroke;
+  transform-origin: 0 0;
+  pointer-events: none;
+  animation: string-pluck calc(9s + var(--string-order) * 2s) linear infinite;
+  animation-delay: calc(var(--string-order) * -2.7s);
+  animation-play-state: paused;
+}
+@keyframes string-pluck {
+  /* A escala mínima conserva o traço quando a corda está em repouso. */
+  0%, 18%, 100% { transform: scaleY(0.01); }
+  2% { transform: scaleY(1); }
+  4% { transform: scaleY(-0.7); }
+  7% { transform: scaleY(0.45); }
+  10% { transform: scaleY(-0.25); }
+  14% { transform: scaleY(0.1); }
+}
+
+/* Na segunda cena, o piano permanece próximo do texto e à frente da ressonância. */
+.story-note {
+  z-index: 2;
+  overflow: hidden;
+  background: #eef3f4;
+  border-top: 1px solid #d5e0e4;
+  padding-inline: 0;
+  padding-bottom: 0;
+  justify-content: flex-start;
+  gap: 32px;
+  color: #29333b;
+}
+.story-note .story-copy { margin-inline: var(--story-gutter); }
+.story-description { max-width: 520px; font-size: 23px; line-height: 1.5; }
+.story-piano { position: relative; z-index: 1; display: block; width: 100%; height: auto; flex-shrink: 0; }
+/* O instrumento mantém a largura da cena; a rolagem local evita teclas minúsculas. */
+.presentation-piano { position: relative; z-index: 1; width: 100%; }
+.piano-status { margin: 0 var(--story-gutter) 16px; min-height: 1.5em; font-size: 18px; color: #60452f; }
+.piano-scroll { overflow-x: auto; scrollbar-color: #ad835e #f7f1e8; }
+.piano-scroll .story-piano { min-width: 700px; }
+.piano-key { cursor: pointer; outline: none; transition: transform 100ms ease-out; }
+.piano-key[aria-disabled="true"] { cursor: wait; }
+/* Os reflexos não interceptam o clique destinado ao grupo da tecla. */
+.piano-key path { pointer-events: none; }
+@media (hover: hover) {
+  .piano-key-white[aria-disabled="false"]:hover .piano-key-surface { fill: #e2d6ec; }
+  .piano-key-black[aria-disabled="false"]:hover .piano-key-surface { fill: #735d82; }
+}
+
+/*
+ * A dashboard usa superfícies, estados e bordas discretas para comunicar
+ * que o Bardian é uma ferramenta acadêmica em construção, não apenas uma
+ * página de apresentação.
+ */
+.dashboard-shell {
+  --dashboard-ink: #263640;
+  --dashboard-muted: #6b7b84;
+  --dashboard-line: #dbe3e7;
+  --dashboard-surface: #ffffff;
+  --dashboard-accent: #2f6d7d;
+  --dashboard-accent-soft: #e7f0f2;
+  min-height: 100svh;
+  display: block;
+  color: var(--dashboard-ink);
+  background: #f4f6f8;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+.dashboard-page {
+  min-height: 100svh;
+  margin: 0;
+  padding: 0;
+  display: block;
+  max-width: none;
+}
+.dashboard-sidebar {
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 20px 22px;
+  border-right: 1px solid var(--dashboard-line);
+  background: #17232d;
+  border-right-color: #293a46;
+}
+.dashboard-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #f3f7f8;
+  font: 650 22px/1 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-decoration: none;
+}
+.dashboard-logo-mark {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 8px;
+  background: #2f8294;
+  color: #fff;
+  font: 600 18px/1 system-ui, sans-serif;
+}
+.dashboard-eyebrow, .dashboard-kicker, .dashboard-card-status {
+  margin: 0;
+  color: var(--dashboard-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.dashboard-eyebrow { margin: 52px 12px 14px; color: #8397a2; }
+.dashboard-eyebrow-secondary { margin-top: 30px; }
+.dashboard-nav { display: grid; gap: 5px; }
+.dashboard-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 42px;
+  padding: 0 12px;
+  border-radius: 6px;
+  color: #9aadb7;
+  font-size: 14px;
+  text-decoration: none;
+}
+.dashboard-nav-icon { position: relative; width: 18px; height: 18px; flex: 0 0 18px; color: #6d8490; }
+.dashboard-nav-icon::before, .dashboard-nav-icon::after { position: absolute; content: ""; }
+.dashboard-nav-icon-home::before { left: 3px; top: 6px; width: 11px; height: 9px; border: 1px solid currentColor; border-radius: 2px; }
+.dashboard-nav-icon-home::after { left: 4px; top: 2px; width: 8px; height: 8px; border-left: 1px solid currentColor; border-top: 1px solid currentColor; transform: rotate(45deg); }
+.dashboard-nav-icon-compose::before { left: 2px; top: 2px; width: 13px; height: 13px; border: 1px solid currentColor; border-radius: 3px; }
+.dashboard-nav-icon-compose::after { left: 6px; top: 5px; width: 5px; height: 5px; border-left: 1px solid currentColor; border-bottom: 1px solid currentColor; }
+.dashboard-nav-icon-learning::before { left: 2px; top: 3px; width: 13px; height: 11px; border: 1px solid currentColor; border-radius: 50%; }
+.dashboard-nav-icon-learning::after { left: 6px; top: 6px; width: 5px; height: 5px; border: 1px solid currentColor; border-radius: 50%; }
+.dashboard-nav-icon-research::before { left: 3px; top: 2px; width: 10px; height: 10px; border: 1px solid currentColor; transform: rotate(45deg); }
+.dashboard-nav-icon-research::after { left: 8px; top: 12px; width: 1px; height: 5px; background: currentColor; transform: rotate(-45deg); }
+.dashboard-nav-link.is-active .dashboard-nav-icon { color: #70c4d3; }
+.dashboard-nav-link:hover, .dashboard-nav-link:focus-visible { background: #223540; color: #f3f7f8; }
+.dashboard-nav-link.is-active { background: #264a57; color: #e8f6f8; font-weight: 700; box-shadow: inset 3px 0 #55aabd; }
+.dashboard-nav-link.is-active span { color: #70c4d3; }
+.dashboard-sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: auto;
+  padding: 14px 12px 0;
+  border-top: 1px solid #293a46;
+  color: #8397a2;
+  font-size: 12px;
+}
+.dashboard-status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #bd8a45; box-shadow: 0 0 0 3px #f3eadb; }
+.dashboard-content { width: min(1180px, 100%); margin-left: 264px; padding: 48px clamp(24px, 5vw, 72px) 36px; }
+.dashboard-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding-bottom: 30px; border-bottom: 1px solid var(--dashboard-line); }
+.dashboard-breadcrumb { margin: 0 0 16px; color: #82929a; font-size: 12px; letter-spacing: .02em; }
+.dashboard-breadcrumb span { padding: 0 7px; color: #b0bdc2; }
+.dashboard-header h1 { margin: 8px 0 10px; font-size: clamp(30px, 4vw, 44px); font-weight: 650; letter-spacing: -0.04em; }
+.dashboard-lead { max-width: 570px; margin: 0; color: var(--dashboard-muted); font-size: 16px; line-height: 1.6; }
+.dashboard-project-state { display: inline-flex; align-items: center; gap: 9px; padding: 9px 12px; border: 1px solid var(--dashboard-line); border-radius: 5px; background: var(--dashboard-surface); color: var(--dashboard-muted); font-size: 12px; white-space: nowrap; }
+.dashboard-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; margin: 26px 0 6px; border: 1px solid var(--dashboard-line); background: var(--dashboard-line); }
+.dashboard-metric { min-height: 108px; display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto 1fr; column-gap: 14px; padding: 18px 20px; background: var(--dashboard-surface); }
+.dashboard-metric-label { color: var(--dashboard-muted); font-size: 12px; }
+.dashboard-metric strong { grid-column: 2; grid-row: 1 / span 2; align-self: center; color: var(--dashboard-ink); font-size: 28px; font-weight: 650; letter-spacing: -.04em; }
+.dashboard-metric-detail { align-self: end; color: #9aa8ad; font-size: 11px; }
+.dashboard-notice { display: flex; gap: 14px; margin: 26px 0 42px; padding: 18px 20px; border: 1px solid #cfe0e5; border-left: 3px solid var(--dashboard-accent); background: #f7fbfc; }
+.dashboard-notice-icon { display: grid; flex: 0 0 23px; width: 23px; height: 23px; place-items: center; border-radius: 50%; background: var(--dashboard-accent-soft); color: var(--dashboard-accent); font-weight: 700; }
+.dashboard-notice strong { font-size: 14px; }
+.dashboard-notice p { margin: 3px 0 0; color: var(--dashboard-muted); font-size: 13px; line-height: 1.5; }
+.dashboard-section { margin-top: 44px; scroll-margin-top: 24px; }
+.dashboard-section-heading { display: flex; justify-content: space-between; align-items: end; margin-bottom: 16px; }
+.dashboard-section-heading h2 { margin: 5px 0 0; font-size: 21px; font-weight: 650; letter-spacing: -0.02em; }
+.dashboard-section-index { color: #a0afb5; font-size: 12px; font-variant-numeric: tabular-nums; }
+.dashboard-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.dashboard-card, .dashboard-learning-panel, .dashboard-experiment-row { border: 1px solid var(--dashboard-line); background: var(--dashboard-surface); }
+.dashboard-card { min-height: 220px; display: flex; flex-direction: column; gap: 18px; padding: 22px; }
+.dashboard-card-primary { border-top: 3px solid var(--dashboard-accent); }
+.dashboard-card-icon { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 7px; background: var(--dashboard-accent-soft); color: var(--dashboard-accent); font-size: 20px; }
+.dashboard-card-icon::before, .dashboard-card-icon::after { content: ""; display: block; }
+.dashboard-card-icon-compose::before { width: 13px; height: 13px; border: 1px solid currentColor; border-radius: 3px; }
+.dashboard-card-icon-compose::after { position: absolute; width: 6px; height: 6px; border-left: 1px solid currentColor; border-bottom: 1px solid currentColor; transform: translate(2px, -2px); }
+.dashboard-card-icon-sound::before { width: 14px; height: 14px; border: 1px solid currentColor; border-radius: 50%; }
+.dashboard-card-icon-sound::after { width: 4px; height: 4px; border: 1px solid currentColor; border-radius: 50%; }
+.dashboard-card-icon { position: relative; }
+.dashboard-card h3, .dashboard-learning-panel h3, .dashboard-experiment-row h3 { margin: 7px 0 6px; font-size: 17px; font-weight: 650; }
+.dashboard-card p, .dashboard-learning-panel p, .dashboard-experiment-row p { margin: 0; color: var(--dashboard-muted); font-size: 14px; line-height: 1.6; }
+.dashboard-card-action { align-self: flex-start; margin-top: auto; color: var(--dashboard-accent); font-size: 12px; font-weight: 700; text-decoration: none; }
+.dashboard-card-action span { display: inline-block; margin-left: 5px; transition: transform 160ms ease; }
+.dashboard-card-action:hover { text-decoration: none; }
+.dashboard-card-action:hover span { transform: translateX(3px); }
+.dashboard-card-action-muted { color: #9aa8ad; font-weight: 600; }
+.dashboard-learning-panel { display: flex; align-items: center; justify-content: space-between; gap: 32px; padding: 24px; }
+.dashboard-learning-steps { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; max-width: 290px; }
+.dashboard-learning-steps span, .dashboard-pill { padding: 7px 9px; border: 1px solid var(--dashboard-line); border-radius: 4px; color: var(--dashboard-muted); font-size: 12px; }
+.dashboard-experiment-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px 22px; }
+.dashboard-pill { background: #faf6ef; border-color: #eadcc8; color: #8c6b3d; }
+.dashboard-footer { display: flex; justify-content: space-between; gap: 20px; margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--dashboard-line); color: var(--dashboard-muted); font-size: 12px; }
+.dashboard-back-link { color: var(--dashboard-accent); text-decoration: none; }
+.dashboard-back-link:hover { text-decoration: underline; }
+.dashboard-nav-link:focus-visible, .dashboard-logo:focus-visible, .dashboard-back-link:focus-visible, .dashboard-card-action:focus-visible { outline: 2px solid #70c4d3; outline-offset: 4px; }
+
+@media (max-width: 800px) {
+  .dashboard-shell { display: block; }
+  .dashboard-sidebar { position: static; height: auto; display: block; padding: 18px 20px 12px; border-right: 0; border-bottom: 1px solid #293a46; }
+  .dashboard-eyebrow { display: none; }
+  .dashboard-nav { display: flex; gap: 4px; margin-top: 18px; overflow-x: auto; }
+  .dashboard-nav-link { flex: 0 0 auto; }
+  .dashboard-sidebar-footer { display: none; }
+  .dashboard-content { width: auto; margin-left: 0; padding: 32px 20px; }
+  .dashboard-header { display: block; }
+  .dashboard-project-state { margin-top: 22px; }
+  .dashboard-metrics { grid-template-columns: 1fr; }
+  .dashboard-metric { min-height: 82px; }
+}
+@media (max-width: 560px) {
+  .dashboard-card-grid { grid-template-columns: 1fr; }
+  .dashboard-learning-panel, .dashboard-experiment-row, .dashboard-footer { display: block; }
+  .dashboard-learning-steps { justify-content: flex-start; margin-top: 20px; }
+  .dashboard-pill { display: inline-block; margin-top: 14px; }
+  .dashboard-footer span { display: block; margin-top: 12px; }
+}
+.piano-key:focus-visible .piano-key-surface { stroke: #684083; stroke-width: 3px; vector-effect: non-scaling-stroke; }
+.piano-key.is-playing { transform: translateY(3px); }
+.piano-key-white.is-playing .piano-key-surface { fill: #b8dcd0; }
+.piano-key-black.is-playing .piano-key-surface { fill: #426d61; }
+.piano-resonance {
+  position: absolute;
+  right: -8%;
+  top: 2%;
+  width: 65%;
+  height: 80%;
+  fill: none;
+  stroke: #9a704b;
+  stroke-width: 1.2;
+  opacity: 0.09;
+  pointer-events: none;
+}
+
+/* Reduz a densidade visual e mantém controles acessíveis em telas pequenas. */
+@media (max-width: 700px) {
+  .story-opening .story-copy { padding-block: 40px; }
+  .story-music { opacity: 0.85; }
+  .story-music > g:nth-last-child(-n+3) { display: none; }
+  .story-strings { opacity: 0.22; }
+  .story-soundhole { opacity: 0.16; }
+  .piano-resonance { opacity: 0.05; width: 100%; right: -30%; }
+}
+@media (max-width: 700px), (max-height: 600px), (prefers-reduced-motion: reduce) {
+  .story-opening { position: relative; }
+}
+/* A alternativa estática conserva a composição e elimina movimentos decorativos. */
+@media (prefers-reduced-motion: reduce) {
+  .ambient-note { animation: none; opacity: 0.3; }
+  .instrument-string { animation: none; transform: scaleY(0.01); }
+  .music-toggle { display: none; }
+  .story-link, .story-button { transition: none; }
+  .piano-key { transition: none; }
+  .piano-key.is-playing { transform: none; }
+}

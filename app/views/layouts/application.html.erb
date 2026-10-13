@@ -24,7 +24,8 @@
   </head>
 
   <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+    <%# Permite que a apresentação ocupe a tela, mantendo o padrão das demais páginas. %>
+    <main class="<%= content_for?(:main_class) ? yield(:main_class) : "container mx-auto mt-28 px-5 flex" %>">
       <%= yield %>
     </main>
   </body>

@@ -1,5 +1,11 @@
 # README
 
+## Documentação do projeto
+
+- [Convenções do domínio musical](docs/dominio-musical.md)
+- [Decisão de áudio: Tone.js e Salamander locais](docs/decisao-audio.md)
+- [Estado atual do projeto](docs/estado-atual.md)
+
 This README would normally document whatever steps are necessary to get the
 application up and running.
 

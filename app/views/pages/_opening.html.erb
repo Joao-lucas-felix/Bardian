@@ -1,0 +1,38 @@
+<%# Cena de abertura com mensagem e ilustrações decorativas; não recebe locals. %>
+<section class="story-scene story-opening" aria-labelledby="opening-title"
+         data-action="pointermove->music-story#pointStrings pointerleave->music-story#leaveStrings">
+  <a class="story-brand" href="/" aria-label="Bardian — início">Bardian</a>
+
+  <div class="story-copy">
+    <p class="story-caption">Um ateliê para criar e aprender música</p>
+    <h1 id="opening-title">Sua criatividade<br><span class="story-title-final">dá o tom.
+      <%# Um gesto de lápis discreto reforça a frase sem disputar sua leitura. %>
+      <svg class="title-flourish" viewBox="0 0 360 24" aria-hidden="true" focusable="false">
+        <path d="M 5 15 Q 165 0 350 12 M 35 21 Q 180 11 285 17" />
+      </svg>
+    </span></h1>
+    <p class="story-handwriting">
+      Toda composição começa com uma ideia.
+    </p>
+    <div class="story-actions">
+      <%# Leva o visitante da apresentação à área principal do Bardian. %>
+      <%= link_to "Ir para o Bardian", dashboard_path, class: "story-button" %>
+      <a class="story-link" href="#primeiro-som">Explore a proposta ↓</a>
+    </div>
+  </div>
+
+  <%# Camadas musicais de fundo preservam o primeiro plano para a mensagem. %>
+  <div class="story-music-band" data-music-story-target="band" data-playing="false">
+    <%# Mantém a roseta atrás das cordas na composição visual. %>
+    <%= render "pages/soundhole" %>
+    <%# Pares de cordas evocam um alaúde; o dedilhado permanece apenas visual. %>
+    <%= render "pages/instrument_strings" %>
+    <%# Tempos e trajetórias distintos evitam a aparência de uma esteira de notas. %>
+    <%= render "pages/ambient_music" %>
+    <%# O botão só aparece quando o controller consegue controlar a animação. %>
+    <button type="button" class="music-toggle" hidden
+            data-music-story-target="button" data-action="music-story#toggle">
+      Pausar animação
+    </button>
+  </div>
+</section>

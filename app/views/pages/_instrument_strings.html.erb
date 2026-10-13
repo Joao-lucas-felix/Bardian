@@ -1,0 +1,19 @@
+<%# Desenha seis pares de cordas decorativas; não recebe locals.
+    Usa as classes da apresentação e a interação do controller music-story. %>
+<svg class="story-strings" viewBox="0 0 1400 160"
+     preserveAspectRatio="none" aria-hidden="true" focusable="false">
+  <%# Cada par contém as posições verticais de suas duas cordas decorativas.
+      O índice do par mantém as duas cordas na mesma sequência de animação. %>
+  <% [[28, 32], [48, 52], [68, 72], [88, 92], [108, 112], [128, 132]].each_with_index do |positions, pair_index| %>
+    <% positions.each do |y| %>
+      <g transform="translate(0 <%= y %>)">
+        <%# Traço transparente preservado nesta extração; a seleção da corda
+          é calculada pelo controller a partir das coordenadas do ponteiro. %>
+        <path class="string-hit" d="M 0 0 H 1400" />
+        <path class="instrument-string"
+              style="--string-order: <%= pair_index %>"
+              d="M 0 0 Q 700 8 1400 0" />
+      </g>
+    <% end %>
+  <% end %>
+</svg>

@@ -1,0 +1,14 @@
+Salamander Grand Piano — sample A4.mp3
+
+Autor: Alexander Holm.
+Licença indicada nesta distribuição: Creative Commons Attribution 3.0.
+Licença: https://creativecommons.org/licenses/by/3.0/
+Créditos e informações originais: README.upstream (preservado integralmente).
+
+Origem: https://github.com/Tonejs/audio/tree/master/salamander
+Sample: https://raw.githubusercontent.com/Tonejs/audio/master/salamander/A4.mp3
+README: https://raw.githubusercontent.com/Tonejs/audio/master/salamander/README
+Obtido em: 2026-10-06.
+Alterações no sample: nenhuma; apenas um arquivo da coleção foi incluído.
+SHA-256 de A4.mp3:
+a62df24a2c84cea8d18c1fa8aca7c18c877ba2b76a00a591256fa74d3ce54ac3

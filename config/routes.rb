@@ -1,4 +1,10 @@
 Rails.application.routes.draw do
+  # Apresenta o projeto na página inicial.
+  root "pages#home"
+
+  # Disponibiliza a entrada da área principal do projeto.
+  get "dashboard", to: "dashboard#index", as: :dashboard
+
   get "audio_demo/index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

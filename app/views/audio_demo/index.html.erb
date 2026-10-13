@@ -1,18 +1,16 @@
-<button id="play-note" 
-        class="bg-blue-500 
-              hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Tocar Lá
-</button>
+<%# Demonstração mínima para validar carregamento e reprodução do piano. %>
+<div data-controller="audio-demo">
+  <button
+    id="play-note"
+    type="button"
+    disabled
+    data-audio-demo-target="button"
+    data-action="click->audio-demo#play"
+    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50">
+    Tocar Lá
+  </button>
 
-<script>
-  document.getElementById("play-note").addEventListener("click", () => {
-    const context = new AudioContext()
-    const oscillator = context.createOscillator()
-
-    oscillator.frequency.value = 261.63
-    oscillator.connect(context.destination)
-
-    oscillator.start()
-    oscillator.stop(context.currentTime + 0.5)
-  })
-</script>
+  <p data-audio-demo-target="status" role="status">
+    Carregando piano…
+  </p>
+</div>
