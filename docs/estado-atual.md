@@ -59,6 +59,17 @@ corporativa; a fonte manuscrita permanece somente na marca. Em telas estreitas,
 a barra lateral se transforma em uma navegação horizontal. Não há atualmente
 editor, lições, persistência de composição ou dados pessoais nessa tela.
 
+### Autenticação
+
+O sistema usa Devise com um único modelo `User` e as roles `user` e `admin`.
+O cadastro público cria somente usuários comuns. A dashboard é protegida no
+controller e aceita apenas administradores autenticados.
+
+O administrador inicial é criado pelo `db/seeds.rb` usando `ADMIN_EMAIL` e
+`ADMIN_PASSWORD`. O seed é idempotente e falha quando qualquer uma das
+variáveis está ausente. Recuperação de senha, confirmação de e-mail, MFA e
+OAuth ainda não fazem parte do escopo.
+
 ### Reprodução de áudio
 
 A rota `/audio_demo` valida a reprodução de uma nota usando Tone.js local e um

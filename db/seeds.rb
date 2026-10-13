@@ -1,9 +1,17 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+# Cria os registros necessários para executar a aplicação em qualquer ambiente.
+# O seed é idempotente e pode ser executado novamente sem duplicar o administrador.
+
+# Lê as credenciais fora do repositório para não versionar uma senha real.
+admin_email = ENV["ADMIN_EMAIL"].to_s.strip
+admin_password = ENV["ADMIN_PASSWORD"].to_s
+
+if admin_email.empty? || admin_password.empty?
+  raise ArgumentError, "ADMIN_EMAIL e ADMIN_PASSWORD devem ser informados para criar o administrador"
+end
+
+# O e-mail identifica exclusivamente a conta que o seed pode administrar.
+admin = User.find_or_initialize_by(email: admin_email)
+admin.role = :admin
+admin.password = admin_password
+admin.password_confirmation = admin_password
+admin.save!
