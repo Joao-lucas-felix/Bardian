@@ -1,0 +1,15 @@
+Virtuosity Drums — kit acústico
+Projeto: https://github.com/sfzinstruments/virtuosity_drums
+Autoria: Versilian Studios / Karoryfer; bateria gravada por Austin McMahon
+Licença: CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/)
+Conversão: FLAC original para MP3 com ffmpeg, libmp3lame -q:a 5, sem mudança de altura.
+
+kick.mp3 <- Samples/kickmic/kick/kickmic_kick_snon_vl3_rr1.flac
+URL: https://github.com/sfzinstruments/virtuosity_drums/blob/master/Samples/kickmic/kick/kickmic_kick_snon_vl3_rr1.flac
+SHA-256 original: a317688b4a81cb833c579f0004beb4fef46b3c80c858448fe3413b2f9b9410be
+snare.mp3 <- Samples/mid/snare/mid_snare_center_vl16.flac
+URL: https://github.com/sfzinstruments/virtuosity_drums/blob/master/Samples/mid/snare/mid_snare_center_vl16.flac
+SHA-256 original: dd4e1de6e84465f94b26e8dbdfdf0f4e72999a7d5ed348a76ab9c8a73d74da79
+hat.mp3 <- Samples/mid/hh/mid_hh_closed_vl3_rr1.flac
+URL: https://github.com/sfzinstruments/virtuosity_drums/blob/master/Samples/mid/hh/mid_hh_closed_vl3_rr1.flac
+SHA-256 original: 5a747638b0acb5dc42f2e68c61b29085a489af524bdd5da180cb1de542e1bad1

@@ -1,0 +1,17 @@
+<%# Apresenta a função musical e entrega ao card apenas dados de exibição. %>
+<section class="creation-layer" aria-labelledby="creation-layer-<%= layer[:key] %>-title">
+  <div class="creation-layer-heading">
+    <h3 id="creation-layer-<%= layer[:key] %>-title"><%= layer[:title] %></h3>
+    <p><%= layer[:description] %></p>
+    <% if layer[:key] == "drums" %>
+      <span class="creation-instrument-static">Som: Bateria básica</span>
+    <% else %>
+      <label class="creation-instrument-label" for="instrument-<%= layer[:key] %>-<%= segment %>">Som da frase</label>
+      <select id="instrument-<%= layer[:key] %>-<%= segment %>" class="creation-instrument-select" data-creation-key-param="<%= layer[:key] %>:<%= segment %>" data-action="change->creation#changeInstrument">
+        <option value="piano">Piano acústico</option>
+        <option value="strings">Cordas</option>
+      </select>
+    <% end %>
+  </div>
+  <%= render "pages/midi_phrase_card", layer: layer, segment: segment %>
+</section>

@@ -1,0 +1,39 @@
+<%# Navegação global entre áreas existentes; a administração só aparece a administradores. %>
+<header class="product-header">
+  <div class="product-header-inner">
+    <%= link_to root_path, class: "product-brand", aria: { label: "Bardian — início" } do %>
+      <span class="product-brand-mark" aria-hidden="true">b.</span>
+      <span>Bardian</span>
+    <% end %>
+
+    <nav class="product-nav" aria-label="Navegação principal">
+      <%= link_to root_path, class: "product-nav-link #{'is-current' if current_page?(root_path)}", aria: (current_page?(root_path) ? { current: "page" } : {}) do %>
+        <%= bard_icon(:home) %><span>Início</span>
+      <% end %>
+      <%= link_to notes_lesson_path, class: "product-nav-link #{'is-current' if current_page?(notes_lesson_path)}", aria: (current_page?(notes_lesson_path) ? { current: "page" } : {}) do %>
+        <%= bard_icon(:book) %><span>Aprender</span>
+      <% end %>
+      <%= link_to compose_path, class: "product-nav-link #{'is-current' if current_page?(compose_path)}", aria: (current_page?(compose_path) ? { current: "page" } : {}) do %>
+        <%= bard_icon(:create) %><span>Criar</span>
+      <% end %>
+      <%= link_to presentation_path, class: "product-nav-link #{'is-current' if current_page?(presentation_path)}", aria: (current_page?(presentation_path) ? { current: "page" } : {}) do %>
+        <%= bard_icon(:compass) %><span>Sobre</span>
+      <% end %>
+      <% if user_signed_in? && current_user.admin? %>
+        <%= link_to dashboard_path, class: "product-nav-link #{'is-current' if current_page?(dashboard_path)}", aria: (current_page?(dashboard_path) ? { current: "page" } : {}) do %>
+          <%= bard_icon(:admin) %><span>Painel</span>
+        <% end %>
+      <% end %>
+    </nav>
+
+    <div class="product-header-actions">
+      <div class="theme-control" data-controller="theme">
+        <button type="button" class="theme-toggle" data-theme-target="toggle"
+                data-action="click->theme#toggle" aria-pressed="false" aria-label="Ativar tema escuro">
+          <%= bard_icon(:moon) %><span data-theme-target="label">Tema escuro</span>
+        </button>
+      </div>
+      <%= render "shared/account_navigation" %>
+    </div>
+  </div>
+</header>

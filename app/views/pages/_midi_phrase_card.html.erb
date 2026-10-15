@@ -1,0 +1,20 @@
+<%# O card oferece uma frase e seu painel, inicialmente vazio e recolhido. %>
+<% phrase_key = "#{layer[:key]}:#{segment}" %>
+<% panel_id = "phrase-panel-#{layer[:key]}-#{segment}" %>
+<article class="midi-phrase-card" data-creation-target="card" data-phrase-key="<%= phrase_key %>" data-audio-enabled="<%= layer[:audio_enabled] %>" data-part-name="<%= layer[:title] %>">
+  <div class="midi-phrase-track-viewport" data-creation-target="timeline" data-action="scroll->creation#syncTimeline">
+    <div class="midi-phrase-track">
+      <button class="midi-phrase-toggle" type="button" data-creation-key-param="<%= phrase_key %>" data-action="click->creation#toggle" aria-expanded="false" aria-controls="<%= panel_id %>" aria-label="Abrir frase de <%= layer[:title] %> no Trecho <%= segment %>">
+        <span class="midi-phrase-title">Frase <%= segment %></span>
+        <span class="midi-phrase-hint">Toque para ver e editar as notas</span>
+        <span class="midi-phrase-toggle-icon" aria-hidden="true"><%= bard_icon(:arrow) %></span>
+      </button>
+      <div class="midi-phrase-preview" data-creation-target="preview" aria-label="Trecho <%= segment %>, <%= layer[:title] %>: nenhuma nota">
+        <canvas aria-hidden="true"></canvas>
+        <span class="midi-phrase-empty">Nenhuma nota ainda · toque para começar</span>
+        <span class="midi-phrase-count" aria-hidden="true"></span>
+      </div>
+    </div>
+  </div>
+  <div class="midi-phrase-panel" id="<%= panel_id %>" data-creation-target="panel" hidden></div>
+</article>

@@ -1,0 +1,38 @@
+<%# Retoma as três notas da prática e apresenta altura, início e duração no tempo. %>
+<section class="lesson-section lesson-piano-roll" data-lesson-section="piano-roll" aria-labelledby="lesson-roll-title">
+  <div class="lesson-section-heading">
+    <h2 id="lesson-roll-title">O piano roll mostra o que você acabou de ouvir</h2>
+    <p>
+      Lembra de Dó4 → Ré4 → Mi4? No <strong>piano roll</strong>, cada uma dessas notas
+      vira um bloco. Os blocos mostram a ordem em que os sons acontecem.
+    </p>
+  </div>
+
+  <div class="lesson-roll-layout">
+    <figure class="lesson-roll-example">
+      <div class="lesson-roll-example-plot" aria-hidden="true">
+        <span class="lesson-roll-example-axis">Altura ↑</span>
+        <div class="lesson-roll-example-row"><span>Mi4 · E4</span><i class="lesson-roll-block lesson-roll-block-mi"></i></div>
+        <div class="lesson-roll-example-row"><span>Ré4 · D4</span><i class="lesson-roll-block lesson-roll-block-re"></i></div>
+        <div class="lesson-roll-example-row"><span>Dó4 · C4</span><i class="lesson-roll-block lesson-roll-block-do"></i></div>
+        <span class="lesson-roll-example-time">Tempo →</span>
+      </div>
+      <figcaption>Dó4 começa primeiro, Ré4 vem depois e Mi4 começa por último. Neste exemplo, Mi4 dura mais tempo.</figcaption>
+    </figure>
+
+    <div class="lesson-prose">
+      <p>
+        <strong>De baixo para cima:</strong> Dó4, Ré4, Mi4. Quanto mais alta a linha,
+        mais aguda é a nota. É a mesma mudança que você ouviu no piano.
+      </p>
+      <p>
+        <strong>Da esquerda para a direita:</strong> os blocos mostram qual nota
+        começa primeiro. Um bloco mais comprido representa um som mais longo.
+        Por isso, neste desenho, Mi4 dura mais que Dó4 e Ré4.
+      </p>
+      <p>Se você mudar a posição ou o tamanho de um bloco no editor, poderá ouvir como a música muda. Assim, criar também vira um jeito de aprender.</p>
+    </div>
+  </div>
+
+  <p class="lesson-roll-action"><%= link_to "Experimentar no editor", components_path %> para desenhar suas notas. O editor ainda não salva composições.</p>
+</section>

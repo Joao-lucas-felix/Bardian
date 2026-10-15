@@ -7,8 +7,9 @@
 # Ignore bundler config.
 /.bundle
 
-# Ignore all environment files.
+# Ignora arquivos de ambiente locais, mas mantém o modelo sem credenciais.
 /.env*
+!/.env.example
 
 # Ignore all logfiles and tempfiles.
 /log/*

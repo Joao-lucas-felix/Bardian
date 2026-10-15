@@ -4,6 +4,16 @@ require "test_helper"
 class AuthenticationTest < ActionDispatch::IntegrationTest
   include Devise::Test::IntegrationHelpers
 
+  test "formularios de acesso oferecem retorno ao inicio e a apresentacao" do
+    [ new_user_session_path, new_user_registration_path ].each do |path|
+      get path
+
+      assert_response :success
+      assert_select 'a[href="/"]', text: "Início"
+      assert_select 'a[href="/apresentacao"]', text: "Apresentação"
+    end
+  end
+
   test "cadastro público cria usuário comum mesmo com role enviada" do
     assert_difference("User.count", 1) do
       post user_registration_path, params: {

@@ -17,7 +17,16 @@
     <p class="story-handwriting">
       Uma trilha de aprendizagem em desenvolvimento.
     </p>
-    <%# Oferece acesso à área principal ao concluir a apresentação. %>
-    <%= link_to "Ir para o Bardian", dashboard_path, class: "story-button" %>
+    <%# Oferece um próximo passo acessível ao concluir a apresentação. %>
+    <%= link_to "Primeiras notas", notes_lesson_path, class: "story-button" %>
+    <% if user_signed_in? %>
+      <% if current_user.admin? %>
+        <%= link_to "Ir para o Bardian", dashboard_path, class: "story-button" %>
+      <% else %>
+        <%= link_to "Voltar ao início", root_path, class: "story-button" %>
+      <% end %>
+    <% else %>
+      <%= link_to "Entrar no Bardian", new_user_session_path, class: "story-button" %>
+    <% end %>
   </div>
 </section>

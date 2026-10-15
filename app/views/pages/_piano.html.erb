@@ -1,14 +1,15 @@
-<%# Piano interativo de Dó4 a Si5, com sete teclas brancas e cinco pretas por oitava.
-    Não recebe locals. As alturas são identificadores de reprodução para o Tone.js.
-    Os IDs dos gradientes e da sombra pressupõem uma instância por página. %>
-<div class="presentation-piano" data-controller="piano">
+<%# Piano interativo configurável por oitavas, com sete teclas brancas e cinco pretas por oitava.
+    Recebe local :octaves e mantém Dó4–Si5 como padrão da apresentação.
+    As alturas são identificadores de reprodução para o Tone.js. %>
+<% octaves = local_assigns.fetch(:octaves, [4, 5]) %>
+<div class="presentation-piano" data-controller="piano" data-piano-octaves="<%= octaves.join(',') %>">
   <p class="piano-status" role="status" data-piano-target="status">
     Ative o JavaScript para tocar o piano.
   </p>
   <%# A rolagem local preserva o tamanho das teclas em telas estreitas. %>
   <div class="piano-scroll">
-    <svg class="story-piano" viewBox="0 0 1400 320"
-         role="group" aria-label="Piano de duas oitavas, de Dó4 a Si5">
+    <svg class="story-piano" viewBox="0 0 <%= octaves.length * 700 %> 320"
+         role="group" aria-label="Piano de <%= octaves.length %> <%= octaves.length == 1 ? 'oitava' : 'oitavas' %>, de Dó<%= octaves.first %> a Si<%= octaves.last %>">
       <defs>
         <%# Gradientes simulam luz sobre as superfícies das teclas. %>
         <linearGradient id="piano-ivory" x2="0" y2="1">
@@ -34,10 +35,10 @@
       <g opacity="0.85">
         <%# Cada posição relaciona o nome legível à altura enviada ao sampler.
             O deslocamento de sete teclas coloca a segunda oitava à direita. %>
-        <% [4, 5].each_with_index do |octave, octave_index| %>
+        <% octaves.each_with_index do |octave, octave_index| %>
           <% [["C", "Dó"], ["D", "Ré"], ["E", "Mi"], ["F", "Fá"], ["G", "Sol"], ["A", "Lá"], ["B", "Si"]].each_with_index do |(pitch, name), index| %>
-            <% x = (octave_index * 7 + index) * 100 %>
-            <g class="piano-key piano-key-white" role="button" tabindex="0"
+          <% x = (octave_index * 7 + index) * 100 %>
+          <g class="piano-key piano-key-white" role="button" tabindex="0"
                aria-label="<%= name %><%= octave %>" aria-disabled="true"
                data-piano-target="key" data-piano-note-param="<%= pitch %><%= octave %>"
                data-action="click->piano#play keydown.enter->piano#play keydown.space->piano#play">
@@ -45,17 +46,21 @@
                     width="98" height="302" rx="12"
                     fill="url(#piano-ivory)" stroke="#C5B498" />
               <path d="M <%= x + 8 %> 299 h 84" stroke="#D1BFA5" stroke-width="3" />
+              <%# Na lição de uma oitava, o nome visível permite localizar a tecla pedida no exercício. %>
+              <% if octaves.length == 1 %>
+                <text class="piano-key-label piano-key-label-white" x="<%= x + 50 %>" y="278" text-anchor="middle" aria-hidden="true"><%= name %><%= octave %></text>
+              <% end %>
             </g>
           <% end %>
         <% end %>
 
         <%# As pretas são desenhadas por último para ficarem sobre as brancas.
             As posições 1, 2, 4, 5 e 6 formam os grupos de duas e três teclas. %>
-        <% [4, 5].each_with_index do |octave, octave_index| %>
+        <% octaves.each_with_index do |octave, octave_index| %>
           <% [[1, "C#", "Dó sustenido"], [2, "D#", "Ré sustenido"], [4, "F#", "Fá sustenido"], [5, "G#", "Sol sustenido"], [6, "A#", "Lá sustenido"]].each do |position, pitch, name| %>
-            <% x = (octave_index * 7 + position) * 100 %>
-            <g class="piano-key piano-key-black" role="button" tabindex="0"
-               aria-label="<%= name %><%= octave %>" aria-disabled="true"
+          <% x = (octave_index * 7 + position) * 100 %>
+          <g class="piano-key piano-key-black" role="button" tabindex="0"
+               aria-label="<%= name %> <%= octave %>" aria-disabled="true"
                data-piano-target="key" data-piano-note-param="<%= pitch %><%= octave %>"
                data-action="click->piano#play keydown.enter->piano#play keydown.space->piano#play"
                filter="url(#piano-key-shadow)">
@@ -63,6 +68,9 @@
                     width="60" height="192" rx="10" fill="url(#piano-ebony)" />
               <path d="M <%= x - 22 %> 14 v 162"
                     stroke="#89715B" stroke-opacity="0.5" stroke-width="2" />
+              <% if octaves.length == 1 %>
+                <text class="piano-key-label piano-key-label-black" x="<%= x %>" y="172" text-anchor="middle" aria-hidden="true"><%= name.gsub(" sustenido", "♯") %><%= octave %></text>
+              <% end %>
             </g>
           <% end %>
         <% end %>

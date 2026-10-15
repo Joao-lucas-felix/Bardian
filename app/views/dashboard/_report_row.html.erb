@@ -1,0 +1,28 @@
+<%# Mostra o resumo da entrega e deixa a lista de alterações disponível sob demanda. %>
+<tr class="dashboard-report-row">
+  <td>
+    <strong class="dashboard-report-title"><%= report.title %></strong>
+    <p class="dashboard-report-description"><%= report.description %></p>
+  </td>
+  <td><time datetime="<%= report.delivered_on.iso8601 %>"><%= report.delivered_on.strftime("%d/%m/%Y") %></time></td>
+  <td>
+    <div class="dashboard-tags">
+      <% report.tags.each do |tag| %>
+        <span class="dashboard-tag"><%= tag %></span>
+      <% end %>
+    </div>
+  </td>
+  <td><%= link_to "Testar", report.test_path, class: "dashboard-test-link" %></td>
+</tr>
+<tr class="dashboard-report-details">
+  <td colspan="4">
+    <details>
+      <summary>Ver alterações</summary>
+      <ul>
+        <% report.changes.each do |change| %>
+          <li><%= change %></li>
+        <% end %>
+      </ul>
+    </details>
+  </td>
+</tr>

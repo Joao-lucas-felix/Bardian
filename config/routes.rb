@@ -2,8 +2,20 @@ Rails.application.routes.draw do
   # Expõe os fluxos de cadastro, login e logout do modelo User.
   devise_for :users
 
-  # Apresenta o projeto na página inicial.
+  # Reúne os caminhos principais na página inicial.
   root "pages#home"
+
+  # Mantém a apresentação pública em uma rota própria.
+  get "apresentacao", to: "pages#presentation", as: :presentation
+
+  # Reúne componentes musicais experimentais sem misturá-los à apresentação.
+  get "componentes", to: "pages#components", as: :components
+
+  # Abre a primeira composição guiada, mantendo o protótipo independente.
+  get "criar", to: "pages#compose", as: :compose
+
+  # Abre a primeira lição independente do Caminho do Bardo.
+  get "caminho-do-bardo/notas", to: "pages#notes_lesson", as: :notes_lesson
 
   # Disponibiliza a entrada da área principal do projeto.
   get "dashboard", to: "dashboard#index", as: :dashboard

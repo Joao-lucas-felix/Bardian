@@ -1,0 +1,116 @@
+# Cada entrega concluída possui uma descrição verificável e uma rota interna de teste.
+reports:
+  - slug: arranjo-canvas-instrumentos-iniciais
+    title: Frases alinhadas e instrumentos iniciais
+    description: A criação reúne quatro frases no mesmo trecho, com prévias ilustrativas em Canvas, editor compacto e timbres locais de piano, cordas e bateria.
+    changes:
+      - Alinhou as quatro camadas numa régua comum de quatro compassos e desenhou prévias derivadas das notas MIDI, sem representar áudio gravado.
+      - Reduziu a altura visível do piano roll na criação e mostrou a Bateria em três linhas próprias para bumbo, caixa e chimbal.
+      - Permitiu escolher piano acústico ou cordas em cada frase melódica sem alterar as notas; a Bateria usa um kit fixo.
+      - Reproduziu as frases individualmente com amostras locais e registrou origem e licença CC0 das novas amostras em SOURCE.txt.
+      - Corrigiu o ataque quase inaudível das cordas em notas curtas, ajustando as cinco amostras e o volume do instrumento sem alterar o MIDI.
+      - Verificou testes Rails e JavaScript, RuboCop, formatos MP3 e os fluxos de abertura, troca de som e reprodução no navegador.
+      - Manteve as frases apenas na memória da página; não há salvamento nem reprodução simultânea das camadas.
+    delivered_on: "2026-10-15"
+    tags:
+      - Composição
+      - Interface
+      - Áudio
+    test_path: /criar
+
+  - slug: criacao-camadas-frases
+    title: Criação musical por camadas e frases
+    description: A página de criação organiza um trecho de quatro compassos em frases independentes de Harmonia, Baixo, Melodia e Bateria.
+    changes:
+      - Adicionou /criar como destino principal de criação, preservando o protótipo em /componentes.
+      - Criou cards de frase com prévia das notas reais e expansão de um piano roll por vez.
+      - Mantém as notas de cada camada separadas enquanto a página está aberta, sem salvamento ao recarregar.
+      - Reutiliza o editor MIDI existente e desabilita reprodução na Bateria enquanto não há timbre de percussão.
+      - Verificou navegação, troca de frases, restauração de notas, tema escuro e testes Rails e JavaScript.
+    delivered_on: "2026-10-15"
+    tags:
+      - Composição
+      - Interface
+      - MIDI
+    test_path: /criar
+
+  - slug: interface-produtividade-aprendizagem
+    title: Interface unificada para criação e aprendizagem
+    description: Reorganizou a navegação e o visual do Bardian para apresentar os caminhos de aprender e criar com clareza a quem está começando.
+    changes:
+      - Criou navegação global com destinos reais e ícones SVG consistentes, respeitando o acesso administrativo.
+      - Substituiu a tipografia manuscrita das superfícies de produto por uma família sem serifa e definiu cores compartilhadas para os temas claro e escuro.
+      - Reorganizou a página inicial, a apresentação, a lição, o editor, os formulários, a área administrativa e a demonstração de áudio.
+      - Ajustou rótulos e ajuda do piano roll para orientar iniciantes e indicar que o protótipo ainda não salva composições.
+    delivered_on: "2026-10-14"
+    tags:
+      - Interface
+      - Acessibilidade
+    test_path: /
+
+  - slug: caminho-do-bardo-primeiras-notas
+    title: Primeira lição do Caminho do Bardo
+    description: Criou uma página própria e uma sequência didática para apresentar o Bardian, comparar notas no piano e ler a mesma ideia musical no piano roll.
+    changes:
+      - Adicionou a rota /caminho-do-bardo/notas e a composição da primeira lição em partials de apresentação.
+      - Configurou o piano existente para exibir uma oitava de Dó4 a Si4 sem duplicar a lógica de áudio.
+      - Explicou visualmente altura, tempo e duração no piano roll e definiu os próximos passos sobre notas, oitavas, acidentes e intervalos.
+      - Ligou a seção O Caminho do Bardo da apresentação à nova lição.
+      - Reorganizou a explicação em conceito, experiência guiada, conferência e aplicação; usa Dó4, Ré4 e Mi4 do piano ao piano roll com linguagem simples e teclas identificadas.
+    delivered_on: "2026-10-15"
+    tags:
+      - Aprendizagem
+      - Notas
+      - Interface
+    test_path: /caminho-do-bardo/notas
+
+  - slug: tema-visual-bardian
+    title: Base visual e modo escuro do Bardian
+    description: Criou uma base de tokens visuais, alternância persistente de tema e ajustes de contraste para aproximar as superfícies públicas da ferramenta de produtividade e aprendizagem.
+    changes:
+      - Adicionou alternância manual entre tema claro e escuro com preferência salva no navegador.
+      - Aplicou cores compartilhadas à apresentação, à lição, aos componentes e às superfícies administrativas existentes.
+      - Revisou hierarquia, espaçamento, responsividade, foco visível e estados do novo fluxo educacional.
+    delivered_on: "2026-10-14"
+    tags:
+      - Interface
+      - Acessibilidade
+      - Tema
+    test_path: /caminho-do-bardo/notas
+
+  - slug: piano-roll-webmusic-score
+    title: Editor piano roll inspirado no BandLab
+    description: Evoluiu o protótipo para um editor MIDI em Canvas, com viewport navegável e estado musical em ticks baseado no @webmusic/score.
+    changes:
+      - Adicionou teclado virtual de quatro oitavas, régua de compassos, zoom, rolagem e lane de velocity.
+      - Permitiu criar, selecionar, mover, redimensionar e excluir notas com snap musical configurável.
+      - Integrou playhead e reprodução temporária ao Tone.js sem persistência de composição.
+      - Corrigiu a rolagem sincronizada da grade, teclado, régua e velocity, incluindo navegação pelo wheel.
+      - Limitou a criação ao último compasso e ativou Delete após selecionar uma nota com o mouse.
+      - Alinhou os quatro compassos da grade ao Score e fez o botão Parar interromper o sintetizador.
+      - Tornou as alças de redimensionamento visíveis e ampliou sua área de captura; acrescentou um menu de duração para notas selecionadas.
+      - Incluiu seleção por área com Shift e movimento em grupo que preserva os intervalos temporais entre notas.
+      - Estendeu a agulha de reprodução à altura completa da grade, inclusive durante a rolagem vertical.
+      - Adicionou marcadores móveis de início e fim do loop na régua, com repetição ligada inicialmente e ajuste por ponteiro ou teclado.
+      - Fez Espaço alternar reprodução e parada fora dos controles, com agendamento antecipado no Tone.js e corte de notas no fim do intervalo.
+      - Reservou o Espaço duplo em até 300 ms para pausar e devolver a agulha ao início do loop, sem mover os marcadores; o Espaço simples mantém a posição ao pausar.
+      - Corrigiu a retomada pelo Espaço para continuar áudio e agulha do tick pausado, incluindo o restante de notas em andamento; clique direito exclui somente a nota atingida.
+    delivered_on: "2026-10-14"
+    tags:
+      - Interface
+      - Composição
+      - MIDI
+    test_path: /componentes
+
+  - slug: dashboard-dev-reports
+    title: Dashboard administrativa e DevReports
+    description: A dashboard administrativa passou a apresentar as entregas verificáveis do Bardian.
+    changes:
+      - Criou o catálogo versionado e o objeto DevReport para registrar entregas.
+      - Reorganizou a dashboard em partials com busca, filtro por tag e detalhes expansíveis.
+      - Aproximou o painel da referência visual com navegação lateral escura e tabela clara.
+    delivered_on: "2026-10-13"
+    tags:
+      - Administração
+      - Interface
+    test_path: /dashboard#dev-reports

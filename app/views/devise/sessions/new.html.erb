@@ -25,4 +25,9 @@
     Ainda não possui uma conta?
     <%= link_to "Criar conta", new_registration_path(resource_name) %>
   </p>
+  <%# Oferece caminhos de retorno sem depender do histórico do navegador. %>
+  <nav class="auth-return" aria-label="Explorar o Bardian">
+    <%= link_to "Início", root_path %>
+    <%= link_to "Apresentação", presentation_path %>
+  </nav>
 </section>

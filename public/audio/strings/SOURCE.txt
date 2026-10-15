@@ -1,0 +1,22 @@
+VSCO 2 Community Edition — Violin Section, susVib (vibrato sustentado)
+Projeto: https://github.com/sgossner/VSCO-2-CE
+Autoria: Versilian Studios / comunidade VSCO 2 CE
+Licença: CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/)
+Origem: https://github.com/sgossner/VSCO-2-CE/tree/master/Strings/Violin%20Section/susVib
+Conversão: WAV original para MP3 com ffmpeg, libmp3lame -q:a 5, sem mudança de altura.
+Para tornar audíveis notas MIDI curtas, removeu-se 0,5 s do ataque muito baixo
+(1,5 s em G4, cujo ataque original era mais lento),
+aplicou-se fade-in de 15 ms e ganho fixo por amostra para pico próximo de -6 dBFS.
+Filtros: atrim=start=<corte>,asetpts=PTS-STARTPTS,afade=t=in:st=0:d=0.015,volume=<ganho>dB.
+Ganhos: G2 +19,7 dB; D3 +15,7 dB; C4 +12,2 dB; G4 +12,3 dB; D5 +13,6 dB.
+
+G2.mp3 <- VlnEns_susVib_G2_v1.wav (SHA-256 original feb96c5064fbef43087c495d61a9cab9f70ff1be5b22905147c1f86d5f89547c)
+URL: https://github.com/sgossner/VSCO-2-CE/blob/master/Strings/Violin%20Section/susVib/VlnEns_susVib_G2_v1.wav
+D3.mp3 <- VlnEns_susVib_D3_v1.wav (SHA-256 original 583e660bc5daa4e094aef5fc014fbb92751040be8741ed7a16847306a1fe0a99)
+URL: https://github.com/sgossner/VSCO-2-CE/blob/master/Strings/Violin%20Section/susVib/VlnEns_susVib_D3_v1.wav
+C4.mp3 <- VlnEns_susVib_C4_v1.wav (SHA-256 original c07edd5b2119fa1da2207aba996961b50dd616f69bbcf2300ab271bc6c16239f)
+URL: https://github.com/sgossner/VSCO-2-CE/blob/master/Strings/Violin%20Section/susVib/VlnEns_susVib_C4_v1.wav
+G4.mp3 <- VlnEns_susVib_G4_v1.wav (SHA-256 original ed2a89cf254432d2af073699fa43ebfa16cfbc5552c7fc964a184fc434eaaa39)
+URL: https://github.com/sgossner/VSCO-2-CE/blob/master/Strings/Violin%20Section/susVib/VlnEns_susVib_G4_v1.wav
+D5.mp3 <- VlnEns_susVib_D5_v1.wav (SHA-256 original f8d870457826c94270b9c3ead8e8ec02cb7e6c4a3481cded055641b7fab7df62)
+URL: https://github.com/sgossner/VSCO-2-CE/blob/master/Strings/Violin%20Section/susVib/VlnEns_susVib_D5_v1.wav

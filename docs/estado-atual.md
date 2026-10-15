@@ -1,6 +1,6 @@
 # Estado atual do Bardian
 
-Atualizado em: 13 de outubro de 2026.
+Atualizado em: 14 de outubro de 2026.
 
 Este documento registra o estado do projeto no início da reta final do TCC.
 Ele descreve o que já existe, o que foi validado, o que permanece limitado e
@@ -38,9 +38,24 @@ As convenções detalhadas estão em [dominio-musical.md](dominio-musical.md).
 
 ### Apresentação pública
 
-A rota `/` apresenta quatro cenas: abertura, primeiro som, processo criativo e
-`O Caminho do Bardo`. A página usa uma identidade visual de ateliê musical,
-com tipografia local, camadas SVG, piano visual e animações controláveis.
+A rota `/` reúne os caminhos de aprendizagem, criação e apresentação. A rota
+`/apresentacao` apresenta quatro cenas: abertura, primeiro som, processo criativo
+e `O Caminho do Bardo`. O piano permanece interativo; a direção visual atual
+usa tipografia sem serifa e navegação comum às páginas.
+
+A primeira lição do Caminho do Bardo está disponível em
+`/caminho-do-bardo/notas`. Ela apresenta o Bardian como ferramenta de criação
+e aprendizagem, usa uma oitava interativa de Dó4 a Si4 e explica o piano roll
+por meio de um diagrama conceitual. A sequência imediata aborda notas, oitavas,
+acidentes e intervalos; lições seguintes, exercícios e progresso ainda não
+foram implementados.
+
+As superfícies públicas passaram a compartilhar tokens visuais e alternância
+entre tema claro e escuro. A preferência é salva no navegador e, na ausência de
+uma escolha anterior, acompanha a preferência de tema do sistema. A revisão
+visual posterior unificou a navegação, os ícones e a tipografia sem serifa nas
+áreas de criação e aprendizagem. A direção e seus limites estão registrados em
+[direcao-visual.md](direcao-visual.md).
 
 O piano da apresentação cobre duas oitavas, de Dó4 a Si5. Possui interação por
 clique, toque e teclado, mensagens de estado e suporte básico a movimento
@@ -49,15 +64,16 @@ desenvolvimento.
 
 ### Dashboard
 
-A rota `/dashboard` mantém uma barra lateral escura fixa no canto esquerdo,
-com a estrutura de workspace, conhecimento e pesquisa. O conteúdo principal
-foi temporariamente limpo para que a próxima etapa possa definir novamente o
-objetivo e a organização da dashboard.
+A rota `/dashboard` mantém uma barra lateral contextual e apresenta uma tabela
+de entregas verificáveis do desenvolvimento. O
+catálogo versionado em `config/dev_reports.yml` contém as entregas concluídas:
+título, descrição curta, alterações, data, tags e link interno de teste. Há
+busca por texto, filtro por tag e detalhes expansíveis.
 
-A interface usa tipografia sans-serif para se aproximar de uma ferramenta
-corporativa; a fonte manuscrita permanece somente na marca. Em telas estreitas,
-a barra lateral se transforma em uma navegação horizontal. Não há atualmente
-editor, lições, persistência de composição ou dados pessoais nessa tela.
+A interface segue a mesma tipografia e os mesmos temas do restante do produto.
+Em telas estreitas, a barra lateral se transforma em uma navegação horizontal
+e a tabela pode ser rolada horizontalmente. A tela não guarda composições ou
+dados pessoais.
 
 ### Autenticação
 
@@ -120,10 +136,13 @@ deve ocorrer após revisão conjunta do conjunto.
 - Não há uma representação de composição com tempo, faixas e eventos.
 - Tonalidades, campos harmônicos, graus e progressões ainda não foram modelados.
 - Não existe integração entre o domínio musical e a reprodução no navegador.
-- A dashboard é apenas uma entrada visual.
+- Os DevReports dependem de registros versionados junto às entregas; não são
+  inferidos automaticamente do código ou dos commits.
 - A reprodução usa um único sample e ainda requer avaliação auditiva pelo autor.
-- Não há editor, piano roll, notação, mixer, efeitos ou exportação.
-- A trilha de aprendizagem ainda é uma proposta visual, sem lições ou progresso.
+- O piano roll em `/componentes` é um protótipo sem persistência; ainda não há
+  notação, mixer, efeitos ou exportação.
+- Há uma primeira lição de notas; exercícios, outras lições e progresso ainda
+  não foram implementados.
 - Análise de áudio e transcrição permanecem experimentais e fora do núcleo atual.
 
 ## 7. Prioridade para a reta final

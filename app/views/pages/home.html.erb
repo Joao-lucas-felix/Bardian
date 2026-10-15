@@ -1,18 +1,54 @@
-<%# Define o título da aba e a classe usada pelo layout nesta página. %>
-<% content_for :title, "Bardian — Um ateliê musical" %>
-<% content_for :main_class, "presentation" %>
+<%# Reúne aprendizagem, criação e apresentação em uma entrada clara para iniciantes. %>
+<% content_for :title, "Bardian — Início" %>
+<% content_for :main_class, "portal-page" %>
 
-<%# Reúne as quatro cenas e mantém o contexto de controle das animações.
-    Os partials não recebem dados externos neste incremento. %>
-<div
-  class="bardian-story"
-  data-controller="music-story"
-  data-action="scroll@window->music-story#refresh resize@window->music-story#refresh visibilitychange@document->music-story#refresh"
->
-  <%= render "pages/opening" %>
-  <%= render "pages/first_sound" %>
-  <%# Continua a apresentação explicando o apoio ao processo criativo. %>
-  <%= render "pages/creative_process" %>
-  <%# Apresenta a aprendizagem como parte do desenvolvimento musical. %>
-  <%= render "pages/bard_path" %>
+<div class="portal-shell">
+  <section class="portal-intro" aria-labelledby="portal-title">
+    <div class="portal-intro-copy">
+      <p class="portal-intro-label">Música começa aqui</p>
+      <h1 id="portal-title">Crie música. Entenda cada nota.</h1>
+      <p>Um espaço simples para experimentar ideias, ouvir resultados e aprender música enquanto você cria.</p>
+      <div class="portal-hero-actions">
+        <%= link_to notes_lesson_path, class: "product-button product-button-primary" do %>
+          Começar pelas notas <%= bard_icon(:arrow) %>
+        <% end %>
+        <%= link_to compose_path, class: "product-button product-button-secondary" do %>
+          Criar música <%= bard_icon(:create) %>
+        <% end %>
+      </div>
+    </div>
+    <div class="portal-hero-demo" aria-label="Exemplo ilustrativo de notas em uma linha do tempo">
+      <div class="portal-demo-bar"><span class="portal-demo-dot"></span><span>Minha primeira ideia</span><span class="portal-demo-label">Exemplo</span></div>
+      <div class="portal-demo-staff" aria-hidden="true">
+        <span class="portal-demo-note is-one"></span><span class="portal-demo-note is-two"></span><span class="portal-demo-note is-three"></span><span class="portal-demo-note is-four"></span>
+      </div>
+      <div class="portal-demo-footer"><%= bard_icon(:play) %><span>Veja, ouça e ajuste</span></div>
+    </div>
+  </section>
+
+  <nav class="portal-destinations" aria-label="Explorar o Bardian">
+    <%= link_to notes_lesson_path, class: "portal-destination" do %>
+      <span class="portal-destination-icon"><%= bard_icon(:book) %></span>
+      <span class="portal-destination-copy"><span class="portal-destination-name">Aprender música</span><span>Descubra as notas no piano e entenda o piano roll.</span></span>
+      <%= bard_icon(:arrow) %>
+    <% end %>
+    <%= link_to compose_path, class: "portal-destination" do %>
+      <span class="portal-destination-icon"><%= bard_icon(:create) %></span>
+      <span class="portal-destination-copy"><span class="portal-destination-name">Criar música</span><span>Monte sua ideia em camadas, uma frase por vez.</span></span>
+      <%= bard_icon(:arrow) %>
+    <% end %>
+    <%= link_to presentation_path, class: "portal-destination" do %>
+      <span class="portal-destination-icon"><%= bard_icon(:compass) %></span>
+      <span class="portal-destination-copy"><span class="portal-destination-name">Apresentação</span><span>Conheça a proposta do Bardian e toque o piano interativo.</span></span>
+      <%= bard_icon(:arrow) %>
+    <% end %>
+    <%# O painel pertence apenas ao perfil administrativo. %>
+    <% if user_signed_in? && current_user.admin? %>
+      <%= link_to dashboard_path, class: "portal-destination" do %>
+        <span class="portal-destination-icon"><%= bard_icon(:admin) %></span>
+        <span class="portal-destination-copy"><span class="portal-destination-name">Dashboard</span><span>Acompanhe as entregas do projeto.</span></span>
+        <%= bard_icon(:arrow) %>
+      <% end %>
+    <% end %>
+  </nav>
 </div>

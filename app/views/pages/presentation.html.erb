@@ -1,0 +1,18 @@
+<%# Define o título e a classe da apresentação pública. %>
+<% content_for :title, "Bardian — Crie e aprenda música" %>
+<% content_for :main_class, "presentation" %>
+
+<%# Reúne as quatro cenas e mantém o contexto de controle das animações.
+    Os partials não recebem dados externos neste incremento. %>
+<div
+  class="bardian-story"
+  data-controller="music-story"
+  data-action="scroll@window->music-story#refresh resize@window->music-story#refresh visibilitychange@document->music-story#refresh"
+>
+  <%= render "pages/opening" %>
+  <%= render "pages/first_sound" %>
+  <%# Continua a apresentação explicando o apoio ao processo criativo. %>
+  <%= render "pages/creative_process" %>
+  <%# Apresenta a aprendizagem como parte do desenvolvimento musical. %>
+  <%= render "pages/bard_path" %>
+</div>

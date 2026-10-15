@@ -20,10 +20,14 @@
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "presentation", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "productivity", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body>
+    <%= render "shared/icon_symbols" %>
+    <%= render "shared/product_navigation" %>
     <%# Mensagens de autenticação e navegação ficam disponíveis para o usuário. %>
     <% if notice.present? || alert.present? %>
       <div class="flash-messages" role="status">

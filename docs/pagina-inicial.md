@@ -1,5 +1,9 @@
 # Referência de desenvolvimento — página inicial do Bardian
 
+> Esta referência registra a apresentação original. A direção visual atual,
+> com navegação de produto, tipografia sem serifa e temas claro e escuro, está
+> em [direcao-visual.md](direcao-visual.md).
+
 Atualizado em: 12 de outubro de 2026.
 
 Este documento reúne o direcionamento acordado para a apresentação do

@@ -1,0 +1,23 @@
+<%# Organiza resumos em uma tabela; o detalhe de cada entrega fica na linha seguinte. %>
+<div class="dashboard-table-frame">
+  <div class="dashboard-table-scroll">
+    <table class="dashboard-table">
+      <thead>
+        <tr>
+          <th scope="col">Funcionalidade</th>
+          <th scope="col">Data</th>
+          <th scope="col">Tags</th>
+          <th scope="col">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% reports.each do |report| %>
+          <%= render "report_row", report: report %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <% if reports.empty? %>
+    <p class="dashboard-empty-state">Nenhuma entrega encontrada. Ajuste a busca ou limpe os filtros.</p>
+  <% end %>
+</div>

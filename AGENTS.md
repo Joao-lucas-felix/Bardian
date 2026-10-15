@@ -1180,6 +1180,34 @@ Ao modificar um trecho, atualizar também sua documentação e seus comentários
 
 ---
 
+# 54-A. Planejamento de views e partials
+
+Antes de implementar uma página, o agente deve planejar a composição da view: identificar a responsabilidade da página principal, os blocos que a formam e quais deles devem ser extraídos para partials.
+
+A view principal deve deixar clara a estrutura da página. Blocos com responsabilidade própria, reutilizados ou extensos devem ser organizados em partials com nomes que indiquem seu propósito. A divisão deve favorecer compreensão e manutenção, sem criar um partial para cada pequeno elemento nem depender de um limite arbitrário de linhas.
+
+O planejamento deve indicar quais dados cada partial recebe e de onde eles vêm. Consultas, autorização e regras de domínio não devem ser transferidas para partials apenas para reduzir o tamanho da view; essas responsabilidades devem permanecer nas camadas apropriadas.
+
+---
+
+# 54-B. Revisão de responsabilidades após cada funcionalidade
+
+Antes de considerar uma funcionalidade concluída, o agente deve revisar o código alterado, com atenção especial aos arquivos ERB. Deve identificar trechos em que a view ou um partial esteja assumindo consultas de dados, autorização, regras de negócio ou transformações complexas.
+
+Views e partials devem priorizar apresentação e interações simples. Controllers coordenam fluxo e acesso; modelos ou objetos próprios concentram regras e dados; helpers podem concentrar formatação de apresentação quando isso tornar o código mais claro. A extração de responsabilidades deve ser justificada pela legibilidade e pelo comportamento, não apenas pelo tamanho dos arquivos.
+
+O agente deve informar ao usuário os pontos encontrados, as separações realizadas e as limitações que permaneceram. Deve verificar a renderização e executar os testes afetados. Refatorações fora do escopo autorizado exigem nova decisão antes de serem aplicadas.
+
+---
+
+# 54-C. Registro de entregas no DevReport
+
+Após implementar e verificar uma funcionalidade ou concluir um plano de implementação, o agente deve registrar a entrega em `config/dev_reports.yml` antes de encerrar a etapa. O registro deve conter título, descrição curta, alterações criadas ou modificadas, data, tags e um link interno existente para testá-la.
+
+Um plano com várias tarefas deve gerar registros por funcionalidade verificável, não por tarefa técnica. Não registrar recursos apenas planejados, incompletos ou sem rota de teste; nesses casos, o agente deve informar a limitação ao usuário.
+
+---
+
 # 55. Regra final
 
 O agente deve ajudar o usuário a construir o projeto, mas o conhecimento sobre o projeto deve permanecer com o usuário.

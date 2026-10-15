@@ -1,0 +1,2 @@
+var e=e=>{throw TypeError(e)},t=(t,n,r)=>n.has(t)||e(`Cannot `+r),n=(e,n,r)=>(t(e,n,`read from private field`),r?r.call(e):n.get(e)),r=(t,n,r)=>n.has(t)?e(`Cannot add the same private member more than once`):n instanceof WeakSet?n.add(t):n.set(t,r),i=(e,n,r,i)=>(t(e,n,`write to private field`),i?i.call(e,r):n.set(e,r),r),a=(e,n,r)=>(t(e,n,`access private method`),r),o=(e,t,r,a)=>({set _(n){i(e,t,n,r)},get _(){return n(e,t,a)}});export{r as _,n as a,a as b,i as c,o as d};
+//# sourceMappingURL=Dz8RECVT.js.map

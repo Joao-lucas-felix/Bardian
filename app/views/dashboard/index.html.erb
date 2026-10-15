@@ -1,50 +1,22 @@
-<%# Apresenta a área principal como um painel acadêmico de experimentação.
-    Os cartões são estados visuais; ainda não consultam dados externos. %>
-<% content_for :title, "Bardian — Seu espaço musical" %>
+<%# Compõe a área administrativa a partir da navegação e do relatório de entregas. %>
+<% content_for :title, "Bardian — Administração" %>
 <% content_for :main_class, "dashboard-page" %>
 
 <div class="dashboard-shell">
-  <aside class="dashboard-sidebar" aria-label="Navegação principal">
-    <%= link_to root_path, class: "dashboard-logo", aria: { label: "Bardian — apresentação" } do %>
-      <span class="dashboard-logo-mark" aria-hidden="true">B</span>
-      <span>Bardian</span>
-    <% end %>
+  <%= render "sidebar" %>
 
-    <p class="dashboard-eyebrow">Workspace</p>
-    <nav class="dashboard-nav" aria-label="Workspace">
-      <a class="dashboard-nav-link is-active" href="#visao-geral" aria-current="page">
-        <span class="dashboard-nav-icon dashboard-nav-icon-home" aria-hidden="true"></span>
-        Visão geral
-      </a>
-      <a class="dashboard-nav-link" href="#composicao">
-        <span class="dashboard-nav-icon dashboard-nav-icon-compose" aria-hidden="true"></span>
-        Composição
-      </a>
-    </nav>
-
-    <p class="dashboard-eyebrow dashboard-eyebrow-secondary">Conhecimento</p>
-    <nav class="dashboard-nav" aria-label="Conhecimento">
-      <a class="dashboard-nav-link" href="#aprendizagem">
-        <span class="dashboard-nav-icon dashboard-nav-icon-learning" aria-hidden="true"></span>
-        Aprendizagem
-      </a>
-    </nav>
-
-    <p class="dashboard-eyebrow dashboard-eyebrow-secondary">Pesquisa</p>
-    <nav class="dashboard-nav" aria-label="Pesquisa">
-      <a class="dashboard-nav-link" href="#experimentos">
-        <span class="dashboard-nav-icon dashboard-nav-icon-research" aria-hidden="true"></span>
-        Experimentos
-      </a>
-    </nav>
-
-    <div class="dashboard-sidebar-footer">
-      <span class="dashboard-status-dot" aria-hidden="true"></span>
-      <span>Protótipo acadêmico</span>
-    </div>
-  </aside>
-
-  <%# Área reservada para o próximo conteúdo definido para a dashboard. %>
   <main class="dashboard-content" id="visao-geral" aria-label="Área de trabalho">
+    <section class="dashboard-reports" id="dev-reports" aria-labelledby="dev-reports-title">
+      <div class="dashboard-reports-heading">
+        <div>
+          <h2 id="dev-reports-title">Entregas do projeto</h2>
+          <p>Funcionalidades implementadas, documentadas e prontas para verificação.</p>
+        </div>
+        <span class="dashboard-report-count"><%= @reports.size %> <%= @reports.size == 1 ? "entrega" : "entregas" %></span>
+      </div>
+
+      <%= render "filters", available_tags: @available_tags, query: @query, selected_tag: @selected_tag %>
+      <%= render "reports_table", reports: @reports %>
+    </section>
   </main>
 </div>

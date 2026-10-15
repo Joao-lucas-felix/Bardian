@@ -1,0 +1,30 @@
+<%# Agrupa os destinos existentes da administração em uma navegação lateral. %>
+<aside class="dashboard-sidebar" aria-label="Navegação principal">
+  <%= link_to root_path, class: "dashboard-logo", aria: { label: "Bardian — início" } do %>
+    <span class="dashboard-logo-mark" aria-hidden="true">B</span>
+    <span>Bardian</span>
+  <% end %>
+
+  <p class="dashboard-eyebrow">Administração</p>
+  <nav class="dashboard-nav" aria-label="Workspace">
+    <%= link_to dashboard_path, class: "dashboard-nav-link is-active", aria: { current: "page" } do %>
+      <%= bard_icon(:admin) %>
+      Visão geral
+    <% end %>
+  </nav>
+
+  <p class="dashboard-eyebrow dashboard-eyebrow-secondary">Acesso rápido</p>
+  <nav class="dashboard-nav" aria-label="Conhecimento">
+    <%= link_to notes_lesson_path, class: "dashboard-nav-link" do %>
+      <%= bard_icon(:book) %> Caminho do Bardo
+    <% end %>
+    <%= link_to components_path, class: "dashboard-nav-link" do %>
+      <%= bard_icon(:create) %> Editor
+    <% end %>
+  </nav>
+
+  <div class="dashboard-sidebar-footer">
+    <span class="dashboard-status-dot" aria-hidden="true"></span>
+    <span>Protótipo acadêmico</span>
+  </div>
+</aside>
