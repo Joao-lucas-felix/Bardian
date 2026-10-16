@@ -8,8 +8,9 @@ reports:
       - Converteu notas relativas sem alterar outras regiões e gerou IDs únicos na composição inteira.
       - Incluiu velocity editável e histórico de desfazer/refazer por região durante a sessão.
       - Manteve o salvamento JSON versionado e os fluxos de /criar e Caminho do Bardo.
-      - Verificou testes Rails e JavaScript, carregamento, estilo e o fluxo manual de salvar e reabrir no navegador de teste.
-      - Registrou que não há reprodução multifaixa nem mesclagem automática de conflitos; movimento por arraste requer nova checagem visual.
+      - Verificou testes Rails e JavaScript, carregamento, estilo e o fluxo manual de criar, mover, salvar e reabrir no navegador de teste.
+      - Ajustou a prévia ao BPM salvo e bloqueou a edição de regiões MIDI inválidas sem truncar o documento.
+      - Registrou que não há reprodução multifaixa nem mesclagem automática de conflitos.
     delivered_on: "2026-10-15"
     tags:
       - Composição

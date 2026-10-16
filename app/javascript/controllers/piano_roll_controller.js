@@ -12,7 +12,7 @@ import { createPhraseInstrument } from "audio/phrase_instruments"
  * quatro compassos 4/4; uma composição salva fornece duração e compasso.
  */
 export default class extends Controller {
-  static values = { initialNotes: Array, audioEnabled: { type: Boolean, default: true }, partName: { type: String, default: "Piano" }, layout: { type: String, default: "pitched" }, instrumentId: { type: String, default: "piano" }, totalTicks: Number, timeNumerator: Number, timeDenominator: Number, persistentMode: Boolean }
+  static values = { initialNotes: Array, audioEnabled: { type: Boolean, default: true }, partName: { type: String, default: "Piano" }, layout: { type: String, default: "pitched" }, instrumentId: { type: String, default: "piano" }, totalTicks: Number, timeNumerator: Number, timeDenominator: Number, bpm: Number, persistentMode: Boolean }
   static targets = [
     "duration", "keyboard", "loopButton", "loopEndLine", "loopEndMarker",
     "loopStartLine", "loopStartMarker", "playhead", "ruler", "roll",
@@ -25,6 +25,7 @@ export default class extends Controller {
     this.totalTicks = this.hasTotalTicksValue ? this.totalTicksValue : this.ticksPerQuarter * 16
     this.timeNumerator = this.hasTimeNumeratorValue ? this.timeNumeratorValue : 4
     this.timeDenominator = this.hasTimeDenominatorValue ? this.timeDenominatorValue : 4
+    this.currentBpm = this.hasBpmValue ? this.bpmValue : 120
     this.minPitch = this.isPersistentMode() ? 0 : 36
     this.maxPitch = this.isPersistentMode() ? 127 : 84
     this.rowHeight = 22
@@ -115,20 +116,26 @@ export default class extends Controller {
   /** Calcula um compasso no denominador declarado, sempre em ticks musicais. */
   numerator() { return this.timeNumerator ?? (this.hasTimeNumeratorValue ? this.timeNumeratorValue : 4) }
   denominator() { return this.timeDenominator ?? (this.hasTimeDenominatorValue ? this.timeDenominatorValue : 4) }
+  bpm() { return this.currentBpm ?? (this.hasBpmValue ? this.bpmValue : 120) }
+  /** Converte um tick para segundos usando o andamento da composição. */
+  secondsPerTick() { return 60 / this.bpm() / this.ticksPerQuarter }
   measureTicks() {
     return this.ticksPerQuarter * 4 / this.denominator() * this.numerator()
   }
 
   /** Atualiza régua e limite quando a região ou o compasso muda, sem retimar notas. */
-  setMusicalContext({ totalTicks, numerator, denominator }) {
+  setMusicalContext({ totalTicks, numerator, denominator, bpm = this.bpm() }) {
     if (!Number.isInteger(totalTicks) || totalTicks < 1 || !Number.isInteger(numerator) || numerator < 1 ||
-      ![1, 2, 4, 8, 16, 32, 64].includes(denominator) || this.notes.some((note) => note.onset + note.duration > totalTicks)) {
+      ![1, 2, 4, 8, 16, 32, 64].includes(denominator) || !Number.isInteger(bpm) || bpm < 1 ||
+      this.notes.some((note) => note.onset + note.duration > totalTicks)) {
       throw new Error("Contexto musical inválido para esta região")
     }
+    if (bpm !== this.bpm() && (this.isPlaying || this.playbackPending)) this.stop()
     const loopAtEnd = this.loopEndTick === this.totalTicks
     this.totalTicks = totalTicks
     this.timeNumerator = numerator
     this.timeDenominator = denominator
+    this.currentBpm = bpm
     this.loopStartTick = Math.min(this.loopStartTick, Math.max(0, totalTicks - 1))
     this.loopEndTick = loopAtEnd ? totalTicks : Math.min(totalTicks, Math.max(this.loopStartTick + 1, this.loopEndTick))
     this.score = this.buildScore()
@@ -496,7 +503,7 @@ export default class extends Controller {
     } else if (interaction.type === "move") {
       const requestedTick = this.snapEnabled
         ? this.snapTick(this.pixelsToMusic(point.x) - this.pixelsToMusic(interaction.point.x))
-        : this.pixelsToMusic(point.x) - this.pixelsToMusic(interaction.point.x)
+        : Math.round(this.pixelsToMusic(point.x) - this.pixelsToMusic(interaction.point.x))
       const requestedPitch = Math.round((interaction.point.y - point.y) / this.rowHeight)
       const originals = interaction.noteIds.map((id) => interaction.snapshot[id]).filter(Boolean)
       const deltaTick = Math.max(-Math.min(...originals.map((note) => note.onset)), Math.min(this.totalTicks - Math.max(...originals.map((note) => note.onset + note.duration)), requestedTick))
@@ -564,11 +571,11 @@ export default class extends Controller {
       if (generation !== this.playbackGeneration) return
       await this.loadInstrument()
       if (generation !== this.playbackGeneration) return
-      this.playbackDuration = (this.loopEndTick - this.loopStartTick) / this.ticksPerQuarter * 0.5
+      this.playbackDuration = (this.loopEndTick - this.loopStartTick) * this.secondsPerTick()
       this.nextCycleAt = Tone.now() + 0.05
       this.playbackAudioStartAt = this.nextCycleAt
       this.nextCycleTick = resumeTick
-      this.playbackStartedAt = this.nextCycleAt - (resumeTick - this.loopStartTick) / this.ticksPerQuarter * 0.5
+      this.playbackStartedAt = this.nextCycleAt - (resumeTick - this.loopStartTick) * this.secondsPerTick()
       this.isPlaying = true
       this.playbackPending = false
       this.scheduleAhead(Tone.now())
@@ -604,7 +611,7 @@ export default class extends Controller {
    * @returns {Array<{pitch: number, offsetSeconds: number, durationSeconds: number}>}
    */
   loopEvents(startTick = this.loopStartTick) {
-    const secondsPerTick = 0.5 / this.ticksPerQuarter
+    const secondsPerTick = this.secondsPerTick()
     return this.notes.filter((note) => note.onset >= this.loopStartTick && note.onset < this.loopEndTick && note.onset + note.duration > startTick).map((note) => ({
       pitch: note.pitch,
       offsetSeconds: (Math.max(note.onset, startTick) - startTick) * secondsPerTick,
@@ -620,7 +627,7 @@ export default class extends Controller {
   scheduleAhead(now) {
     if (!this.isPlaying) return
     if (this.nextCycleAt < now && this.nextCycleTick !== this.loopStartTick) {
-      this.nextCycleAt += (this.loopEndTick - this.nextCycleTick) / this.ticksPerQuarter * 0.5
+      this.nextCycleAt += (this.loopEndTick - this.nextCycleTick) * this.secondsPerTick()
       this.nextCycleTick = this.loopStartTick
     }
     if (this.nextCycleAt < now) {
@@ -632,7 +639,7 @@ export default class extends Controller {
       this.loopEvents(this.nextCycleTick).forEach((event) => this.instrument.trigger(
         event.pitch, event.durationSeconds, cycleAt + event.offsetSeconds
       ))
-      this.nextCycleAt += (this.loopEndTick - this.nextCycleTick) / this.ticksPerQuarter * 0.5
+      this.nextCycleAt += (this.loopEndTick - this.nextCycleTick) * this.secondsPerTick()
       this.nextCycleTick = this.loopStartTick
       if (!this.loopEnabled) break
     }
@@ -667,7 +674,7 @@ export default class extends Controller {
   playheadTickAt(now) {
     const elapsed = Math.max(0, Math.max(now, this.playbackAudioStartAt ?? now) - this.playbackStartedAt)
     const cycleElapsed = this.loopEnabled ? elapsed % this.playbackDuration : Math.min(elapsed, this.playbackDuration)
-    return this.loopStartTick + cycleElapsed / 0.5 * this.ticksPerQuarter
+    return this.loopStartTick + cycleElapsed / this.secondsPerTick()
   }
 
   /** Move o playhead e termina a reprodução única ao alcançar o marcador final. */
@@ -746,8 +753,10 @@ export default class extends Controller {
 
   /** Informa a posição musical do cursor para quem navega sem ponteiro. */
   keyboardCursorStatus() {
-    const beat = Math.floor(this.keyboardCursor.onset / this.ticksPerQuarter)
-    return `Cursor em ${this.pitchName(this.keyboardCursor.pitch)}, compasso ${Math.floor(beat / 4) + 1}, tempo ${beat % 4 + 1}. Setas movem; Enter cria ou seleciona.`
+    const beatTicks = this.ticksPerQuarter * 4 / this.denominator()
+    const measure = Math.floor(this.keyboardCursor.onset / this.measureTicks()) + 1
+    const beat = Math.floor((this.keyboardCursor.onset % this.measureTicks()) / beatTicks) + 1
+    return `Cursor em ${this.pitchName(this.keyboardCursor.pitch)}, compasso ${measure}, tempo ${beat}. Setas movem; Enter cria ou seleciona.`
   }
 
   /** Move o cursor da grade e mantém sua célula dentro da área visível. */

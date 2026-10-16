@@ -163,6 +163,35 @@ test("região vazia abre viewport junto ao Dó4 sem descartar extremos MIDI", ()
   assert.equal(instance.displayPitches().length, 128)
 })
 
+test("arraste sem snap mantém deslocamento em ticks inteiros", () => {
+  const instance = editor()
+  instance.snapEnabled = false
+  const y = instance.pitchToPixels(60) + 11
+  instance.pointerDown(pointer(130, y))
+  instance.pointerMove(pointer(137, y))
+  instance.pointerUp(pointer(137, y))
+  assert.equal(Number.isInteger(instance.notes[0].onset), true)
+})
+
+test("prévia e agulha respeitam BPM da composição persistida", async () => {
+  const instance = editor([{ id: "slow", pitch: 60, onset: 0, duration: 480, velocity: 100 }])
+  instance.hasBpmValue = true
+  instance.bpmValue = 60
+  await instance.play()
+  assert.equal(instance.instrument.events[0][1], 1)
+  assert.equal(instance.playbackDuration, 16)
+  assert.equal(Math.round(instance.playheadTickAt(instance.playbackStartedAt + 1)), 480)
+  instance.stop()
+})
+
+test("rótulo do cursor usa tempos do compasso 6 por 8", () => {
+  const instance = editor([])
+  instance.timeNumerator = 6
+  instance.timeDenominator = 8
+  instance.keyboardCursor.onset = 720
+  assert.match(instance.keyboardCursorStatus(), /compasso 1, tempo 4/)
+})
+
 test("atualiza compasso e duracao da regiao sem deslocar notas", () => {
   const instance = editor()
   instance.resizeCanvases = () => {}

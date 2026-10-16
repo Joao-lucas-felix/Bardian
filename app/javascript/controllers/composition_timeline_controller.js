@@ -128,12 +128,18 @@ export default class extends Controller {
 
   /** Seleciona uma região e inicia seu histórico com as notas locais atuais. */
   selectRegion(trackId, regionId) {
-    const region = regionFor(this.music, trackId, regionId)
+    let editorNotes
+    try {
+      editorNotes = toEditorNotes(regionFor(this.music, trackId, regionId))
+    } catch (error) {
+      this.statusTarget.textContent = `Região inválida; edição bloqueada: ${error.message}`
+      return
+    }
     if (this.selectedRegionId !== regionId || this.selectedTrackId !== trackId) this.activePianoRoll()?.stop()
     this.selectedTrackId = trackId
     this.selectedRegionId = regionId
     this.noteHistories ??= new Map()
-    if (!this.noteHistories.has(regionId)) this.noteHistories.set(regionId, createHistory(toEditorNotes(region)))
+    if (!this.noteHistories.has(regionId)) this.noteHistories.set(regionId, createHistory(editorNotes))
     this.render()
   }
 
@@ -151,7 +157,7 @@ export default class extends Controller {
       this.commit(replaceRegionNotes(this.music, this.selectedTrackId, this.selectedRegionId, event.detail.notes))
     } catch (error) {
       this.statusTarget.textContent = `Notas não aplicadas: ${error.message}`
-      this.activePianoRoll()?.replaceNotes(toEditorNotes(regionFor(this.music, this.selectedTrackId, this.selectedRegionId)))
+      try { this.activePianoRoll()?.replaceNotes(toEditorNotes(regionFor(this.music, this.selectedTrackId, this.selectedRegionId))) } catch { this.syncActiveEditor() }
     }
   }
 
@@ -216,16 +222,28 @@ export default class extends Controller {
       this.activeEditorKey = null
       return
     }
+    let editorNotes
+    try {
+      editorNotes = toEditorNotes(region)
+    } catch (error) {
+      this.activePianoRoll()?.stop()
+      host.querySelector("[data-region-editor-mount]").replaceChildren()
+      host.hidden = true
+      this.activeEditorKey = null
+      this.statusTarget.textContent = `Região inválida; edição bloqueada: ${error.message}`
+      return
+    }
     const track = this.music.tracks.find((item) => item.id === this.selectedTrackId)
     const key = `${track.id}:${region.id}:${track.instrument_id}`
     if (this.activeEditorKey !== key) {
       this.activePianoRoll()?.stop()
       const template = host.querySelector("template")
       const node = template.content.firstElementChild.cloneNode(true)
-      node.dataset.pianoRollInitialNotesValue = JSON.stringify(toEditorNotes(region))
+      node.dataset.pianoRollInitialNotesValue = JSON.stringify(editorNotes)
       node.dataset.pianoRollTotalTicksValue = String(region.duration_ticks)
       node.dataset.pianoRollTimeNumeratorValue = String(this.music.time_signature.numerator)
       node.dataset.pianoRollTimeDenominatorValue = String(this.music.time_signature.denominator)
+      node.dataset.pianoRollBpmValue = String(this.music.bpm)
       node.dataset.pianoRollPersistentModeValue = "true"
       node.dataset.pianoRollPartNameValue = track.name
       node.dataset.pianoRollInstrumentIdValue = track.instrument_id
@@ -234,8 +252,8 @@ export default class extends Controller {
       this.activeEditorKey = key
     } else {
       const editor = this.activePianoRoll()
-      if (editor && (editor.totalTicks !== region.duration_ticks || editor.numerator() !== this.music.time_signature.numerator || editor.denominator() !== this.music.time_signature.denominator)) {
-        editor.setMusicalContext({ totalTicks: region.duration_ticks, numerator: this.music.time_signature.numerator, denominator: this.music.time_signature.denominator })
+      if (editor && (editor.totalTicks !== region.duration_ticks || editor.numerator() !== this.music.time_signature.numerator || editor.denominator() !== this.music.time_signature.denominator || editor.bpm() !== this.music.bpm)) {
+        editor.setMusicalContext({ totalTicks: region.duration_ticks, numerator: this.music.time_signature.numerator, denominator: this.music.time_signature.denominator, bpm: this.music.bpm })
       }
     }
     host.hidden = false

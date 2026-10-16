@@ -34,7 +34,10 @@ atalhos Ctrl/Cmd+Z e Ctrl/Cmd+Shift+Z desfazem e refazem operações de notas
 da região ativa. A reprodução é individual com o instrumento da faixa. A
 grade respeita a duração exata e o compasso (inclusive 6/8 e último compasso
 parcial), sem alterar ticks ao trocar BPM ou compasso. Notas MIDI de 0 a 127
-são preservadas; a viewport abre perto da primeira nota ou do Dó4.
+são preservadas; a viewport abre perto da primeira nota ou do Dó4. A prévia
+individual usa o BPM da composição; mudar o andamento interrompe uma prévia
+em curso para evitar velocidade inconsistente. Uma região com notas inválidas
+é bloqueada para edição e informa o erro sem truncar o documento.
 
 Nome, andamento, compasso, faixas e regiões são salvos juntos por `PATCH` JSON
 com `lock_version`. HTTP 409 não descarta o estado local: a interface mostra o
@@ -55,7 +58,9 @@ metadados e conflitos. Os testes Rails verificam contrato JSON, validação,
 bloqueio por versão, reabertura de notas e renderização. A verificação manual
 em servidor de teste confirmou criação por teclado e arraste, velocity,
 duração, desfazer/refazer, troca de região, zoom, tema e recarga após salvar.
-Uma tentativa manual de mover a nota por arraste não gerou alteração observável;
-o gesto continua coberto por teste de unidade e merece nova checagem visual.
+O movimento por arraste também foi repetido com coordenadas calibradas do
+Canvas: F4 passou de tick 0 a 480 e reapareceu nessa posição após salvar e
+reabrir. A tentativa anterior usou coordenadas de uma captura redimensionada,
+fora da nota, e não indicava falha no gesto.
 A view somente apresenta dados; validação e autorização permanecem no domínio
 e no controller Rails.

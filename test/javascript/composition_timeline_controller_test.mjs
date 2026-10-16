@@ -80,6 +80,17 @@ test("troca de região interrompe áudio e preserva históricos distintos", () =
   assert.equal(controller.noteHistories.get("two").snapshots[0][0].id, "note-two")
 })
 
+test("região inválida recebida do servidor é bloqueada com mensagem sem truncar notas", () => {
+  const controller = editingController()
+  controller.music.tracks[0].regions[1].notes[0].pitch = 128
+  controller.selectedRegionId = null
+  controller.selectedTrackId = null
+  assert.doesNotThrow(() => controller.selectRegion("track", "two"))
+  assert.equal(controller.selectedRegionId, null)
+  assert.match(controller.statusTarget.textContent, /Região.*inválid|não.*edit/i)
+  assert.equal(controller.music.tracks[0].regions[1].notes[0].pitch, 128)
+})
+
 test("remoção descarta histórico da região excluída", () => {
   const controller = editingController()
   controller.render = () => Controller.prototype.render.call(controller)
@@ -109,19 +120,22 @@ test("editor montado recebe compasso e resize sem perder nota nem remontar", () 
   } }
   controller.hasRegionEditorTarget = true
   const contexts = []
-  const editor = { totalTicks: 1920, numerator: () => 4, denominator: () => 4,
+  const editor = { totalTicks: 1920, numerator: () => 4, denominator: () => 4, bpm: () => 120,
     setMusicalContext(value) { contexts.push(value) }, stop() {} }
   controller.activePianoRoll = () => editor
   controller.syncActiveEditor()
   const mounted = mount.node
   assert.equal(mounted.dataset.pianoRollTotalTicksValue, "1920")
   assert.equal(mounted.dataset.pianoRollInstrumentIdValue, "piano")
+  assert.equal(mounted.dataset.pianoRollBpmValue, "120")
   controller.music = state.resizeRegion(controller.music, "track", "one", 3840)
   controller.music.time_signature.numerator = 3
+  controller.music.bpm = 90
   controller.syncActiveEditor()
   assert.equal(mount.node, mounted)
   assert.equal(contexts[0].totalTicks, 3840)
   assert.equal(contexts[0].numerator, 3)
+  assert.equal(contexts[0].bpm, 90)
   assert.equal(controller.music.tracks[0].regions[0].notes[0].onset_tick, 0)
 })
 
@@ -182,6 +196,27 @@ test("conflito ao salvar preserva o documento local", async () => {
   assert.equal(controller.music.name, "Local")
   assert.equal(controller.lockVersion, 2)
   assert.match(controller.statusTarget.textContent, /Conflito/)
+})
+
+test("conflito 409 mantém notas pendentes e histórico da região ativa", async () => {
+  const controller = editingController()
+  const changed = [{ id: "note-one", pitch: 72, onset: 0, duration: 480, velocity: 110 }]
+  controller.notesChanged({ detail: { notes: changed } })
+  controller.notesCommitted({ detail: { notes: changed } })
+  controller.lockVersion = 2
+  controller.urlValue = "/compositions/id.json"
+  controller.formTarget = { reportValidity: () => true }
+  controller.nameTarget = { value: "Teste" }
+  controller.bpmTarget = { value: "120" }
+  controller.numeratorTarget = { value: "4" }
+  controller.denominatorTarget = { value: "4" }
+  controller.saveButtonTarget = { disabled: false }
+  controller.fetch = async () => ({ ok: false, status: 409, json: async () => ({ error: "Conflito" }) })
+  await controller.save({ preventDefault() {} })
+  assert.equal(controller.music.tracks[0].regions[0].notes[0].pitch, 72)
+  assert.equal(controller.noteHistories.get("one").snapshots.length, 2)
+  assert.equal(controller.selectedRegionId, "one")
+  assert.equal(controller.lockVersion, 2)
 })
 
 // Uma resposta tardia confirma a versão, mas não apaga edições feitas durante o envio.
