@@ -17,8 +17,10 @@ function harness() {
   const players = []
   const gains = []
   const callbacks = new Map()
+  const timeouts = new Map()
   let nextToken = 1
   let loadFailure = false
+  let wallTime = 0
   const transport = {
     seconds: 0,
     start() { this.started = true }, pause() { this.paused = true }, stop() { this.stopped = true },
@@ -26,7 +28,7 @@ function harness() {
     clear(token) { callbacks.delete(token) }
   }
   const Tone = {
-    Transport: transport, start: async () => {},
+    Transport: transport, start: async () => {}, now: () => wallTime,
     Gain: class {
       constructor(value) { this.gain = { value }; gains.push(this) }
       toDestination() { return this }
@@ -48,10 +50,21 @@ function harness() {
       dispose() { this.disposed = true; this.options.onstop?.() }
     }
   }
-  const create = vm.runInNewContext(`${phraseSource}\n${audioSource}\ncreateCompositionAudio`, { Tone })
-  return { create, samplers, players, gains, callbacks, transport,
+  const timers = {
+    setTimeout(callback, delay) { const token = nextToken++; timeouts.set(token, { callback, at: wallTime + delay / 1000 }); return token },
+    clearTimeout(token) { timeouts.delete(token) }
+  }
+  const make = vm.runInNewContext(`${phraseSource}\n${audioSource}\ncreateCompositionAudio`, { Tone })
+  return { create: () => make({ timers }), samplers, players, gains, callbacks, transport,
     failLoad(value) { loadFailure = value },
-    fire(token) { const item = callbacks.get(token); callbacks.delete(token); item?.callback(item.time) }
+    fire(token) { const item = callbacks.get(token); callbacks.delete(token); item?.callback(item.time) },
+    advance(seconds) {
+      wallTime += seconds
+      transport.seconds = wallTime
+      for (const [token, item] of [...timeouts]) {
+        if (item.at <= wallTime) { timeouts.delete(token); item.callback() }
+      }
+    }
   }
 }
 
@@ -88,12 +101,26 @@ test("cancela evento pendente sem atingir outra faixa", async () => {
   audio.cancel(old)
   h.fire(old)
   h.fire(kept)
+  h.advance(2)
   assert.deepEqual(played, ["mantido"])
   assert.equal(h.transport.started, true)
   audio.pause()
   assert.equal(h.transport.paused, true)
   audio.stop()
   assert.equal(h.transport.stopped, true)
+  audio.dispose()
+})
+
+// Tone pode chamar cedo; até o ataque real, a edição ainda deve cancelar a nota.
+test("cancela após aviso antecipado do Tone antes do instante audível", async () => {
+  const h = harness()
+  const audio = h.create()
+  const played = []
+  const token = audio.schedule(() => played.push("antigo"), 1)
+  h.fire(token)
+  audio.cancel(token)
+  h.advance(1)
+  assert.deepEqual(played, [])
   audio.dispose()
 })
 

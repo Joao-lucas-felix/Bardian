@@ -5,13 +5,23 @@ import { createPhraseInstrument } from "audio/phrase_instruments"
  * Cria a borda sonora da composição, sem consultar DOM ou alterar o MIDI.
  * Cada faixa recebe seu próprio ganho e instrumento; callbacks do relógio
  * podem ser cancelados antes do disparo de uma nota.
+ * @param {{timers?:object}} options Temporizadores substituíveis para testes.
  * @returns {object} Controles de carregamento, agendamento e ciclo de vida.
  */
-export function createCompositionAudio() {
+export function createCompositionAudio({ timers = globalThis } = {}) {
   const transport = Tone.getTransport ? Tone.getTransport() : Tone.Transport
   const tracks = new Map()
-  const scheduled = new Set()
+  const scheduled = new Map()
   let disposed = false
+
+  /** Cancela tanto o aviso antecipado do Tone quanto o disparo ainda pendente. */
+  function cancelScheduled(token) {
+    const entry = scheduled.get(token)
+    if (!entry) return
+    scheduled.delete(token)
+    transport.clear(token)
+    if (entry.timerId !== null) timers.clearTimeout(entry.timerId)
+  }
 
   /** Libera uma faixa e impede que seu carregamento atrasado volte a tocá-la. */
   function disposeTrack(trackId) {
@@ -35,27 +45,29 @@ export function createCompositionAudio() {
     pause() { if (!disposed) transport.pause() },
     stop() {
       if (disposed) return
-      for (const token of scheduled) transport.clear(token)
-      scheduled.clear()
+      for (const token of scheduled.keys()) cancelScheduled(token)
       transport.stop()
     },
     now() { return transport.seconds },
 
-    /** Agenda um callback cancelável no relógio de áudio. */
+    /** Mantém o callback cancelável até o ataque real, mesmo após aviso antecipado. */
     schedule(callback, atSeconds) {
       if (disposed) throw new Error("Áudio encerrado")
       let token
-      token = transport.scheduleOnce((time) => {
-        scheduled.delete(token)
-        if (!disposed) callback(time)
+      token = transport.scheduleOnce(() => {
+        const entry = scheduled.get(token)
+        if (!entry || disposed) return
+        // Tone avisa com antecedência; só o temporizador dispara a fonte no instante real.
+        const delay = Math.max(0, (atSeconds - transport.seconds) * 1000)
+        entry.timerId = timers.setTimeout(() => {
+          if (!scheduled.delete(token) || disposed) return
+          callback(Tone.now())
+        }, delay)
       }, atSeconds)
-      scheduled.add(token)
+      scheduled.set(token, { timerId: null })
       return token
     },
-    cancel(token) {
-      if (!scheduled.delete(token)) return
-      transport.clear(token)
-    },
+    cancel: cancelScheduled,
 
     /** Carrega um timbre local para a faixa sem prejudicar as demais em caso de falha. */
     async loadTrack(track) {

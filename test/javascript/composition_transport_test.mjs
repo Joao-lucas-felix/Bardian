@@ -41,7 +41,7 @@ function harness({ failTrack = null, delayedTrack = null } = {}) {
     schedule(callback, atSeconds) { const token = nextToken++; pending.set(token, { callback, atSeconds }); return token },
     cancel(token) { pending.delete(token) },
     loadTrack(track) {
-      calls.push(["load", track.id])
+      calls.push(["load", track.id, track.instrument_id])
       if (track.id === failTrack) return Promise.reject(new Error("sem sample"))
       if (track.id === delayedTrack) return new Promise((resolve) => loads.set(track.id, resolve))
       return Promise.resolve()
@@ -139,4 +139,146 @@ test("isola falha de fonte e descarta carregamento obsoleto", async () => {
   late.loads.get("p")()
   await loading
   assert.equal(late.calls.some((call) => call[0] === "start"), false)
+})
+
+// Evento já preparado à frente precisa ser substituído sem ataque fantasma.
+test("edição futura cancela agendamento antigo e toca a versão nova", async () => {
+  const h = harness()
+  const original = music()
+  original.tracks[1].mute = true
+  original.tracks[0].regions[0].notes[0].onset_tick = 120
+  original.tracks[0].regions[0].notes[0].duration_ticks = 480
+  await h.transport.play(original)
+  const edited = structuredClone(original)
+  edited.tracks[0].regions[0].notes[0].pitch = 65
+  edited.tracks[0].regions[0].notes[0].onset_tick = 240
+  h.transport.update(edited)
+  h.advance(0.16)
+  assert.equal(h.calls.filter((call) => call[0] === "note").length, 0)
+  h.advance(0.12)
+  assert.deepEqual(h.calls.filter((call) => call[0] === "note").map((call) => call[2]), [65])
+  assert.equal(h.calls.filter((call) => call[0] === "stop").length, 1)
+  h.transport.dispose()
+})
+
+// Nota editada após seu ataque espera a próxima volta e não corta a voz atual.
+test("edição atrás da agulha só aparece no ciclo seguinte", async () => {
+  const h = harness()
+  const original = music()
+  original.tracks[1].mute = true
+  await h.transport.play(original)
+  h.advance(0.02)
+  const edited = structuredClone(original)
+  edited.tracks[0].regions[0].notes[0].pitch = 67
+  h.transport.update(edited)
+  h.advance(0.5)
+  assert.deepEqual(h.calls.filter((call) => call[0] === "note").map((call) => call[2]), [60])
+  h.advance(0.5)
+  assert.deepEqual(h.calls.filter((call) => call[0] === "note").map((call) => call[2]), [60, 67])
+  assert.equal(h.calls.some((call) => call[0] === "silence" && call[1] === "p"), false)
+  h.transport.dispose()
+})
+
+// Uma nota criada num ponto já percorrido não deve soar como cauda improvisada.
+test("nota nova atrás da agulha aguarda próxima passada", async () => {
+  const h = harness()
+  const original = music()
+  original.tracks[1].mute = true
+  await h.transport.play(original)
+  h.advance(0.3)
+  const edited = structuredClone(original)
+  edited.tracks[0].regions[0].notes.push({ id: "new", pitch: 65, onset_tick: 120, duration_ticks: 480, velocity: 100 })
+  h.transport.update(edited)
+  h.advance(0.3)
+  assert.equal(h.calls.filter((call) => call[0] === "note" && call[2] === 65).length, 0)
+  h.advance(0.6)
+  assert.equal(h.calls.filter((call) => call[0] === "note" && call[2] === 65).length, 1)
+  h.transport.dispose()
+})
+
+// Tempo muda em segundos, nunca a posição musical da agulha.
+test("mudança de BPM conserva tick e desloca somente eventos futuros", async () => {
+  const h = harness()
+  const original = music()
+  original.tracks[1].mute = true
+  original.tracks[0].regions[0].notes[0].onset_tick = 480
+  original.tracks[0].regions[0].notes[0].duration_ticks = 480
+  await h.transport.play(original)
+  h.advance(0.26)
+  const before = h.transport.tick()
+  const edited = structuredClone(original)
+  edited.bpm = 60
+  h.transport.update(edited)
+  assert.equal(h.transport.tick(), before)
+  h.advance(0.3)
+  assert.equal(h.calls.filter((call) => call[0] === "note").length, 0)
+  h.advance(0.25)
+  assert.equal(h.calls.filter((call) => call[0] === "note").length, 1)
+  h.transport.dispose()
+})
+
+// Mute e volume atuam sobre faixas ativas, sem parar o relógio global.
+test("aplica mute solo volume e isolamento durante a reprodução", async () => {
+  const h = harness()
+  const original = music()
+  await h.transport.play(original)
+  h.advance(0.02)
+  const edited = structuredClone(original)
+  edited.tracks[0].volume = 0.2
+  edited.tracks[1].solo = true
+  edited.tracks[1].mute = true
+  h.transport.update(edited)
+  assert.ok(h.calls.some((call) => call[0] === "silence" && call[1] === "p"))
+  assert.ok(h.calls.some((call) => call[0] === "silence" && call[1] === "s"))
+  h.transport.isolateTrack("p")
+  assert.ok(h.calls.some((call) => call[0] === "volume" && call[1] === "p" && call[2] === 0.2))
+  assert.equal(h.states.at(-1).status, "playing")
+  h.transport.dispose()
+})
+
+// Mudar o intervalo não teleporta a agulha; a próxima volta usa marcadores novos.
+test("aplica novos marcadores e alternância do loop somente no retorno", async () => {
+  const h = harness()
+  const original = music()
+  await h.transport.play(original)
+  h.advance(0.5)
+  const edited = structuredClone(original)
+  edited.loop = { start_tick: 240, end_tick: 720 }
+  h.transport.update(edited)
+  assert.ok(h.transport.tick() > 400)
+  h.advance(0.52)
+  assert.ok(h.transport.tick() >= 240 && h.transport.tick() < 720)
+  h.transport.setLoopEnabled(false)
+  h.advance(0.5)
+  assert.equal(h.states.at(-1).status, "playing")
+  h.advance(1.1)
+  assert.equal(h.states.at(-1).status, "stopped")
+  h.transport.dispose()
+})
+
+// Remover uma faixa deve liberar a fonte; trocar o timbre só recarrega aquela faixa.
+test("libera faixa removida e troca instrumento sem parar a composição", async () => {
+  const h = harness()
+  const original = music()
+  await h.transport.play(original)
+  h.advance(0.02)
+  const edited = structuredClone(original)
+  edited.tracks = [edited.tracks[0]]
+  edited.tracks[0].instrument_id = "strings"
+  h.transport.update(edited)
+  await Promise.resolve()
+  assert.ok(h.calls.some((call) => call[0] === "disposeTrack" && call[1] === "s"))
+  assert.ok(h.calls.some((call) => call[0] === "disposeTrack" && call[1] === "p"))
+  assert.ok(h.calls.some((call) => call[0] === "load" && call[1] === "p" && call[2] === "strings"))
+  assert.equal(h.states.at(-1).status, "playing")
+  h.transport.dispose()
+})
+
+// Stop precisa devolver o relógio e liberar amostras, não só cancelar callbacks.
+test("parar libera fontes carregadas das faixas", async () => {
+  const h = harness()
+  await h.transport.play(music())
+  h.transport.stop()
+  assert.deepEqual(h.calls.filter((call) => call[0] === "disposeTrack").map((call) => call[1]).sort(), ["p", "s"])
+  h.transport.dispose()
 })
