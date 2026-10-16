@@ -84,6 +84,34 @@ class CompositionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "strings", Composition.find(composition.id).document.dig("tracks", 0, "instrument_id")
   end
 
+  # Marcadores pertencem ao documento versionado e sobrevivem ao formulário de metadados.
+  test "salva reabre e preserva marcadores de loop em formularios e conflitos" do
+    sign_in user
+    composition = empty_composition
+    document = composition.document.deep_dup
+    document["loop"] = { "start_tick" => 480, "end_tick" => 2400 }
+
+    patch composition_path(composition, format: :json), params: {
+      document: document, lock_version: composition.lock_version
+    }, as: :json
+    assert_response :success
+    get composition_path(composition, format: :json)
+    assert_equal document["loop"], response.parsed_body.dig("document", "loop")
+
+    patch composition_path(composition), params: { lock_version: composition.reload.lock_version,
+      composition: { name: "Com loop", bpm: "110", numerator: "4", denominator: "4" } }
+    assert_redirected_to composition_path(composition)
+    assert_equal document["loop"], composition.reload.document["loop"]
+
+    stale = composition.document.deep_dup
+    stale["loop"] = { "start_tick" => 0, "end_tick" => 960 }
+    patch composition_path(composition, format: :json), params: {
+      document: stale, lock_version: 0
+    }, as: :json
+    assert_response :conflict
+    assert_equal document["loop"], composition.reload.document["loop"]
+  end
+
   # A edição de uma região deve sobreviver à recarga sem reescrever outra faixa.
   test "reabre notas editadas apenas na regiao selecionada e preserva caminhos existentes" do
     sign_in user

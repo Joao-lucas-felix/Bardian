@@ -7,10 +7,11 @@ module Music
     TICKS_PER_QUARTER = 480
     VALID_DENOMINATORS = [ 1, 2, 4, 8, 16, 32, 64 ].freeze
 
-    attr_reader :id, :name, :bpm, :time_signature, :tracks
+    attr_reader :id, :name, :bpm, :time_signature, :tracks, :loop_range
 
-    # Recebe faixas ordenadas, andamento e compasso; rejeita IDs repetidos na árvore.
-    def initialize(id:, name:, bpm:, time_signature:, tracks:)
+    # Recebe faixas, métrica e marcadores opcionais; rejeita limites e IDs inválidos.
+    # loop_range usa ticks absolutos e nil preserva o contrato anterior.
+    def initialize(id:, name:, bpm:, time_signature:, tracks:, loop_range: nil)
       @id = Contract.label(id, "id")
       @name = Contract.label(name, "name")
       @bpm = Contract.number(bpm, "bpm", min: 0, exclusive_min: true)
@@ -24,6 +25,16 @@ module Music
 
         track
       end.freeze
+      if loop_range
+        raise ArgumentError, "loop inválido" unless loop_range.is_a?(Hash) &&
+          loop_range.keys.sort == [ "end_tick", "start_tick" ]
+
+        start_tick = Contract.integer(Contract.required(loop_range, "start_tick"), "start_tick", min: 0)
+        end_tick = Contract.integer(Contract.required(loop_range, "end_tick"), "end_tick", min: 1)
+        raise ArgumentError, "fim do loop deve superar o início" unless end_tick > start_tick
+
+        @loop_range = { "start_tick" => start_tick, "end_tick" => end_tick }.freeze
+      end
       validate_unique_ids!
       freeze
     end
@@ -31,11 +42,13 @@ module Music
     # Reconstrói a composição de um hash JSON da versão conhecida do contrato.
     def self.from_h(data)
       raise ArgumentError, "versão do contrato desconhecida" unless Contract.required(data, "version") == VERSION
+      raise ArgumentError, "loop inválido" if data.key?("loop") && !data["loop"].is_a?(Hash)
 
       tracks = Contract.items(Contract.required(data, "tracks"), "tracks").map { |track| Track.from_h(track) }
       new(id: Contract.required(data, "id"), name: Contract.required(data, "name"),
         bpm: Contract.required(data, "bpm"),
-        time_signature: Contract.required(data, "time_signature"), tracks: tracks)
+        time_signature: Contract.required(data, "time_signature"), tracks: tracks,
+        loop_range: data["loop"])
     end
 
     # Calcula ticks por batida a partir da semínima fixa; BPM muda segundos, não posições.
@@ -45,8 +58,10 @@ module Music
 
     # Devolve uma árvore de hashes e listas pronta para JSON, sem compartilhar listas internas.
     def to_h
-      { "version" => VERSION, "id" => id, "name" => name, "bpm" => bpm,
+      result = { "version" => VERSION, "id" => id, "name" => name, "bpm" => bpm,
         "time_signature" => time_signature.dup, "tracks" => tracks.map(&:to_h) }
+      result["loop"] = loop_range.dup if loop_range
+      result
     end
 
     private

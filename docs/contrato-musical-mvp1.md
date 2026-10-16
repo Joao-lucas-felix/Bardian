@@ -52,6 +52,14 @@ Uma faixa inclui `id`, `name`, `instrument_id`, `volume`, `mute`, `solo` e
 `regions`. Uma região inclui `id`, `start_tick`, `duration_ticks` e `notes`.
 Uma nota inclui `id`, `pitch`, `onset_tick`, `duration_ticks` e `velocity`.
 
+O documento versão 1 também pode incluir `loop: { start_tick, end_tick }`.
+Os dois marcadores são inteiros absolutos, com `0 <= start_tick < end_tick`.
+O campo é opcional: documentos anteriores sem `loop` continuam válidos e
+permanecem sem ele após leitura e salvamento, até que a pessoa ajuste os
+marcadores. Um loop explícito pode terminar após a última região para incluir
+silêncio. A duração automática de reprodução, quando o campo está ausente,
+é calculada pelo cliente a partir das regiões e não é gravada no documento.
+
 Este formato também é armazenado como documento JSON de cada composição no
 SQLite. O fluxo HTTP e o controle de versões estão descritos em
 [persistencia-composicoes-mvp1.md](persistencia-composicoes-mvp1.md).

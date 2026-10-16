@@ -14,6 +14,33 @@ class MusicCompositionTest < ActiveSupport::TestCase
     assert_equal source, Music::Composition.from_h(JSON.parse(JSON.generate(composition.to_h))).to_h
   end
 
+  # O loop opcional não deve aparecer em documentos antigos nem aceitar limites ambíguos.
+  test "preserva marcador opcional em round trip e rejeita limites invalidos" do
+    source = composition_data
+    assert_nil Music::Composition.from_h(source).loop_range
+    assert_equal source, Music::Composition.from_h(source).to_h
+
+    source["loop"] = { "start_tick" => 480, "end_tick" => 2400 }
+    music = Music::Composition.from_h(source)
+    assert_equal source["loop"], music.loop_range
+    assert_equal source, Music::Composition.from_h(JSON.parse(JSON.generate(music.to_h))).to_h
+    assert_raises(FrozenError) { music.loop_range["end_tick"] = 3000 }
+
+    [
+      { "start_tick" => -1, "end_tick" => 2400 },
+      { "start_tick" => 480, "end_tick" => 480 },
+      { "start_tick" => 480, "end_tick" => 240 },
+      { "start_tick" => 0.5, "end_tick" => 2400 },
+      { "start_tick" => "480", "end_tick" => 2400 },
+      { "start_tick" => 480 },
+      { "start_tick" => 480, "end_tick" => 2400, "extra" => 1 },
+      nil,
+      []
+    ].each do |invalid|
+      assert_raises(ArgumentError) { Music::Composition.from_h(source.merge("loop" => invalid)) }
+    end
+  end
+
   # Deslocar uma região não deve alterar os tempos locais das notas nem a ordem das faixas.
   test "preserva faixas, regioes simultaneas e notas em um round trip" do
     source = composition_data
