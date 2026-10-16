@@ -8,11 +8,11 @@ import { createPhraseInstrument } from "audio/phrase_instruments"
  *
  * A tela é apenas uma projeção do estado musical: mover ou ampliar o editor
  * altera a viewport, mas nunca converte as notas para coordenadas persistidas.
- * O protótipo trabalha em quatro compassos 4/4, com uma semínima equivalente
- * a 480 ticks, e continua sem persistência de composição.
+ * Uma semínima equivale a 480 ticks. Sem contexto externo, o rascunho mantém
+ * quatro compassos 4/4; uma composição salva fornece duração e compasso.
  */
 export default class extends Controller {
-  static values = { initialNotes: Array, audioEnabled: { type: Boolean, default: true }, partName: { type: String, default: "Piano" }, layout: { type: String, default: "pitched" }, instrumentId: { type: String, default: "piano" } }
+  static values = { initialNotes: Array, audioEnabled: { type: Boolean, default: true }, partName: { type: String, default: "Piano" }, layout: { type: String, default: "pitched" }, instrumentId: { type: String, default: "piano" }, totalTicks: Number, timeNumerator: Number, timeDenominator: Number, persistentMode: Boolean }
   static targets = [
     "duration", "keyboard", "loopButton", "loopEndLine", "loopEndMarker",
     "loopStartLine", "loopStartMarker", "playhead", "ruler", "roll",
@@ -22,9 +22,11 @@ export default class extends Controller {
   /** Inicializa o estado musical, a viewport e os listeners do editor. */
   connect() {
     this.ticksPerQuarter = 480
-    this.totalTicks = this.ticksPerQuarter * 16
-    this.minPitch = 36
-    this.maxPitch = 84
+    this.totalTicks = this.hasTotalTicksValue ? this.totalTicksValue : this.ticksPerQuarter * 16
+    this.timeNumerator = this.hasTimeNumeratorValue ? this.timeNumeratorValue : 4
+    this.timeDenominator = this.hasTimeDenominatorValue ? this.timeDenominatorValue : 4
+    this.minPitch = this.isPersistentMode() ? 0 : 36
+    this.maxPitch = this.isPersistentMode() ? 127 : 84
     this.rowHeight = 22
     this.pixelsPerQuarter = 88
     this.gridQuarter = 1
@@ -79,9 +81,47 @@ export default class extends Controller {
   /** Preserva reprodução no protótipo que não declara o valor Stimulus. */
   audioAvailable() { return this.hasAudioEnabledValue ? this.audioEnabledValue : true }
 
+  /** Distingue a composição salva do rascunho sem mudar seu comportamento legado. */
+  isPersistentMode() { return this.hasPersistentModeValue && this.persistentModeValue }
+
+  /** Calcula um compasso no denominador declarado, sempre em ticks musicais. */
+  numerator() { return this.timeNumerator ?? (this.hasTimeNumeratorValue ? this.timeNumeratorValue : 4) }
+  denominator() { return this.timeDenominator ?? (this.hasTimeDenominatorValue ? this.timeDenominatorValue : 4) }
+  measureTicks() {
+    return this.ticksPerQuarter * 4 / this.denominator() * this.numerator()
+  }
+
+  /** Atualiza régua e limite quando a região ou o compasso muda, sem retimar notas. */
+  setMusicalContext({ totalTicks, numerator, denominator }) {
+    if (!Number.isInteger(totalTicks) || totalTicks < 1 || !Number.isInteger(numerator) || numerator < 1 ||
+      ![1, 2, 4, 8, 16, 32, 64].includes(denominator) || this.notes.some((note) => note.onset + note.duration > totalTicks)) {
+      throw new Error("Contexto musical inválido para esta região")
+    }
+    const loopAtEnd = this.loopEndTick === this.totalTicks
+    this.totalTicks = totalTicks
+    this.timeNumerator = numerator
+    this.timeDenominator = denominator
+    this.loopStartTick = Math.min(this.loopStartTick, Math.max(0, totalTicks - 1))
+    this.loopEndTick = loopAtEnd ? totalTicks : Math.min(totalTicks, Math.max(this.loopStartTick + 1, this.loopEndTick))
+    this.score = this.buildScore()
+    this.resizeCanvases()
+    this.updateSummary()
+  }
+
   /** Define as alturas desenhadas; bateria usa linhas por peça, não cromatismo. */
   displayPitches() {
-    return this.isDrumLayout() ? [42, 38, 36] : Array.from({ length: this.maxPitch - this.minPitch + 1 }, (_, index) => this.maxPitch - index)
+    if (this.isDrumLayout()) {
+      const pitches = [42, 38, 36]
+      if (this.isPersistentMode()) {
+        for (const note of [...(this.initialNotesValue || []), ...this.notes]) {
+          if (Number.isInteger(note.pitch) && note.pitch >= 0 && note.pitch <= 127) pitches.push(note.pitch)
+        }
+      }
+      return [...new Set(pitches)].sort((a, b) => b - a)
+    }
+    const minimum = this.isPersistentMode() ? 0 : this.minPitch
+    const maximum = this.isPersistentMode() ? 127 : this.maxPitch
+    return Array.from({ length: maximum - minimum + 1 }, (_, index) => maximum - index)
   }
 
   /** Identifica o modo de três peças sem alterar o protótipo isolado. */
@@ -130,13 +170,14 @@ export default class extends Controller {
 
     builder.setMetadata({ title: "Composição de demonstração", composer: "Bardian" })
     builder.addPart({ id: partId, name: this.partNameValue || "Piano", midiProgram: 0 })
-    for (let number = 1; number <= 4; number += 1) {
+    for (let start = 0, number = 1; start < this.totalTicks; start += this.measureTicks(), number += 1) {
+      const duration = Math.min(this.measureTicks(), this.totalTicks - start)
       builder.addMeasure({
         id: builder.newMeasureId(),
         number,
-        onsetQuarters: new Rational((number - 1) * 4),
-        durationQuarters: new Rational(4),
-        timeSignature: { numerator: 4, denominator: 4 }
+        onsetQuarters: this.quarters(start),
+        durationQuarters: this.quarters(duration),
+        timeSignature: { numerator: this.numerator(), denominator: this.denominator() }
       })
     }
 
@@ -151,6 +192,14 @@ export default class extends Controller {
     })
 
     return builder.build()
+  }
+
+  /** Reduz a fração de ticks em semínimas para o ScoreBuilder. */
+  quarters(ticks) {
+    let divisor = this.ticksPerQuarter
+    let value = ticks
+    while (value !== 0) [value, divisor] = [divisor % value, value]
+    return new Rational(ticks / divisor, this.ticksPerQuarter / divisor)
   }
 
   /** Cria as teclas virtuais e permite ouvir uma altura isolada. */
@@ -233,7 +282,7 @@ export default class extends Controller {
 
     for (let tick = 0; tick <= this.totalTicks; tick += this.gridTicks()) {
       const x = this.musicToPixels(tick)
-      const major = tick % (this.ticksPerQuarter * 4) === 0
+      const major = tick % this.measureTicks() === 0
       context.strokeStyle = major ? "#b6c8cc" : "#e1e9ea"
       context.lineWidth = major ? 1.4 : 1
       context.beginPath()
@@ -303,10 +352,13 @@ export default class extends Controller {
     context.fillRect(0, 0, this.musicToPixels(this.loopStartTick), 36)
     context.fillRect(this.musicToPixels(this.loopEndTick), 0, width - this.musicToPixels(this.loopEndTick), 36)
     context.font = "600 11px system-ui"
-    for (let beat = 0; beat < 16; beat += 1) {
-      const x = this.musicToPixels(beat * this.ticksPerQuarter)
-      context.fillStyle = beat % 4 === 0 ? "#385c65" : "#71858b"
-      context.fillText(beat % 4 === 0 ? `Compasso ${beat / 4 + 1}` : `${beat % 4 + 1}`, x + 8, 22)
+    const beatTicks = this.ticksPerQuarter * 4 / this.denominator()
+    for (let tick = 0; tick < this.totalTicks; tick += beatTicks) {
+      const x = this.musicToPixels(tick)
+      const measure = Math.floor(tick / this.measureTicks()) + 1
+      const beat = Math.floor((tick % this.measureTicks()) / beatTicks) + 1
+      context.fillStyle = beat === 1 ? "#385c65" : "#71858b"
+      context.fillText(beat === 1 ? `Compasso ${measure}` : String(beat), x + 8, 22)
     }
   }
 
@@ -357,9 +409,10 @@ export default class extends Controller {
     }
 
     this.selectedNoteIds.clear()
-    const onset = Math.max(0, Math.min(this.totalTicks - this.gridTicks(), this.snapTick(this.pixelsToMusic(point.x))))
+    const duration = Math.min(this.gridTicks(), this.totalTicks)
+    const onset = Math.max(0, Math.min(this.totalTicks - duration, this.snapTick(this.pixelsToMusic(point.x))))
     const pitch = this.pixelsToPitch(point.y)
-    const noteData = { id: `note-${this.nextNoteId++}`, pitch, onset, duration: this.gridTicks(), velocity: 100 }
+    const noteData = { id: `note-${this.nextNoteId++}`, pitch, onset, duration, velocity: 100 }
     this.notes.push(noteData)
     this.selectOnly(noteData.id)
     this.interaction = { type: "draw", point, noteId: noteData.id, snapshot: { ...noteData } }
@@ -399,7 +452,7 @@ export default class extends Controller {
     } else if (interaction.type === "draw") {
       const note = this.notes.find((item) => item.id === interaction.noteId)
       if (!note) return
-      const end = Math.max(note.onset + this.gridTicks(), this.snapTick(this.pixelsToMusic(point.x)))
+      const end = Math.max(note.onset + Math.min(this.gridTicks(), this.totalTicks - note.onset), this.snapTick(this.pixelsToMusic(point.x)))
       note.duration = Math.min(this.totalTicks - note.onset, end - note.onset)
     } else if (interaction.type === "move") {
       const requestedTick = this.snapEnabled
@@ -633,7 +686,7 @@ export default class extends Controller {
   selectOnly(id) {
     this.selectedNoteIds = new Set([id])
     const note = this.notes.find((item) => item.id === id)
-    if (note) this.statusTarget.textContent = `${this.pitchName(note.pitch)}, compasso ${Math.floor(note.onset / (this.ticksPerQuarter * 4)) + 1}`
+    if (note) this.statusTarget.textContent = `${this.pitchName(note.pitch)}, compasso ${Math.floor(note.onset / this.measureTicks()) + 1}`
   }
 
   /** Alterna uma nota na seleção múltipla. */
@@ -675,7 +728,7 @@ export default class extends Controller {
       event.preventDefault()
       const step = this.gridTicks()
       if (event.key === "ArrowLeft") this.keyboardCursor.onset = Math.max(0, this.keyboardCursor.onset - step)
-      if (event.key === "ArrowRight") this.keyboardCursor.onset = Math.min(this.totalTicks - step, this.keyboardCursor.onset + step)
+      if (event.key === "ArrowRight") this.keyboardCursor.onset = Math.max(0, Math.min(this.totalTicks - Math.min(step, this.totalTicks), this.keyboardCursor.onset + step))
       if (event.key === "ArrowUp") this.keyboardCursor.pitch = this.adjacentPitch(this.keyboardCursor.pitch, -1)
       if (event.key === "ArrowDown") this.keyboardCursor.pitch = this.adjacentPitch(this.keyboardCursor.pitch, 1)
       this.statusTarget.textContent = this.keyboardCursorStatus()
@@ -845,7 +898,9 @@ export default class extends Controller {
     this.loopEndMarkerTarget.style.left = `${endPixels - scrollLeft}px`
     this.loopStartLineTarget.style.left = `${startPixels}px`
     this.loopEndLineTarget.style.left = `${endPixels}px`
-    const label = (tick) => tick === this.totalTicks ? "fim do compasso 4" : `compasso ${Math.floor(tick / (this.ticksPerQuarter * 4)) + 1}, tempo ${((tick % (this.ticksPerQuarter * 4)) / this.ticksPerQuarter + 1).toLocaleString("pt-BR")}`
+    const beatTicks = this.ticksPerQuarter * 4 / this.denominator()
+    const label = (tick) => tick === this.totalTicks ? `fim da região, compasso ${Math.ceil(this.totalTicks / this.measureTicks())}` :
+      `compasso ${Math.floor(tick / this.measureTicks()) + 1}, tempo ${(Math.floor((tick % this.measureTicks()) / beatTicks) + 1).toLocaleString("pt-BR")}`
     this.loopStartMarkerTarget.setAttribute("aria-label", `Início do loop: ${label(this.loopStartTick)}. Use as setas para ajustar.`)
     this.loopEndMarkerTarget.setAttribute("aria-label", `Fim do loop: ${label(this.loopEndTick)}. Use as setas para ajustar.`)
   }
@@ -897,7 +952,7 @@ export default class extends Controller {
 
   /** Mantém o resumo acessível sincronizado com o estado temporário. */
   updateSummary() {
-    this.scoreTarget.textContent = `Score inicial: 1 parte, 4 compassos, ${this.notes.length} nota${this.notes.length === 1 ? "" : "s"}`
+    this.scoreTarget.textContent = `Score inicial: 1 parte, ${Math.ceil(this.totalTicks / this.measureTicks())} compassos, ${this.notes.length} nota${this.notes.length === 1 ? "" : "s"}`
     const selected = this.notes.filter((note) => this.selectedNoteIds.has(note.id))
     this.durationTarget.disabled = !selected.length
     const durations = new Set(selected.map((note) => note.duration))

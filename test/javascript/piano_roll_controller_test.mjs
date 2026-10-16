@@ -30,9 +30,23 @@ const createPhraseInstrument = (id) => {
   return instrument
 }
 const dom = { createElement: (tagName) => ({ tagName: tagName.toUpperCase(), className: "", dataset: {}, attributes: {}, children: [], addEventListener() { this.listens = true }, setAttribute(name, value) { this.attributes[name] = value }, append(child) { this.children.push(child) } }) }
+// Mantém o teste nos cálculos do controller; o pacote externo só recebe medidas.
+class Rational { constructor(numerator, denominator = 1) { this.numerator = numerator; this.denominator = denominator } }
+class Duration { constructor(options) { this.base = options.base } }
+class ScoreBuilder {
+  constructor() { this.measures = []; this.notes = [] }
+  newPartId() { return "part-1" }
+  newMeasureId() { return `measure-${this.measures.length + 1}` }
+  setMetadata() {}
+  addPart() {}
+  addMeasure(measure) { this.measures.push(measure) }
+  addNote(_part, note) { this.notes.push(note) }
+  build() { return { measures: this.measures, notes: this.notes } }
+}
 const PianoRollController = vm.runInNewContext(`${source}\nPianoRollController`, {
   Controller: class {}, Tone, createPhraseInstrument,
   document: dom,
+  Rational, Duration, ScoreBuilder,
   Pitch: { fromMidi: (midi) => ({ toString: () => `MIDI-${midi}` }) },
   requestAnimationFrame: () => 1, cancelAnimationFrame: () => {},
   setInterval: () => 1, clearInterval: () => {}
@@ -75,6 +89,76 @@ function editor(notes = [{ id: "note-1", pitch: 60, onset: 480, duration: 480, v
 function pointer(x, y, shiftKey = false) {
   return { x, y, shiftKey, pointerId: 7, button: 0, preventDefault() {} }
 }
+
+test("calcula score e limites de um compasso 6 por 8", () => {
+  const instance = editor([])
+  instance.totalTicks = 1440
+  instance.hasTimeNumeratorValue = true
+  instance.timeNumeratorValue = 6
+  instance.hasTimeDenominatorValue = true
+  instance.timeDenominatorValue = 8
+  assert.equal(instance.measureTicks(), 1440)
+  const score = instance.buildScore()
+  assert.equal(score.measures.length, 1)
+  assert.equal(score.measures[0].timeSignature.numerator, 6)
+  assert.equal(score.measures[0].durationQuarters.numerator, 3)
+  assert.equal(score.measures[0].durationQuarters.denominator, 1)
+})
+
+test("compasso parcial e grade grande nao criam nota alem da regiao", () => {
+  const instance = editor([])
+  instance.totalTicks = 720
+  instance.loopEndTick = 720
+  instance.noteAt = () => null
+  instance.pointerDown(pointer(instance.musicToPixels(600), instance.pitchToPixels(60) + 10))
+  instance.pointerMove(pointer(instance.musicToPixels(900), instance.pitchToPixels(60) + 10))
+  assert.ok(instance.notes[0].onset + instance.notes[0].duration <= 720)
+  const score = instance.buildScore()
+  assert.equal(score.measures.length, 1)
+  assert.equal(score.measures[0].durationQuarters.numerator, 3)
+  assert.equal(score.measures[0].durationQuarters.denominator, 2)
+})
+
+test("regiao menor que a grade mantem loop e nota dentro dos limites", () => {
+  const instance = editor([])
+  instance.totalTicks = 240
+  instance.loopEndTick = 240
+  instance.noteAt = () => null
+  instance.setLoopBoundary("start", 120)
+  assert.equal(instance.loopStartTick, 0)
+  instance.pointerDown(pointer(instance.musicToPixels(120), instance.pitchToPixels(60) + 10))
+  assert.equal(instance.notes[0].onset, 0)
+  assert.equal(instance.notes[0].duration, 240)
+})
+
+test("modo persistido carrega extremos MIDI e pecas extras de bateria", () => {
+  const instance = editor([])
+  instance.hasPersistentModeValue = true
+  instance.persistentModeValue = true
+  instance.initialNotesValue = [
+    { id: "low", pitch: 0, onset: 0, duration: 480, velocity: 1 },
+    { id: "high", pitch: 127, onset: 480, duration: 480, velocity: 127 }
+  ]
+  instance.loadInitialNotes()
+  assert.deepEqual(instance.notes.map((note) => note.pitch), [0, 127])
+  instance.hasLayoutValue = true
+  instance.layoutValue = "drums"
+  instance.initialNotesValue = [{ id: "ride", pitch: 49, onset: 0, duration: 480, velocity: 90 }]
+  instance.loadInitialNotes()
+  assert.deepEqual(instance.notes.map((note) => note.pitch), [49])
+  assert.ok(instance.displayPitches().includes(49))
+})
+
+test("atualiza compasso e duracao da regiao sem deslocar notas", () => {
+  const instance = editor()
+  instance.resizeCanvases = () => {}
+  instance.buildScore = () => ({})
+  instance.setMusicalContext({ totalTicks: 2880, numerator: 6, denominator: 8 })
+  assert.equal(instance.totalTicks, 2880)
+  assert.equal(instance.measureTicks(), 1440)
+  assert.equal(instance.notes[0].onset, 480)
+  assert.equal(instance.notes[0].duration, 480)
+})
 
 test("a borda direita visível continua selecionável a dez pixels do fim", () => {
   const instance = editor()
