@@ -37,6 +37,13 @@
       <span class="portal-destination-copy"><span class="portal-destination-name">Criar música</span><span>Monte sua ideia em camadas, uma frase por vez.</span></span>
       <%= bard_icon(:arrow) %>
     <% end %>
+    <% if user_signed_in? %>
+      <%= link_to compositions_path, class: "portal-destination" do %>
+        <span class="portal-destination-icon"><%= bard_icon(:create) %></span>
+        <span class="portal-destination-copy"><span class="portal-destination-name">Minhas músicas</span><span>Abra e continue suas composições salvas.</span></span>
+        <%= bard_icon(:arrow) %>
+      <% end %>
+    <% end %>
     <%= link_to presentation_path, class: "portal-destination" do %>
       <span class="portal-destination-icon"><%= bard_icon(:compass) %></span>
       <span class="portal-destination-copy"><span class="portal-destination-name">Apresentação</span><span>Conheça a proposta do Bardian e toque o piano interativo.</span></span>

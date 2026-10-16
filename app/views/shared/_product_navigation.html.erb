@@ -16,6 +16,11 @@
       <%= link_to compose_path, class: "product-nav-link #{'is-current' if current_page?(compose_path)}", aria: (current_page?(compose_path) ? { current: "page" } : {}) do %>
         <%= bard_icon(:create) %><span>Criar</span>
       <% end %>
+      <% if user_signed_in? %>
+        <%= link_to compositions_path, class: "product-nav-link #{'is-current' if request.path.start_with?(compositions_path)}", aria: (request.path.start_with?(compositions_path) ? { current: "page" } : {}) do %>
+          <%= bard_icon(:create) %><span>Minhas músicas</span>
+        <% end %>
+      <% end %>
       <%= link_to presentation_path, class: "product-nav-link #{'is-current' if current_page?(presentation_path)}", aria: (current_page?(presentation_path) ? { current: "page" } : {}) do %>
         <%= bard_icon(:compass) %><span>Sobre</span>
       <% end %>

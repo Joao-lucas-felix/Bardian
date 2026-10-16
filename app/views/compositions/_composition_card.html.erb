@@ -1,0 +1,8 @@
+<%# Recebe uma Composition própria e mostra somente nome e atualização. %>
+<article class="compositions-card">
+  <div>
+    <h3><%= link_to composition.name, composition_path(composition) %></h3>
+    <p>Atualizada em <%= l(composition.updated_at, format: "%d/%m/%Y %H:%M") %></p>
+  </div>
+  <%= link_to "Abrir", composition_path(composition), class: "compositions-open" %>
+</article>

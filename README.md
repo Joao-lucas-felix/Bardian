@@ -5,6 +5,9 @@
 - [Convenções do domínio musical](docs/dominio-musical.md)
 - [Decisão de áudio: Tone.js e Salamander locais](docs/decisao-audio.md)
 - [Estado atual do projeto](docs/estado-atual.md)
+- [Contrato musical do MVP 1](docs/contrato-musical-mvp1.md)
+- [Persistência de composições](docs/persistencia-composicoes-mvp1.md)
+- [Timeline de composições](docs/timeline-composicoes-mvp1.md)
 
 ## Autenticação local
 
@@ -25,9 +28,9 @@ mise exec -- bin/rails db:seed
 Em outros ambientes, forneça `ADMIN_EMAIL` e `ADMIN_PASSWORD` como variáveis do
 processo, sem depender de `.env`.
 
-As rotas principais são `/users/sign_in`, `/users/sign_up` e `/dashboard`.
-Usuários comuns são encaminhados temporariamente para a página pública após o
-login; administradores são encaminhados para a dashboard.
+As rotas de conta são `/users/sign_in` e `/users/sign_up`. Usuários comuns são
+encaminhados para a página pública após o login e podem abrir suas composições
+em `/compositions`; administradores são encaminhados para `/dashboard`.
 
 ## Relatórios de desenvolvimento
 
@@ -38,9 +41,9 @@ testar a funcionalidade. O objeto `DevReport` valida o catálogo e a página
 permite buscar texto e filtrar por tag. Não há tabela de banco nem cadastro pela
 interface; o registro deve acompanhar a implementação de cada nova entrega.
 
-Nesta etapa, o catálogo contém somente a própria dashboard. Funcionalidades
-anteriores não foram registradas retroativamente, e recursos ainda não
-implementados, como o piano roll, não devem receber um relatório.
+O catálogo reúne as entregas verificadas do projeto. Cada nova funcionalidade
+deve receber um relatório com uma rota existente para teste; planos e recursos
+ainda não implementados não são registrados como entregas.
 
 This README would normally document whatever steps are necessary to get the
 application up and running.

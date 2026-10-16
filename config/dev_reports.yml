@@ -1,5 +1,37 @@
 # Cada entrega concluída possui uma descrição verificável e uma rota interna de teste.
 reports:
+  - slug: timeline-composicoes-mvp1
+    title: Timeline editável de composições
+    description: Faixas e regiões podem ser organizadas visualmente em ticks musicais e salvas no mesmo documento dos metadados.
+    changes:
+      - Adicionou controles de faixa para nome, instrumento, volume, mute, solo, ordem e remoção.
+      - Permitiu criar, mover, redimensionar e excluir regiões com snap musical, zoom visual e alternativa por teclado.
+      - Unificou metadados e timeline no salvamento JSON versionado, preservando edições locais em conflitos e respostas tardias.
+      - Manteve o formulário HTML de metadados, a página de criação e o início do Caminho do Bardo.
+      - Registrou limites da etapa e verificou contrato musical, interface e operações de ticks.
+    delivered_on: "2026-10-15"
+    tags:
+      - Composição
+      - Interface
+      - MIDI
+    test_path: /compositions
+
+  - slug: composicoes-persistidas-mvp1
+    title: Composições persistidas por usuário
+    description: Contas autenticadas podem criar, listar, abrir, renomear, salvar e excluir composições validadas pelo contrato musical.
+    changes:
+      - Criou uma tabela de documentos JSON associados ao usuário, com ID musical estável e versão de salvamento.
+      - Adicionou rotas HTML e JSON para reabrir e salvar metadados, faixas, regiões, notas e instrumentos.
+      - Impediu acesso a composições de terceiros, rejeitou documentos inválidos e informou conflitos de versão sem sobrescrever dados.
+      - Criou telas de catálogo e detalhes com salvamento manual, indicação de alterações pendentes e confirmação de exclusão.
+      - Verificou testes Rails e JavaScript; a timeline e o piano roll ainda não editam o documento persistido.
+    delivered_on: "2026-10-15"
+    tags:
+      - Composição
+      - Interface
+      - MIDI
+    test_path: /compositions
+
   - slug: arranjo-canvas-instrumentos-iniciais
     title: Frases alinhadas e instrumentos iniciais
     description: A criação reúne quatro frases no mesmo trecho, com prévias ilustrativas em Canvas, editor compacto e timbres locais de piano, cordas e bateria.

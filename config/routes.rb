@@ -17,6 +17,9 @@ Rails.application.routes.draw do
   # Abre a primeira lição independente do Caminho do Bardo.
   get "caminho-do-bardo/notas", to: "pages#notes_lesson", as: :notes_lesson
 
+  # Lista e salva apenas composições pertencentes à conta autenticada.
+  resources :compositions, only: [ :index, :create, :show, :update, :destroy ]
+
   # Disponibiliza a entrada da área principal do projeto.
   get "dashboard", to: "dashboard#index", as: :dashboard
 

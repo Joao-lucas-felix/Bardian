@@ -1,0 +1,33 @@
+<%# Lista documentos próprios e oferece uma criação vazia para começar. %>
+<% content_for :title, "Bardian — Minhas composições" %>
+<% content_for :main_class, "compositions-page" %>
+
+<div class="compositions-shell">
+  <header class="compositions-heading">
+    <p class="compositions-eyebrow">Meu espaço de criação</p>
+    <h1>Minhas composições</h1>
+    <p>Guarde suas ideias musicais e continue de onde parou.</p>
+  </header>
+
+  <section class="compositions-panel" aria-labelledby="new-composition-title">
+    <h2 id="new-composition-title">Começar uma composição</h2>
+    <%= form_with url: compositions_path, method: :post, class: "compositions-create-form" do %>
+      <%= label_tag :name, "Nome da composição" %>
+      <%= text_field_tag :name, nil, maxlength: 120, placeholder: "Minha nova ideia" %>
+      <%= submit_tag "Criar composição", class: "product-button product-button-primary" %>
+    <% end %>
+  </section>
+
+  <section class="compositions-list" aria-labelledby="saved-compositions-title">
+    <h2 id="saved-compositions-title">Salvas</h2>
+    <% if @compositions.any? %>
+      <div class="compositions-cards">
+        <% @compositions.each do |composition| %>
+          <%= render "composition_card", composition: composition %>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="compositions-empty">Você ainda não salvou nenhuma composição.</p>
+    <% end %>
+  </section>
+</div>

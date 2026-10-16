@@ -1,0 +1,23 @@
+<%# Recebe contagens do controller; faixas e regiões são desenhadas do documento JSON. %>
+<section class="composition-timeline" aria-labelledby="composition-timeline-title">
+  <div class="composition-timeline-heading">
+    <div>
+      <h2 id="composition-timeline-title">Timeline</h2>
+      <p data-composition-timeline-target="summary"><%= pluralize(track_count, "faixa") %> · <%= pluralize(region_count, "região", "regiões") %> · <%= pluralize(note_count, "nota") %></p>
+    </div>
+    <div class="composition-timeline-actions">
+      <button type="button" class="product-button product-button-secondary" data-action="click->composition-timeline#addTrack">Adicionar faixa</button>
+      <div class="composition-timeline-zoom" aria-label="Zoom da timeline">
+        <button type="button" data-action="click->composition-timeline#zoomOut" aria-label="Diminuir zoom">−</button>
+        <span data-composition-timeline-target="zoomLabel">100%</span>
+        <button type="button" data-action="click->composition-timeline#zoomIn" aria-label="Aumentar zoom">+</button>
+      </div>
+    </div>
+  </div>
+  <p class="composition-timeline-help">Arraste uma região para mover; arraste sua borda direita para mudar a duração. Com a região selecionada, use ← e → para mover, Shift + setas para redimensionar e Delete para excluir.</p>
+  <div class="composition-timeline-scroll" data-composition-timeline-target="scroll">
+    <div class="composition-timeline-ruler" data-composition-timeline-target="ruler" aria-label="Régua de compassos"></div>
+    <div data-composition-timeline-target="tracks"></div>
+  </div>
+  <p class="composition-timeline-empty" data-composition-timeline-target="empty">Adicione uma faixa para começar sua composição.</p>
+</section>

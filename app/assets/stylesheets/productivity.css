@@ -107,6 +107,76 @@ body, button, input, select { font-family: var(--p-font); }
 .portal-destination-name { color: var(--p-ink); font-size: 17px; font-weight: 800; }
 .portal-destination > .ui-icon { width: 17px; height: 17px; flex-basis: 17px; margin-left: auto; color: var(--p-accent); }
 
+/* CRUD de composições: mantém formulários legíveis sem misturar regras musicais à view. */
+.compositions-page { min-height: calc(100svh - 72px); padding: 48px clamp(20px, 4vw, 64px) 96px; background: var(--p-bg); color: var(--p-ink); }
+.compositions-shell { width: min(100%, 900px); margin: 0 auto; }
+.compositions-heading { margin-bottom: 32px; }
+.compositions-eyebrow { margin: 12px 0 8px; color: var(--p-accent); font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+.compositions-heading h1 { margin: 0 0 10px; font-size: clamp(34px, 4vw, 54px); line-height: 1.1; letter-spacing: -.035em; }
+.compositions-heading p:last-child { color: var(--p-muted); line-height: 1.5; }
+.compositions-back { color: var(--p-accent); font-weight: 700; text-decoration: none; }
+.compositions-panel { margin: 22px 0; padding: clamp(20px, 3vw, 32px); border: 1px solid var(--p-line); border-radius: 14px; background: var(--p-surface); box-shadow: var(--p-shadow); }
+.compositions-panel h2, .compositions-list h2 { margin: 0 0 20px; font-size: 21px; }
+.compositions-create-form, .compositions-details-form { display: grid; gap: 12px; }
+.compositions-create-form label, .compositions-field label { font-weight: 700; }
+.compositions-create-form input[type="text"], .compositions-field input, .compositions-field select { width: 100%; min-height: 44px; padding: 9px 12px; border: 1px solid var(--p-line); border-radius: 8px; background: var(--p-surface); color: var(--p-ink); box-sizing: border-box; }
+.compositions-create-form .product-button, .compositions-details-form .product-button { width: fit-content; border: 0; cursor: pointer; }
+.compositions-details-form { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.compositions-field { display: grid; gap: 7px; }
+.compositions-field:first-of-type, .compositions-save-state, .compositions-details-form .product-button { grid-column: 1 / -1; }
+.compositions-save-state { margin: 0; color: var(--p-muted); font-size: 14px; }
+.compositions-list { margin-top: 38px; }
+.compositions-cards { display: grid; gap: 12px; }
+.compositions-card { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 18px 22px; border: 1px solid var(--p-line); border-radius: 11px; background: var(--p-surface); }
+.compositions-card h3 { margin: 0 0 5px; font-size: 18px; }
+.compositions-card h3 a { color: var(--p-ink); text-decoration: none; }
+.compositions-card h3 a:hover, .compositions-open:hover { color: var(--p-accent); }
+.compositions-card p, .compositions-empty { margin: 0; color: var(--p-muted); }
+.compositions-open { flex: 0 0 auto; color: var(--p-accent); font-weight: 800; text-decoration: none; }
+.compositions-error { padding: 14px 18px; border: 1px solid var(--p-accent); border-radius: 8px; background: var(--p-accent-soft); color: var(--p-ink); }
+.compositions-danger { margin-top: 28px; }
+.compositions-danger button { min-height: 42px; padding: 0 14px; border: 1px solid var(--p-accent); border-radius: 8px; background: transparent; color: var(--p-accent); font-weight: 800; cursor: pointer; }
+/* A timeline separa controles fixos de uma superfície temporal que pode rolar. */
+.compositions-editor-shell { width: min(100%, 1280px); }
+.composition-timeline { margin-top: 30px; border: 1px solid var(--p-line); border-radius: 14px; background: var(--p-surface); box-shadow: var(--p-shadow); overflow: hidden; }
+.composition-timeline-heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 24px 28px 15px; }
+.composition-timeline-heading h2 { margin: 0 0 4px; font-size: 24px; }
+.composition-timeline-heading p, .composition-timeline-help { margin: 0; color: var(--p-muted); font-size: 13px; line-height: 1.5; }
+.composition-timeline-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.composition-timeline-actions .product-button { border: 1px solid var(--p-line); cursor: pointer; }
+.composition-timeline-zoom { display: flex; align-items: center; gap: 6px; border: 1px solid var(--p-line); border-radius: 8px; }
+.composition-timeline-zoom button { width: 34px; height: 34px; border: 0; background: transparent; color: var(--p-ink); font-size: 20px; cursor: pointer; }
+.composition-timeline-zoom span { min-width: 42px; text-align: center; font-size: 12px; font-weight: 800; }
+.composition-timeline-help { padding: 0 28px 18px; }
+.composition-timeline-scroll { overflow: auto; max-height: 620px; border-top: 1px solid var(--p-line); }
+.composition-timeline-ruler, .composition-track-row { display: flex; width: max-content; min-width: 100%; }
+.composition-timeline-ruler { position: sticky; top: 0; z-index: 3; min-height: 35px; background: var(--p-surface-alt); }
+.composition-ruler-label, .composition-track-controls { position: sticky; left: 0; z-index: 2; flex: 0 0 248px; box-sizing: border-box; border-right: 1px solid var(--p-line); }
+.composition-ruler-label { z-index: 4; padding: 10px 15px; color: var(--p-muted); background: var(--p-surface-alt); font-size: 11px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+.composition-ruler-marks { display: flex; flex: none; }
+.composition-ruler-mark { box-sizing: border-box; padding: 10px 9px; border-left: 1px solid var(--p-line); color: var(--p-muted); font-size: 11px; font-weight: 800; }
+.composition-track-row { border-top: 1px solid var(--p-line); }
+.composition-track-controls { display: grid; gap: 7px; padding: 12px; background: var(--p-surface); }
+.composition-track-name, .composition-track-instrument { box-sizing: border-box; width: 100%; min-height: 33px; padding: 5px 8px; border: 1px solid var(--p-line); border-radius: 6px; background: var(--p-surface); color: var(--p-ink); font: inherit; font-size: 13px; }
+.composition-track-name { font-weight: 800; }
+.composition-track-volume { width: 100%; accent-color: var(--p-accent); }
+.composition-track-switches, .composition-track-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.composition-track-switch { display: flex; align-items: center; gap: 3px; color: var(--p-muted); font-size: 11px; font-weight: 700; }
+.composition-track-switch input { accent-color: var(--p-accent); }
+.composition-mini-button { min-height: 27px; padding: 3px 6px; border: 1px solid var(--p-line); border-radius: 5px; background: var(--p-surface-alt); color: var(--p-ink); font-size: 11px; font-weight: 700; cursor: pointer; }
+.composition-mini-button:hover { border-color: var(--p-accent); color: var(--p-accent); }
+.composition-mini-button:disabled { opacity: .4; cursor: default; }
+.composition-mini-danger { color: var(--p-accent); }
+.composition-track-lane { position: relative; flex: none; min-height: 177px; background-color: var(--p-surface-alt); background-image: linear-gradient(to right, var(--p-line) 1px, transparent 1px), linear-gradient(to right, color-mix(in srgb, var(--p-line) 55%, transparent) 1px, transparent 1px); background-size: var(--measure-width) 100%, var(--beat-width) 100%; }
+.composition-region { position: absolute; top: 36px; box-sizing: border-box; display: flex; align-items: center; min-width: 25px; height: 100px; padding: 10px; border: 1px solid var(--p-accent); border-radius: 6px; background: var(--p-accent-soft); color: var(--p-ink); font-size: 12px; font-weight: 800; cursor: grab; user-select: none; touch-action: none; }
+.composition-region[aria-pressed="true"] { outline: 2px solid var(--p-accent); outline-offset: 2px; }
+.composition-region:active { cursor: grabbing; }
+.composition-region-grip { position: absolute; top: 0; right: 0; width: 13px; height: 100%; border-left: 2px solid var(--p-accent); cursor: ew-resize; }
+.composition-timeline-empty { margin: 0; padding: 36px 28px; color: var(--p-muted); }
+.composition-timeline-empty[hidden] { display: none; }
+@media (max-width: 700px) { .composition-timeline-heading { align-items: flex-start; flex-direction: column; padding: 20px; } .composition-timeline-help { padding: 0 20px 16px; } .composition-ruler-label, .composition-track-controls { flex-basis: 205px; } }
+@media (max-width: 620px) { .compositions-details-form { grid-template-columns: 1fr; } .compositions-card { align-items: flex-start; } }
+
 /* A apresentação vira uma visão de produto com o piano como demonstração concreta. */
 .presentation { background: var(--p-bg); color: var(--p-ink); font-family: var(--p-font); font-size: 17px; }
 .presentation .story-scene { --story-gutter: clamp(24px, 7vw, 110px); min-height: auto; padding: clamp(68px, 8vw, 110px) var(--story-gutter); background: var(--p-bg); color: var(--p-ink); }
