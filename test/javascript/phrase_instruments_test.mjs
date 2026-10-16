@@ -14,12 +14,14 @@ const Tone = {
   Sampler: class {
     constructor(options) { this.options = options; this.events = []; samplers.push(this) }
     toDestination() { return this }
+    connect(destination) { this.destination = destination; return this }
     triggerAttackRelease(...args) { this.events.push(args) }
     dispose() { this.disposed = true }
   },
   Player: class {
-    constructor(options = {}) { this.options = options; this.buffer = options.url || { sample: true } }
+    constructor(options = {}) { this.options = options; this.buffer = options.url || { sample: true }; this.volume = { value: 0 } }
     toDestination() { players.push(this); return this }
+    connect(destination) { this.destination = destination; players.push(this); return this }
     load(url) { this.url = url; return failLoad ? Promise.reject(new Error("sem amostra")) : Promise.resolve() }
     start(time) { this.startedAt = time }
     dispose() { this.disposeCount = (this.disposeCount || 0) + 1; this.disposed = true; this.options.onstop?.() }
@@ -96,5 +98,25 @@ test("falha ao carregar pode ser tentada novamente", async () => {
   await kit.load()
   kit.trigger(36, 0.1, 20)
   assert.equal(players.at(-1).startedAt, 20)
+  kit.dispose()
+})
+
+// A mixagem envia vozes à saída da faixa sem mudar o destino das prévias antigas.
+test("aceita saída por faixa e intensidade da nota sem alterar padrão anterior", async () => {
+  const destination = { id: "faixa" }
+  const piano = createPhraseInstrument("piano", { destination })
+  const pending = piano.load()
+  samplers.at(-1).options.onload()
+  await pending
+  piano.trigger(60, 0.5, 3, 0.25)
+  assert.equal(samplers.at(-1).destination, destination)
+  assert.deepEqual(samplers.at(-1).events[0], ["C4", 0.5, 3, 0.25])
+  piano.dispose()
+
+  const kit = createPhraseInstrument("drums", { destination })
+  await kit.load()
+  kit.trigger(36, 0.1, 4, 0.5)
+  assert.equal(players.at(-1).destination, destination)
+  assert.ok(players.at(-1).volume.value < 0)
   kit.dispose()
 })

@@ -11,15 +11,19 @@ function noteName(pitch) {
 /**
  * Cria uma fonte sonora descartável para a frase ativa, sem modificar MIDI.
  * @param {"piano"|"strings"|"drums"} instrumentId Identificador do catálogo.
- * @returns {{load: () => Promise<void>, trigger: (pitch: number, durationSeconds: number, time: number) => void, dispose: () => void}}
+ * @param {{destination?: object}} options Saída opcional para mixar a faixa.
+ * @returns {{load: () => Promise<void>, trigger: (pitch: number, durationSeconds: number, time: number, velocity?: number) => boolean, dispose: () => void}}
  */
-export function createPhraseInstrument(instrumentId) {
+export function createPhraseInstrument(instrumentId, { destination } = {}) {
   if (!["piano", "strings", "drums"].includes(instrumentId)) throw new Error("Instrumento desconhecido")
   let nodes = []
   let ready = false
   let disposed = false
   let pending = null
   const activeVoices = new Set()
+
+  /** Mantém a saída antiga quando não há um canal de faixa específico. */
+  function route(node) { return destination ? node.connect(destination) : node.toDestination() }
 
   /** Libera tentativa incompleta antes de recomeçar após falha. */
   function clearNodes() {
@@ -39,7 +43,7 @@ export function createPhraseInstrument(instrumentId) {
       if (pending) return pending
       if (instrumentId === "drums") {
         const entries = Object.entries(DRUMS)
-        const players = entries.map(() => new Tone.Player().toDestination())
+        const players = entries.map(() => route(new Tone.Player()))
         nodes = players
         pending = Promise.all(players.map((player, index) => player.load(entries[index][1]))).then(() => {
           if (!disposed) ready = true
@@ -54,7 +58,7 @@ export function createPhraseInstrument(instrumentId) {
         pending = new Promise((resolve, reject) => {
           // Cordas já vêm niveladas para notas curtas; piano mantém sua atenuação original.
           const volume = instrumentId === "strings" ? -6 : -12
-          const sampler = new Tone.Sampler({ urls, baseUrl, release: .35, volume, onload: resolve, onerror: reject }).toDestination()
+          const sampler = route(new Tone.Sampler({ urls, baseUrl, release: .35, volume, onload: resolve, onerror: reject }))
           nodes = [sampler]
         }).then(() => {
           if (!disposed) ready = true
@@ -68,19 +72,22 @@ export function createPhraseInstrument(instrumentId) {
     },
 
     /** Agenda um evento válido; bateria ignora alturas fora do kit. */
-    trigger(pitch, durationSeconds, time) {
-      if (disposed || !ready) return
+    trigger(pitch, durationSeconds, time, velocity = 1) {
+      if (disposed || !ready) return false
       if (instrumentId === "drums") {
         const index = Object.keys(DRUMS).indexOf(String(pitch))
-        if (index < 0) return
+        if (index < 0) return false
         // Cada ataque recebe sua própria fonte; batidas rápidas não cortam a cauda anterior.
         let voice
-        voice = new Tone.Player({ url: nodes[index].buffer, onstop: () => {
+        voice = route(new Tone.Player({ url: nodes[index].buffer, onstop: () => {
           if (activeVoices.delete(voice)) voice.dispose()
-        } }).toDestination()
+        } }))
+        voice.volume.value = velocity > 0 ? 20 * Math.log10(velocity) : -Infinity
         activeVoices.add(voice)
         voice.start(time)
-      } else nodes[0].triggerAttackRelease(noteName(pitch), durationSeconds, time)
+      } else if (velocity === 1) nodes[0].triggerAttackRelease(noteName(pitch), durationSeconds, time)
+      else nodes[0].triggerAttackRelease(noteName(pitch), durationSeconds, time, velocity)
+      return true
     },
 
     /** Interrompe e libera os recursos desta frase. */
