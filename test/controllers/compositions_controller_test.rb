@@ -121,6 +121,41 @@ class CompositionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal document["loop"], composition.reload.document["loop"]
   end
 
+  # O aceite cobre duas fontes no mesmo documento, reabertura e rotas legadas.
+  test "aceite da reproducao com duas faixas e loop persistido" do
+    sign_in user
+    composition = empty_composition
+    second = track_data.deep_dup
+    second["id"] = "track-2"
+    second["name"] = "Cordas"
+    second["instrument_id"] = "strings"
+    second["regions"][0]["id"] = "region-2"
+    second["regions"][0]["start_tick"] = 1920
+    second["regions"][0]["notes"][0]["id"] = "note-2"
+    document = composition.document.deep_dup
+    document["tracks"] = [ track_data, second ]
+    document["loop"] = { "start_tick" => 480, "end_tick" => 2400 }
+
+    patch composition_path(composition, format: :json), params: {
+      document: document, lock_version: composition.lock_version
+    }, as: :json
+    assert_response :success
+    get composition_path(composition, format: :json)
+    assert_response :success
+    assert_equal document, response.parsed_body.fetch("document")
+    get composition_path(composition)
+    assert_response :success
+    assert_select "[data-composition-timeline-target='transportStatus'][role='status']"
+    assert_select "[data-action='click->composition-timeline#playComposition']"
+    get "/criar"
+    assert_response :success
+    get "/caminho-do-bardo/notas"
+    assert_response :success
+    sign_out user
+    get composition_path(composition)
+    assert_redirected_to new_user_session_path
+  end
+
   # A edição de uma região deve sobreviver à recarga sem reescrever outra faixa.
   test "reabre notas editadas apenas na regiao selecionada e preserva caminhos existentes" do
     sign_in user

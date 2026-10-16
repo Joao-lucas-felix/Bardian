@@ -272,7 +272,10 @@ test("edições de notas e metadados atualizam transporte sem pará-lo", () => {
   controller.bpmTarget = { value: "90" }
   controller.numeratorTarget = { value: "4" }
   controller.denominatorTarget = { value: "4" }
+  const priorMusic = controller.music
   controller.changeMetadata()
+  assert.notEqual(controller.music, priorMusic)
+  assert.equal(priorMusic.bpm, 120)
   assert.equal(transport.calls.filter((call) => call[0] === "update").length, 4)
   assert.equal(transport.calls.some((call) => call[0] === "stop"), false)
   assert.equal(transport.calls.at(-1)[1].bpm, 90)
@@ -348,6 +351,17 @@ test("ouvir faixa e alternar loop preservam documento e seleção", async () => 
   assert.equal(controller.transport.calls.at(-1)[1], false)
   assert.equal(JSON.stringify(controller.music), before)
   assert.equal(controller.selectedRegionId, "one")
+})
+
+// Play global após uma escuta isolada deve devolver todas as faixas audíveis.
+test("play global remove isolamento sem reiniciar agulha em movimento", async () => {
+  const controller = editingController()
+  controller.transport = transportSpy()
+  controller.activePianoRoll = () => null
+  controller.playbackStatus = "playing"
+  await controller.playComposition()
+  assert.deepEqual(controller.transport.calls.map((call) => call[0]), ["isolate"])
+  assert.equal(controller.transport.calls[0][1], null)
 })
 
 // As setas permitem editar os marcadores sem ponteiro e mantêm o snap musical.

@@ -38,7 +38,7 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_select "main.dashboard-content > section#dev-reports", count: 1
     assert_select "main.dashboard-content", text: /Administração · acompanhamento do desenvolvimento/, count: 0
     assert_select "section#dev-reports table", count: 1
-    assert_select "tr.dashboard-report-row", count: 10
+    assert_select "tr.dashboard-report-row", count: DevReport.load.length
     assert_select 'tr.dashboard-report-row a[href="/criar"]', text: "Testar"
     assert_select "tr.dashboard-report-row", text: /Dashboard administrativa e DevReports/
     assert_select "tr.dashboard-report-row", text: /passou a apresentar as entregas verificáveis/
@@ -91,6 +91,6 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     get dashboard_path, params: { q: [ "dashboard" ], tag: { valor: "Interface" } }
 
     assert_response :success
-    assert_select "tr.dashboard-report-row", count: 10
+    assert_select "tr.dashboard-report-row", count: DevReport.load.length
   end
 end

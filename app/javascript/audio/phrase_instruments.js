@@ -12,7 +12,7 @@ function noteName(pitch) {
  * Cria uma fonte sonora descartável para a frase ativa, sem modificar MIDI.
  * @param {"piano"|"strings"|"drums"} instrumentId Identificador do catálogo.
  * @param {{destination?: object}} options Saída opcional para mixar a faixa.
- * @returns {{load: () => Promise<void>, trigger: (pitch: number, durationSeconds: number, time: number, velocity?: number) => boolean, dispose: () => void}}
+ * @returns {{load: () => Promise<void>, trigger: (pitch: number, durationSeconds: number, time: number, velocity?: number) => boolean, stopVoices: () => void, dispose: () => void}}
  */
 export function createPhraseInstrument(instrumentId, { destination } = {}) {
   if (!["piano", "strings", "drums"].includes(instrumentId)) throw new Error("Instrumento desconhecido")
@@ -88,6 +88,13 @@ export function createPhraseInstrument(instrumentId, { destination } = {}) {
       } else if (velocity === 1) nodes[0].triggerAttackRelease(noteName(pitch), durationSeconds, time)
       else nodes[0].triggerAttackRelease(noteName(pitch), durationSeconds, time, velocity)
       return true
+    },
+
+    /** Interrompe caudas ao pausar, sem descartar os samples carregados. */
+    stopVoices() {
+      if (instrumentId === "drums") {
+        for (const voice of [...activeVoices]) voice.stop()
+      } else if (ready) nodes[0].releaseAll()
     },
 
     /** Interrompe e libera os recursos desta frase. */

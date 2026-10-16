@@ -34,6 +34,7 @@ function harness({ failTrack = null, delayedTrack = null } = {}) {
   const calls = []
   const states = []
   const loads = new Map()
+  const delayed = new Set(delayedTrack ? [delayedTrack] : [])
   const audio = {
     async start() { calls.push(["start"]) },
     pause() { calls.push(["pause"]) }, stop() { calls.push(["stop"]); pending.clear() },
@@ -43,7 +44,7 @@ function harness({ failTrack = null, delayedTrack = null } = {}) {
     loadTrack(track) {
       calls.push(["load", track.id, track.instrument_id])
       if (track.id === failTrack) return Promise.reject(new Error("sem sample"))
-      if (track.id === delayedTrack) return new Promise((resolve) => loads.set(track.id, resolve))
+      if (delayed.has(track.id)) return new Promise((resolve) => loads.set(track.id, resolve))
       return Promise.resolve()
     },
     trigger(trackId, pitch, duration, atSeconds, velocity) {
@@ -57,7 +58,7 @@ function harness({ failTrack = null, delayedTrack = null } = {}) {
   const timer = { setInterval(fn) { pulse = fn; return 1 }, clearInterval() { pulse = null } }
   const create = vm.runInNewContext(`${source}\ncreateCompositionTransport`, { ...events })
   const transport = create({ audio, onState: (state) => states.push(state), timer })
-  return { audio, transport, calls, states, pending, loads,
+  return { audio, transport, calls, states, pending, loads, delayTrack(id) { delayed.add(id) },
     advance(seconds) {
       time += seconds
       pulse?.()
@@ -68,12 +69,30 @@ function harness({ failTrack = null, delayedTrack = null } = {}) {
   }
 }
 
+// Um load concluído após troca de timbre não pode marcar a versão antiga disponível.
+test("ignora carregamento de instrumento substituído durante Play", async () => {
+  const h = harness()
+  const original = music()
+  await h.transport.play(original)
+  h.delayTrack("p")
+  const drums = structuredClone(original)
+  drums.tracks[0].instrument_id = "drums"
+  h.transport.update(drums)
+  const piano = structuredClone(original)
+  h.transport.update(piano)
+  h.loads.get("p")()
+  await Promise.resolve()
+  assert.ok(h.calls.filter((call) => call[0] === "load" && call[1] === "p" && call[2] === "piano").length >= 2)
+  h.transport.dispose()
+})
+
 // O mesmo relógio precisa disparar duas faixas sem serializar ataques simultâneos.
 test("reproduz duas faixas juntas e repete no próximo ciclo", async () => {
   const h = harness()
   await h.transport.play(music())
   h.advance(0.01)
   assert.deepEqual(h.calls.filter((call) => call[0] === "note").map((call) => call[1]), ["p", "s"])
+  assert.ok(h.calls.find((call) => call[0] === "note" && call[1] === "p")[3] > 0.9)
   h.advance(1)
   assert.equal(h.calls.filter((call) => call[0] === "note" && call[1] === "p").length, 2)
   assert.equal(h.states.at(-1).status, "playing")
@@ -89,6 +108,7 @@ test("pausa retoma a cauda e para no início do loop", async () => {
   // A largada deixa 10 ms para Tone.js preparar o primeiro ataque.
   assert.equal(Math.round(h.transport.tick()), 230)
   assert.equal(h.states.at(-1).status, "paused")
+  assert.ok(h.calls.some((call) => call[0] === "pause"))
   await h.transport.resume()
   h.advance(0.01)
   const piano = h.calls.filter((call) => call[0] === "note" && call[1] === "p")
@@ -97,6 +117,19 @@ test("pausa retoma a cauda e para no início do loop", async () => {
   h.transport.stop()
   assert.equal(h.transport.tick(), 0)
   assert.equal(h.states.at(-1).status, "stopped")
+  h.transport.dispose()
+})
+
+// A próxima volta com marcadores antigos não pode ser preparada após uma edição.
+test("não agenda ataque antigo além da borda de loop pendente", async () => {
+  const h = harness()
+  const original = music()
+  await h.transport.play(original)
+  h.advance(0.9)
+  const edited = structuredClone(original)
+  edited.loop = { start_tick: 240, end_tick: 720 }
+  h.transport.update(edited)
+  assert.equal([...h.pending.values()].some((item) => item.atSeconds >= 1.01), false)
   h.transport.dispose()
 })
 

@@ -1,5 +1,22 @@
 # Cada entrega concluída possui uma descrição verificável e uma rota interna de teste.
 reports:
+  - slug: reproducao-composicao-loop-mvp1
+    title: Reprodução contínua da composição com loop
+    description: A timeline toca faixas juntas ou isoladas e incorpora edições futuras sem parar a agulha.
+    changes:
+      - Persistiu marcadores opcionais de loop no documento musical versionado, preservando documentos antigos.
+      - Extraiu eventos em ticks absolutos e separou transporte, fontes sonoras por faixa e apresentação.
+      - Adicionou Play, pausa, retomada, Stop, isolamento por faixa e marcadores editáveis por número, arraste e teclado.
+      - Aplicou alterações à frente da agulha na passagem atual e alterações já percorridas na próxima, sem interromper o áudio.
+      - Verificou 143 testes Rails, 12 arquivos de testes JavaScript, RuboCop e Zeitwerk; as rotas públicas abriram no navegador local.
+      - Registrou que a composição autenticada e a escuta real ainda requerem conferência manual em sessão autenticada.
+    delivered_on: "2026-10-16"
+    tags:
+      - Composição
+      - Áudio
+      - Interface
+    test_path: /compositions
+
   - slug: piano-roll-regioes-persistidas
     title: Piano roll persistido por região
     description: Composições salvas permitem editar notas MIDI da região ativa, ouvir a faixa e reabrir o resultado após salvar.

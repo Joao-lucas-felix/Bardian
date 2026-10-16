@@ -54,6 +54,8 @@ export default class extends Controller {
   changeMetadata() {
     if (!this.music) return
     const before = JSON.stringify([this.music.name, this.music.bpm, this.music.time_signature])
+    // O transporte conserva o documento anterior para ancorar corretamente mudanças de BPM.
+    this.music = { ...this.music, time_signature: { ...this.music.time_signature } }
     this.music.name = this.nameTarget.value.trim()
     const bpm = Number(this.bpmTarget.value)
     const numerator = Number(this.numeratorTarget.value)
@@ -136,6 +138,9 @@ export default class extends Controller {
   async playComposition() {
     if (!this.music || !this.transport) return
     this.activePianoRoll()?.stop()
+    // Retorna da escuta isolada à mixagem completa sem rebobinar a agulha.
+    this.transport.isolateTrack(null)
+    if (this.playbackStatus === "playing") return
     if (this.playbackStatus === "paused") await this.transport.resume()
     else await this.transport.play(this.music)
   }

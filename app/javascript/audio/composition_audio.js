@@ -42,7 +42,15 @@ export function createCompositionAudio({ timers = globalThis } = {}) {
     },
 
     /** Suspende e reinicia a posição temporal sem descartar as fontes. */
-    pause() { if (!disposed) transport.pause() },
+    pause() {
+      if (disposed) return
+      // Pausar o relógio não libera ataques já iniciados; o ganho os silencia.
+      for (const entry of tracks.values()) {
+        entry.gain.gain.value = 0
+        entry.instrument.stopVoices()
+      }
+      transport.pause()
+    },
     stop() {
       if (disposed) return
       for (const token of scheduled.keys()) cancelScheduled(token)

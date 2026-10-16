@@ -91,7 +91,10 @@ export function createCompositionTransport({ audio, onState, timer = globalThis 
       loadingTrackIds.add(track.id)
       audio.loadTrack(track).then(() => {
         loadingTrackIds.delete(track.id)
-        if (disposed || status !== "playing" || !music.tracks.some((item) => item.id === track.id)) return
+        if (disposed || status !== "playing") return
+        const current = music.tracks.find((item) => item.id === track.id)
+        if (!current) { audio.disposeTrack(track.id); return }
+        if (current.instrument_id !== track.instrument_id) { loadNewTracks(); return }
         availableTrackIds.add(track.id)
         loadedInstrumentIds.set(track.id, track.instrument_id)
         unavailableTrackIds = unavailableTrackIds.filter((id) => id !== track.id)
@@ -100,6 +103,8 @@ export function createCompositionTransport({ audio, onState, timer = globalThis 
       }).catch(() => {
         loadingTrackIds.delete(track.id)
         if (disposed || status !== "playing") return
+        const current = music.tracks.find((item) => item.id === track.id)
+        if (!current || current.instrument_id !== track.instrument_id) { loadNewTracks(); return }
         if (!unavailableTrackIds.includes(track.id)) unavailableTrackIds.push(track.id)
         emit()
       })
@@ -154,7 +159,10 @@ export function createCompositionTransport({ audio, onState, timer = globalThis 
       if (seen.has(key)) continue
       seen.add(key)
       const atSeconds = anchorSeconds + (cycle * length + event.onsetTick - anchorTick) * secondsPerTick(music.bpm)
-      const duration = event.durationTicks * secondsPerTick(music.bpm)
+      // A janela seleciona ataques, não a duração: a voz pode ir até o fim do loop.
+      const full = eventsInRange(music, event.onsetTick, range.endTick, isolatedTrackId)
+        .find((item) => item.id === event.id && item.trackId === event.trackId)
+      const duration = (full?.durationTicks ?? event.durationTicks) * secondsPerTick(music.bpm)
       const token = audio.schedule((time) => {
         pending.delete(key)
         if (disposed || status !== "playing") return
@@ -177,7 +185,9 @@ export function createCompositionTransport({ audio, onState, timer = globalThis 
     if (!loopEnabled && absolute >= range.endTick) { controller.stop(); return }
     positionTick = visibleTickAt(now)
     const length = range.endTick - range.startTick
-    const until = Math.min(loopEnabled ? Infinity : range.endTick, absoluteTickAt(now + 0.2))
+    // Uma troca pendente proíbe preparar ataques da volta antiga além da borda.
+    const boundary = pendingWrapAt === null ? Infinity : absoluteTickAt(pendingWrapAt)
+    const until = Math.min(loopEnabled ? Infinity : range.endTick, absoluteTickAt(now + 0.2), boundary)
     const firstCycle = loopEnabled ? Math.max(0, Math.floor((absolute - range.startTick) / length)) : 0
     const lastCycle = loopEnabled ? Math.floor((until - range.startTick) / length) : 0
     for (let cycle = firstCycle; cycle <= lastCycle; cycle++) {
@@ -255,6 +265,7 @@ export function createCompositionTransport({ audio, onState, timer = globalThis 
       anchorSeconds = audio.now() + 0.01
       seen.clear()
       status = "playing"
+      syncTrackLevels()
       startPulses()
     },
 

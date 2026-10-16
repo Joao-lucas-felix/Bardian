@@ -1,6 +1,6 @@
 # Timeline de composições do MVP 1
 
-Data: 15 de outubro de 2026. Etapa: edição de faixas, regiões e notas.
+Data: 16 de outubro de 2026. Etapa: edição e reprodução contínua da composição.
 
 ## Responsabilidades
 
@@ -17,6 +17,10 @@ do compasso. O redimensionamento respeita a última nota relativa à região.
 de volta, valida seus limites e evita colisões de IDs em toda a composição.
 `note_history.js` mantém snapshots imutáveis, separados por região e somente
 durante a sessão.
+`playback_events.js` extrai eventos absolutos e o intervalo de loop sem depender
+da interface. `composition_transport.js` coordena relógio, ciclos e atualização
+ao vivo; `composition_audio.js` mantém instrumento e ganho por faixa sobre o
+Tone.js local. A timeline apenas envia o documento atual e apresenta o estado.
 
 ## Fluxo de uso
 
@@ -45,10 +49,29 @@ conflito e exige recuperação manual antes de recarregar. HTTP 422 mantém as
 alterações para correção. Uma resposta tardia não substitui edições feitas
 durante o envio. Sem JavaScript, o formulário HTML ainda salva metadados.
 
+## Reprodução e loop
+
+Os botões da timeline tocam, pausam/retomam e param a composição inteira.
+"Ouvir faixa" isola uma faixa sem alterar solo/mute salvos. Volume, mute,
+solo, instrumento, notas, regiões e BPM são enviados ao transporte ao editar,
+sem exigir salvamento nem reiniciar a agulha. Notas alteradas à frente da
+agulha entram na passagem atual; alterações atrás dela entram na próxima.
+Notas já iniciadas não são cortadas. Uma prévia individual do piano roll pausa
+a reprodução global, e o Play global interrompe a prévia individual.
+
+O loop começa ligado. Os marcadores aceitam números em ticks, arraste na régua
+e setas do teclado; são arredondados à batida. O intervalo explícito é salvo
+como `loop: { start_tick, end_tick }` no mesmo JSON versionado, enquanto
+documentos antigos continuam sem esse campo até uma edição de marcador.
+Alterações do intervalo durante a reprodução valem na próxima volta, sem
+teletransportar a agulha. Desligar o loop conclui o arranjo uma vez.
+
 ## Limites e verificação
 
 As notas existentes permanecem nas regiões ao movê-las ou redimensioná-las.
-A timeline ainda não reproduz múltiplas faixas nem realiza mistura sonora.
+O controle global usa as três fontes sonoras locais existentes; não há mixer,
+efeitos nem exportação de áudio nesta etapa. Uma faixa cujo instrumento falhe
+é informada no status, enquanto as demais podem continuar.
 Regiões podem se sobrepor, pois o domínio atual não proíbe sobreposição. Não
 há mesclagem automática após conflito, nem histórico persistido entre sessões.
 O rascunho `/criar` e o início do Caminho do Bardo continuam independentes.
@@ -64,3 +87,16 @@ reabrir. A tentativa anterior usou coordenadas de uma captura redimensionada,
 fora da nota, e não indicava falha no gesto.
 A view somente apresenta dados; validação e autorização permanecem no domínio
 e no controller Rails.
+
+Em 16/10/2026, a verificação automatizada passou com 143 testes Rails e 1043
+asserções, 12 arquivos de testes JavaScript, RuboCop sem ofensas e
+`zeitwerk:check` sem erros. O aceite de integração salvou e reabriu duas faixas
+e loop de 480 a 2400 ticks, verificou controles HTML, bloqueio de visitante e
+respostas de `/criar` e `/caminho-do-bardo/notas`. O navegador local confirmou
+essas duas rotas públicas; a timeline autenticada redirecionou ao login.
+Não houve conta de teste autenticada disponível no navegador, portanto a
+escuta real multifaixa, o gesto visual de arraste dos marcadores, tema/foco em
+dispositivos estreitos e falhas reais de amostra ainda requerem conferência
+manual em sessão autenticada. Os testes de unidade cobrem as regras de
+agendamento, cancelamento, passagem atual/próxima e falha de carregamento;
+eles não substituem a confirmação auditiva em um navegador.

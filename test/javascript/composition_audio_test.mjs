@@ -39,6 +39,7 @@ function harness() {
       toDestination() { return this }
       connect(destination) { this.destination = destination; return this }
       triggerAttackRelease(...args) { this.events.push(args) }
+      releaseAll() { this.released = true }
       dispose() { this.disposed = true }
     },
     Player: class {
@@ -47,6 +48,7 @@ function harness() {
       connect(destination) { this.destination = destination; players.push(this); return this }
       load(url) { this.url = url; return loadFailure ? Promise.reject(new Error("sem sample")) : Promise.resolve() }
       start(time) { this.startedAt = time }
+      stop() { this.stopped = true; this.options.onstop?.() }
       dispose() { this.disposed = true; this.options.onstop?.() }
     }
   }
@@ -108,6 +110,20 @@ test("cancela evento pendente sem atingir outra faixa", async () => {
   assert.equal(h.transport.paused, true)
   audio.stop()
   assert.equal(h.transport.stopped, true)
+  audio.dispose()
+})
+
+// Pausar o relógio deve silenciar também vozes que já receberam ataque.
+test("pausa silencia ganho de faixa ativa", async () => {
+  const h = harness()
+  const audio = h.create()
+  const loading = audio.loadTrack({ id: "p", instrument_id: "piano", volume: 0.8 })
+  h.samplers.at(-1).options.onload()
+  await loading
+  audio.trigger("p", 60, 1, 0, 127)
+  audio.pause()
+  assert.equal(h.gains[0].gain.value, 0)
+  assert.equal(h.samplers[0].released, true)
   audio.dispose()
 })
 
