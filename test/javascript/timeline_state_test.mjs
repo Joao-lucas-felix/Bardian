@@ -3,7 +3,7 @@ import test from "node:test"
 import {
   addTrack, moveTrack, removeTrack, updateTrack,
   addRegion, moveRegion, resizeRegion, removeRegion,
-  measureTicks, timelineTicks
+  measureTicks, timelineTicks, setLoopRange
 } from "../../app/javascript/composition/timeline_state.js"
 
 // Usa um documento realista, com IDs estáveis e nota relativa à região.
@@ -69,4 +69,17 @@ test("calcula compasso e tamanho visivel para 6 por 8", () => {
 test("rejeita identificadores desconhecidos", () => {
   assert.throws(() => updateTrack(document(), "missing", { name: "Outra" }), /faixa/i)
   assert.throws(() => moveRegion(document(), "track-1", "missing", 0), /região/i)
+})
+
+// Marcadores são ticks musicais salvos e ampliam a régua sem alterar regiões.
+test("ajusta marcadores com snap em 6 por 8 e preserva a entrada", () => {
+  const original = document()
+  original.time_signature = { numerator: 6, denominator: 8 }
+  const changed = setLoopRange(original, 260, 6000)
+  assert.deepEqual(changed.loop, { start_tick: 240, end_tick: 6000 })
+  assert.equal(original.loop, undefined)
+  assert.ok(timelineTicks(changed) >= 6000)
+  changed.time_signature = { numerator: 4, denominator: 4 }
+  assert.deepEqual(changed.loop, { start_tick: 240, end_tick: 6000 })
+  assert.throws(() => setLoopRange(original, 480, 240), /loop|fim|marcador/i)
 })

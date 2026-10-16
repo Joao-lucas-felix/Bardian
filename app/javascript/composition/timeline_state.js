@@ -23,7 +23,26 @@ export function timelineTicks(music) {
   const lastEnd = music.tracks.reduce((max, track) =>
     Math.max(max, ...track.regions.map((region) => region.start_tick + region.duration_ticks)), 0)
   const measure = measureTicks(music)
-  return Math.max(measure * 4, Math.ceil((lastEnd + measure) / measure) * measure)
+  return Math.max(measure * 4, Math.ceil((Math.max(lastEnd, music.loop?.end_tick || 0) + measure) / measure) * measure)
+}
+
+/**
+ * Guarda marcadores em ticks com snap de batida, sem modificar a composição.
+ * @param {object} music Documento musical a copiar.
+ * @param {number} startTick Início solicitado em ticks absolutos.
+ * @param {number} endTick Fim solicitado em ticks absolutos.
+ * @returns {object} Novo documento com intervalo explícito válido.
+ */
+export function setLoopRange(music, startTick, endTick) {
+  if (!Number.isInteger(startTick) || !Number.isInteger(endTick) || startTick < 0 || endTick <= startTick) {
+    throw new Error("Marcadores de loop inválidos")
+  }
+  const start = snapTick(music, startTick)
+  const end = snapTick(music, endTick)
+  if (end <= start) throw new Error("Fim do loop deve superar o início")
+  const next = copy(music)
+  next.loop = { start_tick: start, end_tick: end }
+  return next
 }
 
 /** Arredonda uma posição à batida mais próxima e impede tempo negativo. */
