@@ -151,6 +151,18 @@ test("modo persistido carrega extremos MIDI e pecas extras de bateria", () => {
   assert.ok(instance.displayPitches().includes(49))
 })
 
+test("região vazia abre viewport junto ao Dó4 sem descartar extremos MIDI", () => {
+  const instance = editor([])
+  instance.hasPersistentModeValue = true
+  instance.persistentModeValue = true
+  instance.rollViewportTarget = { clientHeight: 365, scrollTop: 0 }
+  instance.syncViewport = () => {}
+  instance.revealInitialPitch()
+  assert.ok(instance.rollViewportTarget.scrollTop > 1000)
+  assert.ok(instance.rollViewportTarget.scrollTop < instance.pitchToPixels(60))
+  assert.equal(instance.displayPitches().length, 128)
+})
+
 test("atualiza compasso e duracao da regiao sem deslocar notas", () => {
   const instance = editor()
   instance.resizeCanvases = () => {}

@@ -55,6 +55,7 @@ export default class extends Controller {
     this.bindCanvasEvents()
     this.buildKeyboard()
     this.resizeCanvases()
+    this.revealInitialPitch()
     this.render()
     this.updateSummary()
   }
@@ -248,6 +249,14 @@ export default class extends Controller {
     }
     this.keyboardTarget.setAttribute("aria-hidden", String(!audioEnabled))
     this.keyboardTarget.replaceChildren(this.keyList)
+  }
+
+  /** Centraliza a primeira nota (ou Dó4) ao abrir a grade MIDI completa. */
+  revealInitialPitch() {
+    if (!this.isPersistentMode() || this.isDrumLayout()) return
+    const pitch = this.notes[0]?.pitch ?? 60
+    this.rollViewportTarget.scrollTop = Math.max(0, this.pitchToPixels(pitch) - this.rollViewportTarget.clientHeight / 2)
+    this.syncViewport()
   }
 
   /** Ajusta Canvas e linhas auxiliares ao tamanho disponível e ao zoom atual. */

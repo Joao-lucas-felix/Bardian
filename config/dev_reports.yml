@@ -1,5 +1,22 @@
 # Cada entrega concluída possui uma descrição verificável e uma rota interna de teste.
 reports:
+  - slug: piano-roll-regioes-persistidas
+    title: Piano roll persistido por região
+    description: Composições salvas permitem editar notas MIDI da região ativa, ouvir a faixa e reabrir o resultado após salvar.
+    changes:
+      - Reutilizou o piano roll existente com duração e compasso da região, preservando pitches MIDI de 0 a 127.
+      - Converteu notas relativas sem alterar outras regiões e gerou IDs únicos na composição inteira.
+      - Incluiu velocity editável e histórico de desfazer/refazer por região durante a sessão.
+      - Manteve o salvamento JSON versionado e os fluxos de /criar e Caminho do Bardo.
+      - Verificou testes Rails e JavaScript, carregamento, estilo e o fluxo manual de salvar e reabrir no navegador de teste.
+      - Registrou que não há reprodução multifaixa nem mesclagem automática de conflitos; movimento por arraste requer nova checagem visual.
+    delivered_on: "2026-10-15"
+    tags:
+      - Composição
+      - Interface
+      - MIDI
+    test_path: /compositions
+
   - slug: timeline-composicoes-mvp1
     title: Timeline editável de composições
     description: Faixas e regiões podem ser organizadas visualmente em ticks musicais e salvas no mesmo documento dos metadados.

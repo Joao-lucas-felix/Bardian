@@ -7,7 +7,8 @@ class DevReportTest < ActiveSupport::TestCase
   test "carrega os relatorios da dashboard" do
     reports = DevReport.load
 
-    assert_equal 9, reports.length
+    assert_equal 10, reports.length
+    assert_equal "/compositions", reports.find { |item| item.slug == "piano-roll-regioes-persistidas" }.test_path
     assert_equal "/criar", reports.find { |item| item.slug == "arranjo-canvas-instrumentos-iniciais" }.test_path
     creation_report = reports.find { |item| item.slug == "criacao-camadas-frases" }
     assert_equal "/criar", creation_report.test_path

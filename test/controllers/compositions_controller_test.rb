@@ -84,6 +84,40 @@ class CompositionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "strings", Composition.find(composition.id).document.dig("tracks", 0, "instrument_id")
   end
 
+  # A edição de uma região deve sobreviver à recarga sem reescrever outra faixa.
+  test "reabre notas editadas apenas na regiao selecionada e preserva caminhos existentes" do
+    sign_in user
+    composition = empty_composition
+    original_second = track_data.deep_dup
+    original_second["id"] = "track-2"
+    original_second["regions"][0]["id"] = "region-2"
+    original_second["regions"][0]["notes"][0]["id"] = "note-2"
+    document = composition.document.deep_dup
+    document["tracks"] = [ track_data, original_second ]
+    edited = document["tracks"][0]["regions"][0]["notes"][0]
+    edited["pitch"] = 72
+    edited["velocity"] = 127
+    edited["duration_ticks"] = 960
+
+    patch composition_path(composition, format: :json), params: {
+      document: document, lock_version: composition.lock_version
+    }, as: :json
+
+    assert_response :success
+    get composition_path(composition, format: :json)
+    assert_response :success
+    saved = response.parsed_body.fetch("document")
+    assert_equal 72, saved.dig("tracks", 0, "regions", 0, "notes", 0, "pitch")
+    assert_equal 127, saved.dig("tracks", 0, "regions", 0, "notes", 0, "velocity")
+    assert_equal 960, saved.dig("tracks", 0, "regions", 0, "notes", 0, "duration_ticks")
+    assert_equal original_second, saved.dig("tracks", 1)
+
+    get "/criar"
+    assert_response :success
+    get "/caminho-do-bardo/notas"
+    assert_response :success
+  end
+
   # Dados MIDI inválidos recebem erro e não substituem o documento salvo.
   test "rejeita documento invalido sem gravar" do
     sign_in user

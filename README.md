@@ -9,6 +9,11 @@
 - [Persistência de composições](docs/persistencia-composicoes-mvp1.md)
 - [Timeline de composições](docs/timeline-composicoes-mvp1.md)
 
+Em `/compositions`, selecione uma região da timeline para editar suas notas no
+piano roll. As notas, duração e velocity são salvas com o documento versionado
+ao clicar em **Salvar composição**; desfazer/refazer atua por região na sessão.
+O rascunho de `/criar` e a lição `/caminho-do-bardo/notas` permanecem separados.
+
 ## Autenticação local
 
 O Bardian usa Devise para autenticar usuários por e-mail e senha. O cadastro
