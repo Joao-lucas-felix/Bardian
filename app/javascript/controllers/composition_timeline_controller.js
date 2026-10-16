@@ -1,30 +1,36 @@
 import { Controller } from "@hotwired/stimulus"
-import { addTrack, updateTrack, moveTrack, removeTrack, addRegion, moveRegion, resizeRegion, removeRegion, beatTicks, measureTicks, timelineTicks } from "composition/timeline_state"
+import { addTrack, updateTrack, moveTrack, removeTrack, addRegion, moveRegion, resizeRegion, removeRegion, beatTicks, measureTicks, timelineTicks, setLoopRange } from "composition/timeline_state"
 import { newNoteId, regionFor, replaceRegionNotes, toEditorNotes } from "composition/region_notes"
 import { createHistory, record, redo, undo } from "composition/note_history"
+import { loopRange } from "composition/playback_events"
+import { createCompositionAudio } from "audio/composition_audio"
+import { createCompositionTransport } from "audio/composition_transport"
 
 /** Coordena a timeline e o formulário sobre um único documento musical versionado. */
 export default class extends Controller {
-  static targets = ["form", "name", "bpm", "numerator", "denominator", "status", "saveButton", "summary", "scroll", "ruler", "tracks", "empty", "zoomLabel", "regionEditor"]
+  static targets = ["form", "name", "bpm", "numerator", "denominator", "status", "saveButton", "summary", "scroll", "ruler", "tracks", "empty", "zoomLabel", "regionEditor", "transportStatus", "playhead", "loopStart", "loopEnd", "loopStartHandle", "loopEndHandle", "loopButton"]
   static values = { url: String }
 
   /** Carrega o documento persistido; até lá o formulário HTML continua disponível. */
   async connect() {
+    this.disconnected = false
     this.pixelsPerBeat = 64
     this.revision = 0
     this.selectedRegionId = null
     this.selectedTrackId = null
     this.noteHistories = new Map()
     this.pointerMove = (event) => this.dragMove(event)
-    this.pointerUp = () => { this.drag = null }
+    this.pointerUp = () => { this.drag = null; this.markerDrag = null }
     window.addEventListener("pointermove", this.pointerMove)
     window.addEventListener("pointerup", this.pointerUp)
     try {
       const response = await this.request(this.urlValue, { headers: { Accept: "application/json" } })
       if (!response.ok) throw new Error("Não foi possível carregar a timeline. O formulário ainda pode salvar os dados da composição.")
       const snapshot = await response.json()
+      if (this.disconnected) return
       this.music = snapshot.document
       this.lockVersion = snapshot.lock_version
+      this.transport = createCompositionTransport({ audio: createCompositionAudio(), onState: (state) => this.onTransportState(state) })
       this.statusTarget.textContent = "Tudo salvo."
       this.render()
     } catch (error) {
@@ -34,7 +40,9 @@ export default class extends Controller {
 
   /** Desfaz listeners globais para não acumular interações após navegar. */
   disconnect() {
+    this.disconnected = true
     this.activePianoRoll()?.stop()
+    this.transport?.dispose()
     window.removeEventListener("pointermove", this.pointerMove)
     window.removeEventListener("pointerup", this.pointerUp)
   }
@@ -56,6 +64,7 @@ export default class extends Controller {
     if (before !== JSON.stringify([this.music.name, this.music.bpm, this.music.time_signature])) {
       this.revision = (this.revision || 0) + 1
       this.markDirty()
+      this.transport?.update(this.music)
       this.render()
     }
   }
@@ -84,7 +93,10 @@ export default class extends Controller {
         this.statusTarget.textContent = result.error || "Não foi possível salvar."
         return
       }
-      if ((this.revision || 0) === savedRevision) this.music = result.document
+      if ((this.revision || 0) === savedRevision) {
+        this.music = result.document
+        this.transport?.update(this.music)
+      }
       this.lockVersion = result.lock_version
       this.formTarget.querySelector('[name="lock_version"]').value = this.lockVersion
       this.statusTarget.textContent = (this.revision || 0) === savedRevision ? "Tudo salvo." : "Alterações novas ainda não salvas."
@@ -116,7 +128,85 @@ export default class extends Controller {
     this.music = next
     this.revision = (this.revision || 0) + 1
     this.markDirty()
+    this.transport?.update(this.music)
     this.render()
+  }
+
+  /** Toca o documento em memória; o botão também retoma uma pausa sem reiniciar. */
+  async playComposition() {
+    if (!this.music || !this.transport) return
+    this.activePianoRoll()?.stop()
+    if (this.playbackStatus === "paused") await this.transport.resume()
+    else await this.transport.play(this.music)
+  }
+
+  /** Suspende a reprodução global, preservando a posição musical. */
+  pauseComposition() { this.transport?.pause() }
+
+  /** A prévia da região usa outro relógio; pausa o arranjo antes de iniciá-la. */
+  previewStarted() { this.pauseComposition() }
+
+  /** Para a reprodução global e retorna ao começo do intervalo. */
+  stopComposition() { this.transport?.stop() }
+
+  /** Ativa ou desativa o loop; durante Play a mudança vale na próxima volta. */
+  toggleCompositionLoop() { this.transport?.setLoopEnabled(!this.loopEnabled) }
+
+  /** Ouve uma faixa sem alterar solo/mute persistidos nem parar o relógio atual. */
+  async playTrack(trackId) {
+    if (!this.music || !this.transport) return
+    this.activePianoRoll()?.stop()
+    this.transport.isolateTrack(trackId)
+    if (this.playbackStatus !== "playing") await this.transport.play(this.music)
+  }
+
+  /** Valida e grava os marcadores numéricos no documento musical. */
+  changeLoopMarker() {
+    if (!this.music) return
+    try {
+      const start = Number(this.loopStartTarget.value)
+      const end = Number(this.loopEndTarget.value)
+      this.commit(setLoopRange(this.music, start, end))
+    } catch (error) {
+      this.statusTarget.textContent = `Marcadores não aplicados: ${error.message}`
+    }
+  }
+
+  /** Inicia arraste de um marcador mantendo a régua como origem visual. */
+  startLoopMarkerDrag(event) {
+    if (event.button !== 0 || !this.music) return
+    event.preventDefault()
+    this.markerDrag = event.currentTarget.dataset.marker
+  }
+
+  /** Move o marcador selecionado por uma batida, alternativa ao ponteiro. */
+  loopMarkerKey(event) {
+    if (!["ArrowLeft", "ArrowRight"].includes(event.key) || !this.music) return
+    event.preventDefault()
+    const range = loopRange(this.music)
+    const delta = (event.key === "ArrowRight" ? 1 : -1) * beatTicks(this.music)
+    this.applyLoopMarker(event.currentTarget.dataset.marker, event.currentTarget.dataset.marker === "start" ? range.startTick + delta : range.endTick + delta)
+    event.currentTarget.focus()
+  }
+
+  /** Mantém início menor que fim e informa erros sem perder a composição atual. */
+  applyLoopMarker(marker, tick) {
+    const range = loopRange(this.music)
+    try {
+      this.commit(setLoopRange(this.music, marker === "start" ? tick : range.startTick, marker === "end" ? tick : range.endTick))
+    } catch (error) {
+      this.statusTarget.textContent = `Marcadores não aplicados: ${error.message}`
+    }
+  }
+
+  /** Atualiza apenas agulha e estado, sem reconstruir lanes ou editor a cada pulso. */
+  onTransportState(state) {
+    this.playbackStatus = state.status
+    this.loopEnabled = state.loopEnabled
+    if (this.music && this.hasPlayheadTarget !== false) this.playheadTarget.style.left = `${state.tick / beatTicks(this.music) * this.pixelsPerBeat}px`
+    const labels = { stopped: "Parado", loading: "Carregando áudio…", playing: "Reproduzindo", paused: "Pausado", error: "Áudio indisponível" }
+    if (this.hasTransportStatusTarget !== false) this.transportStatusTarget.textContent = `${labels[state.status] || state.status}${state.unavailableTrackIds?.length ? ` · ${state.unavailableTrackIds.length} faixa(s) indisponível(is)` : ""}`
+    if (this.hasLoopButtonTarget) this.loopButtonTarget.setAttribute("aria-pressed", String(state.loopEnabled))
   }
 
   /** Localiza o controller já montado sem acoplar a timeline ao Canvas. */
@@ -291,6 +381,9 @@ export default class extends Controller {
     this.zoomLabelTarget.textContent = `${Math.round(this.pixelsPerBeat / 64 * 100)}%`
     const measure = measureTicks(this.music)
     const width = timelineTicks(this.music) / beatTicks(this.music) * this.pixelsPerBeat
+    const playhead = this.hasPlayheadTarget ? this.playheadTarget : null
+    const startHandle = this.hasLoopStartHandleTarget ? this.loopStartHandleTarget : null
+    const endHandle = this.hasLoopEndHandleTarget ? this.loopEndHandleTarget : null
     this.rulerTarget.replaceChildren()
     const label = this.element("span", "composition-ruler-label", "Faixas / Compassos")
     this.rulerTarget.append(label)
@@ -301,7 +394,16 @@ export default class extends Controller {
       mark.style.width = `${measure / beatTicks(this.music) * this.pixelsPerBeat}px`
       marks.append(mark)
     }
+    if (playhead) marks.append(playhead)
+    const range = loopRange(this.music)
+    for (const [handle, tick] of [[startHandle, range.startTick], [endHandle, range.endTick]]) {
+      if (!handle) continue
+      handle.style.left = `${tick / beatTicks(this.music) * this.pixelsPerBeat}px`
+      marks.append(handle)
+    }
     this.rulerTarget.append(marks)
+    if (this.hasLoopStartTarget) this.loopStartTarget.value = String(range.startTick)
+    if (this.hasLoopEndTarget) this.loopEndTarget.value = String(range.endTick)
     this.tracksTarget.replaceChildren(...tracks.map((track, index) => this.trackRow(track, index, width)))
     this.syncActiveEditor()
   }
@@ -343,13 +445,14 @@ export default class extends Controller {
     controls.append(switches)
     const actions = this.element("div", "composition-track-actions")
     actions.append(
+      this.button("Ouvir faixa", () => this.playTrack(track.id), "composition-mini-button"),
       this.button("+ Região", () => this.appendRegion(track), "composition-mini-button"),
       this.button("↑", () => this.commit(moveTrack(this.music, track.id, -1)), "composition-mini-button"),
       this.button("↓", () => this.commit(moveTrack(this.music, track.id, 1)), "composition-mini-button"),
       this.button("Excluir faixa", () => { if (window.confirm(`Excluir ${track.name} e suas regiões?`)) this.commit(removeTrack(this.music, track.id)) }, "composition-mini-button composition-mini-danger")
     )
-    actions.children[1].disabled = index === 0
-    actions.children[2].disabled = index === this.music.tracks.length - 1
+    actions.children[2].disabled = index === 0
+    actions.children[3].disabled = index === this.music.tracks.length - 1
     controls.append(actions)
     const lane = this.element("div", "composition-track-lane")
     lane.style.width = `${width}px`
@@ -404,6 +507,13 @@ export default class extends Controller {
 
   /** Converte deslocamento em ticks com snap musical antes de alterar o documento. */
   dragMove(event) {
+    if (this.markerDrag && this.music) {
+      const marks = this.rulerTarget.querySelector(".composition-ruler-marks")
+      const tick = Math.max(0, Math.round((event.clientX - marks.getBoundingClientRect().left) / this.pixelsPerBeat * beatTicks(this.music)))
+      const current = loopRange(this.music)
+      if (tick !== (this.markerDrag === "start" ? current.startTick : current.endTick)) this.applyLoopMarker(this.markerDrag, tick)
+      return
+    }
     if (!this.drag || !this.music) return
     const delta = (event.clientX - this.drag.x) / this.pixelsPerBeat * beatTicks(this.music)
     const { trackId, regionId, mode, start, duration } = this.drag

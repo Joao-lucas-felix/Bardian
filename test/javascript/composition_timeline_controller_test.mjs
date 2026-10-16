@@ -5,6 +5,7 @@ import vm from "node:vm"
 import * as state from "../../app/javascript/composition/timeline_state.js"
 import * as notes from "../../app/javascript/composition/region_notes.js"
 import * as history from "../../app/javascript/composition/note_history.js"
+import * as playback from "../../app/javascript/composition/playback_events.js"
 
 // Carrega o controller com Stimulus mínimo para verificar o protocolo de salvamento.
 const source = readFileSync(new URL("../../app/javascript/controllers/composition_timeline_controller.js", import.meta.url), "utf8")
@@ -12,10 +13,21 @@ const source = readFileSync(new URL("../../app/javascript/controllers/compositio
   .replace("export default class extends Controller", "class TimelineController extends Controller")
   .concat("\nTimelineController")
 const Controller = vm.runInNewContext(source, {
-  Controller: class {}, ...state, ...notes, ...history, crypto: { randomUUID: () => "uuid" },
+  Controller: class {}, ...state, ...notes, ...history, ...playback, crypto: { randomUUID: () => "uuid" },
+  createCompositionAudio: () => ({}), createCompositionTransport: () => ({}),
   document: { querySelector: () => ({ content: "token" }) },
   window: { confirm: () => true, addEventListener() {}, removeEventListener() {} }
 })
+
+/** Transporte observável sem substituir as regras musicais do controller. */
+function transportSpy() {
+  const calls = []
+  return { calls, update(music) { calls.push(["update", music]) },
+    play(music) { calls.push(["play", music]); return Promise.resolve() },
+    pause() { calls.push(["pause"]) }, stop() { calls.push(["stop"]) },
+    setLoopEnabled(value) { calls.push(["loop", value]) },
+    isolateTrack(id) { calls.push(["isolate", id]) }, dispose() { calls.push(["dispose"]) } }
+}
 
 /** Documento mínimo com duas regiões para verificar isolamento das edições. */
 function editingController() {
@@ -244,4 +256,112 @@ test("salvamento tardio preserva edicoes posteriores", async () => {
   assert.equal(controller.music.name, "Segunda")
   assert.equal(controller.lockVersion, 1)
   assert.match(controller.statusTarget.textContent, /ainda não salvas/)
+})
+
+// Mudanças locais devem chegar ao áudio sem reiniciar a agulha nem exigir Save.
+test("edições de notas e metadados atualizam transporte sem pará-lo", () => {
+  const controller = editingController()
+  const transport = transportSpy()
+  controller.transport = transport
+  controller.commit(state.updateTrack(controller.music, "track", { volume: 0.5 }))
+  const changed = [{ id: "note-one", pitch: 72, onset: 0, duration: 480, velocity: 100 }]
+  controller.notesChanged({ detail: { notes: changed } })
+  controller.notesCommitted({ detail: { notes: changed } })
+  controller.undoNotes()
+  controller.nameTarget = { value: "Novo nome" }
+  controller.bpmTarget = { value: "90" }
+  controller.numeratorTarget = { value: "4" }
+  controller.denominatorTarget = { value: "4" }
+  controller.changeMetadata()
+  assert.equal(transport.calls.filter((call) => call[0] === "update").length, 4)
+  assert.equal(transport.calls.some((call) => call[0] === "stop"), false)
+  assert.equal(transport.calls.at(-1)[1].bpm, 90)
+})
+
+// O usuário ouve o documento atual, mesmo se ainda houver mudanças pendentes.
+test("play da composição interrompe só a prévia individual", async () => {
+  const controller = editingController()
+  const transport = transportSpy()
+  controller.transport = transport
+  let previewStops = 0
+  controller.activePianoRoll = () => ({ stop() { previewStops += 1 } })
+  controller.music.tracks[0].regions[0].notes[0].pitch = 75
+  await controller.playComposition()
+  assert.equal(previewStops, 1)
+  assert.equal(transport.calls.at(-1)[0], "play")
+  assert.equal(transport.calls.at(-1)[1].tracks[0].regions[0].notes[0].pitch, 75)
+  controller.pauseComposition()
+  controller.stopComposition()
+  assert.deepEqual(transport.calls.slice(-2).map((call) => call[0]), ["pause", "stop"])
+})
+
+// Os campos de marcador usam os mesmos ticks persistidos, sem afetar outras faixas.
+test("marcadores numéricos entram no documento e deixam o salvamento pendente", () => {
+  const controller = editingController()
+  const transport = transportSpy()
+  controller.transport = transport
+  controller.loopStartTarget = { value: "480" }
+  controller.loopEndTarget = { value: "2400" }
+  controller.changeLoopMarker()
+  assert.equal(controller.music.loop.start_tick, 480)
+  assert.equal(controller.music.loop.end_tick, 2400)
+  assert.match(controller.statusTarget.textContent, /não salvas/)
+  assert.equal(transport.calls.at(-1)[0], "update")
+})
+
+// Posição visual não pode provocar remount ou perda de foco no editor aberto.
+test("pulso da agulha só altera apresentação e desconexão libera áudio", () => {
+  const controller = editingController()
+  const transport = transportSpy()
+  controller.transport = transport
+  controller.pixelsPerBeat = 64
+  controller.playheadTarget = { style: {} }
+  controller.transportStatusTarget = { textContent: "" }
+  controller.render = () => { throw new Error("não reconstruir timeline por pulso") }
+  controller.onTransportState({ status: "playing", tick: 480, loopEnabled: true, unavailableTrackIds: [] })
+  assert.equal(controller.playheadTarget.style.left, "64px")
+  assert.match(controller.transportStatusTarget.textContent, /Reproduzindo/)
+  controller.activePianoRoll = () => null
+  controller.disconnect()
+  assert.equal(transport.calls.at(-1)[0], "dispose")
+})
+
+// A prévia de uma região não deve tocar sobre o transporte global.
+test("iniciar prévia individual pausa composição, sem descartar o documento", () => {
+  const controller = editingController()
+  controller.transport = transportSpy()
+  controller.previewStarted()
+  assert.deepEqual(controller.transport.calls.map((call) => call[0]), ["pause"])
+  assert.equal(controller.music.tracks[0].regions[0].notes[0].pitch, 60)
+})
+
+// Isolamento e modo de loop são controles da escuta, não mutações do JSON.
+test("ouvir faixa e alternar loop preservam documento e seleção", async () => {
+  const controller = editingController()
+  controller.transport = transportSpy()
+  controller.activePianoRoll = () => null
+  controller.loopEnabled = true
+  const before = JSON.stringify(controller.music)
+  await controller.playTrack("track")
+  controller.toggleCompositionLoop()
+  assert.deepEqual(controller.transport.calls.map((call) => call[0]), ["isolate", "play", "loop"])
+  assert.equal(controller.transport.calls.at(-1)[1], false)
+  assert.equal(JSON.stringify(controller.music), before)
+  assert.equal(controller.selectedRegionId, "one")
+})
+
+// As setas permitem editar os marcadores sem ponteiro e mantêm o snap musical.
+test("seta em marcador avança uma batida e rejeita cruzamento", () => {
+  const controller = editingController()
+  controller.transport = transportSpy()
+  const handle = { dataset: { marker: "start" }, focus() {} }
+  let prevented = false
+  controller.loopMarkerKey({ key: "ArrowRight", currentTarget: handle, preventDefault() { prevented = true } })
+  assert.equal(prevented, true)
+  assert.equal(controller.music.loop.start_tick, 480)
+  assert.equal(controller.music.loop.end_tick, 3840)
+  const revision = controller.revision
+  controller.applyLoopMarker("start", 3840)
+  assert.equal(controller.revision, revision)
+  assert.match(controller.statusTarget.textContent, /Marcadores não aplicados/)
 })

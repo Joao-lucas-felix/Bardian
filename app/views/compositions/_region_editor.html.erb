@@ -1,6 +1,6 @@
 <%# O shell mantém o editor fora das lanes; a timeline injeta somente dados da região ativa. %>
 <section class="composition-region-editor" data-composition-timeline-target="regionEditor"
-  data-action="piano-roll:request-note-id->composition-timeline#provideNoteId piano-roll:notes-changed->composition-timeline#notesChanged piano-roll:notes-committed->composition-timeline#notesCommitted keydown->composition-timeline#handleEditorKeydown" hidden>
+  data-action="piano-roll:request-note-id->composition-timeline#provideNoteId piano-roll:notes-changed->composition-timeline#notesChanged piano-roll:notes-committed->composition-timeline#notesCommitted piano-roll:playback-started->composition-timeline#previewStarted keydown->composition-timeline#handleEditorKeydown" hidden>
   <div class="composition-region-editor-heading">
     <div>
       <p class="compositions-eyebrow">Edição da região</p>

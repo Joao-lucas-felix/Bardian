@@ -64,6 +64,15 @@ class CompositionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-composition-timeline-target='summary']", text: /1 faixa.*1 região.*1 nota/
     assert_select "[data-composition-timeline-target='regionEditor'] template"
     assert_select "[data-action*='piano-roll:notes-changed->composition-timeline#notesChanged']"
+    assert_select "[data-action='click->composition-timeline#playComposition']", text: /Tocar composição/
+    assert_select "[data-action='click->composition-timeline#stopComposition']", text: /Parar/
+    assert_select "[data-composition-timeline-target='transportStatus'][role='status']"
+    assert_select "[data-composition-timeline-target='playhead']"
+    assert_select "input[data-composition-timeline-target='loopStart'][data-action*='changeLoopMarker']"
+    assert_select "input[data-composition-timeline-target='loopEnd'][data-action*='changeLoopMarker']"
+    assert_select "[data-composition-timeline-target='loopStartHandle'][tabindex='0']"
+    assert_select "[data-composition-timeline-target='loopEndHandle'][tabindex='0']"
+    assert_select "[data-action*='piano-roll:playback-started->composition-timeline#previewStarted']"
   end
 
   # O endpoint JSON recebe o documento inteiro e reconstrói a mesma música.

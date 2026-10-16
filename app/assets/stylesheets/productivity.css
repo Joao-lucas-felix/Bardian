@@ -144,6 +144,13 @@ body, button, input, select { font-family: var(--p-font); }
 .composition-timeline-heading p, .composition-timeline-help { margin: 0; color: var(--p-muted); font-size: 13px; line-height: 1.5; }
 .composition-timeline-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .composition-timeline-actions .product-button { border: 1px solid var(--p-line); cursor: pointer; }
+/* O transporte fica fora da área rolável; a agulha usa apenas a coordenada da régua. */
+.composition-transport { display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; padding: 0 28px 16px; }
+.composition-transport-buttons, .composition-loop-fields { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.composition-transport-buttons .product-button { cursor: pointer; }
+.composition-loop-fields label { display: inline-flex; align-items: center; gap: 5px; color: var(--p-muted); font-size: 12px; font-weight: 700; }
+.composition-loop-fields input { width: 78px; padding: 6px; border: 1px solid var(--p-line); border-radius: 6px; background: var(--p-surface); color: var(--p-ink); font: inherit; }
+.composition-transport-status { color: var(--p-muted); font-size: 12px; font-weight: 700; }
 .composition-timeline-zoom { display: flex; align-items: center; gap: 6px; border: 1px solid var(--p-line); border-radius: 8px; }
 .composition-timeline-zoom button { width: 34px; height: 34px; border: 0; background: transparent; color: var(--p-ink); font-size: 20px; cursor: pointer; }
 .composition-timeline-zoom span { min-width: 42px; text-align: center; font-size: 12px; font-weight: 800; }
@@ -153,7 +160,11 @@ body, button, input, select { font-family: var(--p-font); }
 .composition-timeline-ruler { position: sticky; top: 0; z-index: 3; min-height: 35px; background: var(--p-surface-alt); }
 .composition-ruler-label, .composition-track-controls { position: sticky; left: 0; z-index: 2; flex: 0 0 248px; box-sizing: border-box; border-right: 1px solid var(--p-line); }
 .composition-ruler-label { z-index: 4; padding: 10px 15px; color: var(--p-muted); background: var(--p-surface-alt); font-size: 11px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
-.composition-ruler-marks { display: flex; flex: none; }
+.composition-ruler-marks { position: relative; display: flex; flex: none; }
+.composition-playhead { position: absolute; top: 0; bottom: 0; left: 0; width: 2px; background: var(--p-accent); z-index: 1; pointer-events: none; }
+.composition-loop-handle { position: absolute; top: 2px; z-index: 2; width: 15px; height: 29px; padding: 0; border: 2px solid var(--p-accent); border-radius: 4px; background: var(--p-surface); cursor: ew-resize; transform: translateX(-50%); }
+.composition-loop-end { border-color: var(--p-ink); }
+.composition-loop-handle:focus-visible { outline: 3px solid var(--p-accent); outline-offset: 2px; }
 .composition-ruler-mark { box-sizing: border-box; padding: 10px 9px; border-left: 1px solid var(--p-line); color: var(--p-muted); font-size: 11px; font-weight: 800; }
 .composition-track-row { border-top: 1px solid var(--p-line); }
 .composition-track-controls { display: grid; gap: 7px; padding: 12px; background: var(--p-surface); }

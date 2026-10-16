@@ -560,6 +560,8 @@ export default class extends Controller {
       this.statusTarget.textContent = "Adicione uma nota antes de reproduzir"
       return
     }
+    // A timeline hospedeira pausa sua reprodução antes que a prévia assuma o áudio.
+    this.dispatch("playback-started")
     const resumeTick = this.currentTick >= this.loopStartTick && this.currentTick < this.loopEndTick ? this.currentTick : this.loopStartTick
     this.stop()
     this.currentTick = resumeTick
