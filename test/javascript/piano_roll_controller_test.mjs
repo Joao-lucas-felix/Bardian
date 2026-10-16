@@ -45,6 +45,7 @@ class ScoreBuilder {
 }
 const PianoRollController = vm.runInNewContext(`${source}\nPianoRollController`, {
   Controller: class {}, Tone, createPhraseInstrument,
+  CustomEvent: class { constructor(type, options) { this.type = type; this.detail = options.detail } },
   document: dom,
   Rational, Duration, ScoreBuilder,
   Pitch: { fromMidi: (midi) => ({ toString: () => `MIDI-${midi}` }) },
@@ -82,6 +83,7 @@ function editor(notes = [{ id: "note-1", pitch: 60, onset: 480, duration: 480, v
   instance.render = () => {}
   instance.updateSummary = () => {}
   instance.commitScore = () => {}
+  instance.dispatch = () => {}
   return instance
 }
 
@@ -188,6 +190,60 @@ test("uma edição confirmada emite cópia das notas, sem disparo na montagem", 
   instance.notes[0].pitch = 72
   assert.equal(events[0].name, "notes-changed")
   assert.equal(events[0].payload.detail.notes[0].pitch, 60)
+})
+
+test("arraste confirma uma única operação e não confirma seleção vazia", () => {
+  const instance = editor([])
+  const events = []
+  instance.dispatch = (name, payload) => events.push({ name, payload })
+  instance.buildScore = () => ({})
+  instance.noteAt = () => null
+  const y = instance.pitchToPixels(60) + 11
+  instance.pointerDown(pointer(20, y))
+  instance.pointerMove(pointer(100, y))
+  instance.pointerMove(pointer(180, y))
+  instance.pointerUp(pointer(180, y))
+  assert.equal(events.filter((event) => event.name === "notes-committed").length, 1)
+  assert.equal(events.find((event) => event.name === "notes-committed").payload.detail.notes[0].duration, 960)
+  instance.pointerDown(pointer(300, y, true))
+  instance.pointerUp(pointer(300, y, true))
+  assert.equal(events.filter((event) => event.name === "notes-committed").length, 1)
+})
+
+test("modo persistido solicita ID síncrono para mouse e teclado", () => {
+  const instance = editor([])
+  instance.hasPersistentModeValue = true
+  instance.persistentModeValue = true
+  instance.noteAt = () => null
+  let next = 1
+  instance.element.dispatchEvent = (event) => { event.detail.id = `global-${next++}` }
+  instance.pointerDown(pointer(20, instance.pitchToPixels(60) + 11))
+  instance.pointerUp(pointer(20, instance.pitchToPixels(60) + 11))
+  instance.handleKeyDown({ key: "ArrowRight", preventDefault() {} })
+  instance.handleKeyDown({ key: "Enter", preventDefault() {} })
+  assert.deepEqual(instance.notes.map((note) => note.id), ["global-1", "global-2"])
+  instance.element.dispatchEvent = () => {}
+  instance.handleKeyDown({ key: "ArrowRight", preventDefault() {} })
+  assert.throws(() => instance.handleKeyDown({ key: "Enter", preventDefault() {} }), /ID/)
+})
+
+test("duração, velocity e exclusão confirmam; restauração não emite eventos", () => {
+  const instance = editor()
+  const events = []
+  instance.dispatch = (name, payload) => events.push({ name, payload })
+  instance.buildScore = () => ({})
+  instance.selectedNoteIds.add("note-1")
+  instance.changeDuration({ currentTarget: { value: "2" } })
+  instance.changeVelocity({ currentTarget: { value: "127" } })
+  assert.equal(instance.notes[0].velocity, 127)
+  instance.changeVelocity({ currentTarget: { value: "0" } })
+  assert.equal(instance.notes[0].velocity, 127)
+  instance.handleKeyDown({ key: "Delete", preventDefault() {} })
+  assert.equal(events.filter((event) => event.name === "notes-committed").length, 3)
+  const count = events.length
+  instance.replaceNotes([{ id: "restored", pitch: 62, onset: 0, duration: 480, velocity: 80 }])
+  assert.equal(events.length, count)
+  assert.equal(instance.notes[0].id, "restored")
 })
 
 test("bateria usa o kit para tocar uma batida MIDI", async () => {

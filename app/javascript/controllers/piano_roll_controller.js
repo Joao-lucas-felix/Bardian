@@ -16,7 +16,7 @@ export default class extends Controller {
   static targets = [
     "duration", "keyboard", "loopButton", "loopEndLine", "loopEndMarker",
     "loopStartLine", "loopStartMarker", "playhead", "ruler", "roll",
-    "rollViewport", "score", "snapButton", "status", "velocity", "zoomLabel"
+    "rollViewport", "score", "snapButton", "status", "velocity", "velocityInput", "zoomLabel"
   ]
 
   /** Inicializa o estado musical, a viewport e os listeners do editor. */
@@ -76,6 +76,33 @@ export default class extends Controller {
   /** Devolve uma cópia transportável das notas para a página de criação. */
   snapshotNotes() {
     return this.notes.map(({ id, pitch, onset, duration, velocity }) => ({ id, pitch, onset, duration, velocity }))
+  }
+
+  /** Solicita à composição um ID global; no rascunho mantém a sequência legada. */
+  nextNoteIdForEditor() {
+    if (!this.isPersistentMode()) return `note-${this.nextNoteId++}`
+    const detail = { id: null }
+    this.element.dispatchEvent(new CustomEvent("piano-roll:request-note-id", { bubbles: true, detail }))
+    if (typeof detail.id !== "string" || !detail.id || this.notes.some((note) => note.id === detail.id)) {
+      throw new Error("ID global de nota não fornecido pela composição")
+    }
+    return detail.id
+  }
+
+  /** Restaura um snapshot do histórico sem gerar outra alteração ou ponto de desfazer. */
+  replaceNotes(notes) {
+    this.notes = notes.map((note) => ({ ...note }))
+    this.selectedNoteIds.clear()
+    this.score = this.buildScore()
+    this.render()
+    this.updateSummary()
+  }
+
+  /** Publica somente alterações reais e finalizadas, para um ponto de histórico por gesto. */
+  confirmNotesChanged(previous) {
+    if (JSON.stringify(previous) !== JSON.stringify(this.snapshotNotes())) {
+      this.dispatch("notes-committed", { detail: { notes: this.snapshotNotes() } })
+    }
   }
 
   /** Preserva reprodução no protótipo que não declara o valor Stimulus. */
@@ -395,7 +422,7 @@ export default class extends Controller {
         this.selectOnly(note.id)
       }
       if (this.selectedNoteIds.has(note.id)) {
-        this.interaction = { type: edge || "move", point, noteIds: edge ? [note.id] : [...this.selectedNoteIds], snapshot: this.snapshotSelection() }
+        this.interaction = { type: edge || "move", point, noteIds: edge ? [note.id] : [...this.selectedNoteIds], snapshot: this.snapshotSelection(), snapshotNotes: this.snapshotNotes() }
       }
       this.render()
       this.updateSummary()
@@ -412,10 +439,11 @@ export default class extends Controller {
     const duration = Math.min(this.gridTicks(), this.totalTicks)
     const onset = Math.max(0, Math.min(this.totalTicks - duration, this.snapTick(this.pixelsToMusic(point.x))))
     const pitch = this.pixelsToPitch(point.y)
-    const noteData = { id: `note-${this.nextNoteId++}`, pitch, onset, duration, velocity: 100 }
+    const beforeNotes = this.snapshotNotes()
+    const noteData = { id: this.nextNoteIdForEditor(), pitch, onset, duration, velocity: 100 }
     this.notes.push(noteData)
     this.selectOnly(noteData.id)
-    this.interaction = { type: "draw", point, noteId: noteData.id, snapshot: { ...noteData } }
+    this.interaction = { type: "draw", point, noteId: noteData.id, snapshot: { ...noteData }, beforeNotes }
     this.commitScore()
     this.render()
     this.updateSummary()
@@ -429,9 +457,11 @@ export default class extends Controller {
     const note = this.noteAt(this.pointerPoint(event))
     if (!note) return
     event.preventDefault()
+    const previous = this.snapshotNotes()
     this.notes = this.notes.filter((item) => item.id !== note.id)
     this.selectedNoteIds.delete(note.id)
     this.commitScore()
+    this.confirmNotesChanged(previous)
     this.render()
     this.updateSummary()
   }
@@ -496,8 +526,10 @@ export default class extends Controller {
   pointerUp(event) {
     if (!this.interaction) return
     if (event?.pointerId != null && this.rollTarget.hasPointerCapture?.(event.pointerId)) this.rollTarget.releasePointerCapture(event.pointerId)
+    const previous = this.interaction.beforeNotes || this.interaction.snapshotNotes
     this.interaction = null
     this.commitScore()
+    if (previous) this.confirmNotesChanged(previous)
     this.render()
     this.updateSummary()
   }
@@ -739,18 +771,22 @@ export default class extends Controller {
       const existing = this.notes.find((note) => note.pitch === this.keyboardCursor.pitch && note.onset === this.keyboardCursor.onset)
       if (existing) this.selectOnly(existing.id)
       else {
-        const note = { id: `note-${this.nextNoteId++}`, pitch: this.keyboardCursor.pitch, onset: this.keyboardCursor.onset, duration: Math.min(this.gridTicks(), this.totalTicks - this.keyboardCursor.onset), velocity: 100 }
+        const previous = this.snapshotNotes()
+        const note = { id: this.nextNoteIdForEditor(), pitch: this.keyboardCursor.pitch, onset: this.keyboardCursor.onset, duration: Math.min(this.gridTicks(), this.totalTicks - this.keyboardCursor.onset), velocity: 100 }
         this.notes.push(note)
         this.selectOnly(note.id)
         this.commitScore()
+        this.confirmNotesChanged(previous)
       }
       this.render()
       this.updateSummary()
     } else if (["Delete", "Backspace"].includes(event.key)) {
       event.preventDefault()
+      const previous = this.snapshotNotes()
       this.notes = this.notes.filter((note) => !this.selectedNoteIds.has(note.id))
       this.selectedNoteIds.clear()
       this.commitScore()
+      this.confirmNotesChanged(previous)
       this.render()
       this.updateSummary()
     } else if (event.key === "Escape") {
@@ -859,10 +895,26 @@ export default class extends Controller {
     const quarters = Number(event.currentTarget.value)
     if (![0.25, 0.5, 1, 2, 4].includes(quarters) || !this.selectedNoteIds.size) return
     const ticks = Math.round(quarters * this.ticksPerQuarter)
+    const previous = this.snapshotNotes()
     this.notes.forEach((note) => {
       if (this.selectedNoteIds.has(note.id)) note.duration = Math.min(ticks, this.totalTicks - note.onset)
     })
     this.commitScore()
+    this.confirmNotesChanged(previous)
+    this.render()
+    this.updateSummary()
+  }
+
+  /** Aplica intensidade MIDI inteira (1–127) à seleção, sem afetar outras notas. */
+  changeVelocity(event) {
+    const velocity = Number(event.currentTarget.value)
+    if (!Number.isInteger(velocity) || velocity < 1 || velocity > 127 || !this.selectedNoteIds.size) return
+    const previous = this.snapshotNotes()
+    this.notes.forEach((note) => {
+      if (this.selectedNoteIds.has(note.id)) note.velocity = velocity
+    })
+    this.commitScore()
+    this.confirmNotesChanged(previous)
     this.render()
     this.updateSummary()
   }
@@ -958,6 +1010,11 @@ export default class extends Controller {
     const durations = new Set(selected.map((note) => note.duration))
     const quarters = selected.length && durations.size === 1 ? selected[0].duration / this.ticksPerQuarter : null
     this.durationTarget.value = [0.25, 0.5, 1, 2, 4].includes(quarters) ? String(quarters) : "custom"
+    if (this.hasVelocityInputTarget) {
+      this.velocityInputTarget.disabled = !selected.length
+      const velocities = new Set(selected.map((note) => note.velocity))
+      this.velocityInputTarget.value = selected.length && velocities.size === 1 ? String(selected[0].velocity) : ""
+    }
   }
 
   /** Retorna a distância em ticks do snap atual. */
