@@ -174,6 +174,15 @@ body, button, input, select { font-family: var(--p-font); }
 .composition-region-grip { position: absolute; top: 0; right: 0; width: 13px; height: 100%; border-left: 2px solid var(--p-accent); cursor: ew-resize; }
 .composition-timeline-empty { margin: 0; padding: 36px 28px; color: var(--p-muted); }
 .composition-timeline-empty[hidden] { display: none; }
+.composition-region-editor { margin-top: 24px; border: 1px solid var(--p-line); border-radius: 14px; background: var(--p-surface); overflow: hidden; }
+.composition-region-editor[hidden] { display: none; }
+.composition-region-editor-heading { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 22px 26px; }
+.composition-region-editor-heading h2 { margin: 4px 0 6px; font-size: 23px; }
+.composition-region-editor-heading p:last-child { margin: 0; color: var(--p-muted); font-size: 13px; line-height: 1.5; }
+.composition-region-editor-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.composition-region-editor-actions button { min-height: 38px; border: 1px solid var(--p-line); cursor: pointer; }
+.composition-region-editor .piano-roll-card { border: 0; border-top: 1px solid var(--p-line); border-radius: 0; }
+@media (max-width: 700px) { .composition-region-editor-heading { align-items: flex-start; flex-direction: column; padding: 20px; } }
 @media (max-width: 700px) { .composition-timeline-heading { align-items: flex-start; flex-direction: column; padding: 20px; } .composition-timeline-help { padding: 0 20px 16px; } .composition-ruler-label, .composition-track-controls { flex-basis: 205px; } }
 @media (max-width: 620px) { .compositions-details-form { grid-template-columns: 1fr; } .compositions-card { align-items: flex-start; } }
 
@@ -269,7 +278,10 @@ body, button, input, select { font-family: var(--p-font); }
 .piano-roll-subtitle { margin: 6px 0 0; color: var(--p-muted); font-size: 13px; }
 .piano-roll-state { color: var(--p-muted); font-size: 12px; }
 .piano-roll-toolbar { border-color: var(--p-line); color: var(--p-muted); }
-.piano-roll-play, .piano-roll-stop, .piano-roll-tool, .piano-roll-zoom button, .piano-roll-control select { border-color: var(--p-line); border-radius: 7px; background: var(--p-surface); color: var(--p-ink); font: 800 12px var(--p-font); }
+.piano-roll-play, .piano-roll-stop, .piano-roll-tool, .piano-roll-zoom button, .piano-roll-control select, .piano-roll-control input { border-color: var(--p-line); border-radius: 7px; background: var(--p-surface); color: var(--p-ink); font: 800 12px var(--p-font); }
+.piano-roll-control input { box-sizing: border-box; width: 72px; min-height: 32px; padding: 0 8px; border: 1px solid var(--p-line); }
+.piano-roll-control input:focus-visible { outline: 2px solid var(--p-accent); outline-offset: 2px; }
+.piano-roll-control input:disabled { opacity: .55; }
 .piano-roll-play { display: inline-flex; align-items: center; gap: 6px; border-color: var(--p-accent); background: var(--p-accent); color: #fff; }
 .piano-roll-play .ui-icon { width: 15px; height: 15px; flex-basis: 15px; fill: currentColor; }
 .piano-roll-tool.is-active { border-color: var(--p-accent); background: var(--p-accent-soft); color: var(--p-accent); }

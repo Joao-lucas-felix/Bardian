@@ -1,0 +1,17 @@
+<%# O shell mantém o editor fora das lanes; a timeline injeta somente dados da região ativa. %>
+<section class="composition-region-editor" data-composition-timeline-target="regionEditor"
+  data-action="piano-roll:request-note-id->composition-timeline#provideNoteId piano-roll:notes-changed->composition-timeline#notesChanged piano-roll:notes-committed->composition-timeline#notesCommitted keydown->composition-timeline#handleEditorKeydown" hidden>
+  <div class="composition-region-editor-heading">
+    <div>
+      <p class="compositions-eyebrow">Edição da região</p>
+      <h2 data-region-editor-title>Selecione uma região</h2>
+      <p>As notas são relativas ao início da região. Use Salvar composição para persistir alterações.</p>
+    </div>
+    <div class="composition-region-editor-actions" aria-label="Histórico de notas da região">
+      <button type="button" class="product-button product-button-secondary" data-action="click->composition-timeline#undoNotes">Desfazer</button>
+      <button type="button" class="product-button product-button-secondary" data-action="click->composition-timeline#redoNotes">Refazer</button>
+    </div>
+  </div>
+  <template><%= render "pages/piano_roll", editor_title: "Piano roll da região" %></template>
+  <div data-region-editor-mount></div>
+</section>

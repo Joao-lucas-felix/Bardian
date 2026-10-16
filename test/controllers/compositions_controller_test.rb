@@ -62,6 +62,8 @@ class CompositionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-composition-timeline-target='tracks']"
     assert_select "[data-action='click->composition-timeline#addTrack']", text: /Adicionar faixa/
     assert_select "[data-composition-timeline-target='summary']", text: /1 faixa.*1 região.*1 nota/
+    assert_select "[data-composition-timeline-target='regionEditor'] template"
+    assert_select "[data-action*='piano-roll:notes-changed->composition-timeline#notesChanged']"
   end
 
   # O endpoint JSON recebe o documento inteiro e reconstrói a mesma música.

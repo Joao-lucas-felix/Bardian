@@ -1,9 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
 import { addTrack, updateTrack, moveTrack, removeTrack, addRegion, moveRegion, resizeRegion, removeRegion, beatTicks, measureTicks, timelineTicks } from "composition/timeline_state"
+import { newNoteId, regionFor, replaceRegionNotes, toEditorNotes } from "composition/region_notes"
+import { createHistory, record, redo, undo } from "composition/note_history"
 
 /** Coordena a timeline e o formulário sobre um único documento musical versionado. */
 export default class extends Controller {
-  static targets = ["form", "name", "bpm", "numerator", "denominator", "status", "saveButton", "summary", "scroll", "ruler", "tracks", "empty", "zoomLabel"]
+  static targets = ["form", "name", "bpm", "numerator", "denominator", "status", "saveButton", "summary", "scroll", "ruler", "tracks", "empty", "zoomLabel", "regionEditor"]
   static values = { url: String }
 
   /** Carrega o documento persistido; até lá o formulário HTML continua disponível. */
@@ -11,6 +13,8 @@ export default class extends Controller {
     this.pixelsPerBeat = 64
     this.revision = 0
     this.selectedRegionId = null
+    this.selectedTrackId = null
+    this.noteHistories = new Map()
     this.pointerMove = (event) => this.dragMove(event)
     this.pointerUp = () => { this.drag = null }
     window.addEventListener("pointermove", this.pointerMove)
@@ -30,6 +34,7 @@ export default class extends Controller {
 
   /** Desfaz listeners globais para não acumular interações após navegar. */
   disconnect() {
+    this.activePianoRoll()?.stop()
     window.removeEventListener("pointermove", this.pointerMove)
     window.removeEventListener("pointerup", this.pointerUp)
   }
@@ -107,7 +112,135 @@ export default class extends Controller {
   }
 
   /** Troca o documento após uma operação musical e atualiza a tela. */
-  commit(next) { this.music = next; this.revision = (this.revision || 0) + 1; this.markDirty(); this.render() }
+  commit(next) {
+    this.music = next
+    this.revision = (this.revision || 0) + 1
+    this.markDirty()
+    this.render()
+  }
+
+  /** Localiza o controller já montado sem acoplar a timeline ao Canvas. */
+  activePianoRoll() {
+    if (!this.hasRegionEditorTarget) return null
+    const node = this.regionEditorTarget.querySelector("[data-controller~='piano-roll']")
+    return node ? this.application?.getControllerForElementAndIdentifier(node, "piano-roll") : null
+  }
+
+  /** Seleciona uma região e inicia seu histórico com as notas locais atuais. */
+  selectRegion(trackId, regionId) {
+    const region = regionFor(this.music, trackId, regionId)
+    if (this.selectedRegionId !== regionId || this.selectedTrackId !== trackId) this.activePianoRoll()?.stop()
+    this.selectedTrackId = trackId
+    this.selectedRegionId = regionId
+    this.noteHistories ??= new Map()
+    if (!this.noteHistories.has(regionId)) this.noteHistories.set(regionId, createHistory(toEditorNotes(region)))
+    this.render()
+  }
+
+  /** Atende ao pedido síncrono do editor usando IDs únicos no documento inteiro. */
+  provideNoteId(event) {
+    if (!this.music || !this.selectedRegionId) return
+    event.detail.id = newNoteId(this.music, () => crypto.randomUUID())
+  }
+
+  /** Atualiza apenas notas da região ativa; entradas inválidas não chegam ao salvamento. */
+  notesChanged(event) {
+    if (!this.music || !this.selectedRegionId) return
+    try {
+      if (JSON.stringify(toEditorNotes(regionFor(this.music, this.selectedTrackId, this.selectedRegionId))) === JSON.stringify(event.detail.notes)) return
+      this.commit(replaceRegionNotes(this.music, this.selectedTrackId, this.selectedRegionId, event.detail.notes))
+    } catch (error) {
+      this.statusTarget.textContent = `Notas não aplicadas: ${error.message}`
+      this.activePianoRoll()?.replaceNotes(toEditorNotes(regionFor(this.music, this.selectedTrackId, this.selectedRegionId)))
+    }
+  }
+
+  /** Registra só a operação completa, sem criar um ponto por movimento do mouse. */
+  notesCommitted(event) {
+    if (!this.selectedRegionId) return
+    try {
+      if (JSON.stringify(toEditorNotes(regionFor(this.music, this.selectedTrackId, this.selectedRegionId))) !== JSON.stringify(event.detail.notes)) return
+    } catch { return }
+    this.noteHistories ??= new Map()
+    const history = this.noteHistories.get(this.selectedRegionId)
+    if (history) this.noteHistories.set(this.selectedRegionId, record(history, event.detail.notes))
+  }
+
+  /** Restaura um passo do histórico local e marca o documento como pendente. */
+  undoNotes() { this.travelNotes(undo) }
+
+  /** Reaplica o próximo passo do histórico local após um desfazer. */
+  redoNotes() { this.travelNotes(redo) }
+
+  /** Compartilha a restauração entre desfazer/refazer sem reenviar evento do editor. */
+  travelNotes(direction) {
+    const history = this.noteHistories?.get(this.selectedRegionId)
+    if (!history) return
+    const result = direction(history)
+    if (!result.changed) return
+    try {
+      const next = replaceRegionNotes(this.music, this.selectedTrackId, this.selectedRegionId, result.notes)
+      this.noteHistories.set(this.selectedRegionId, result.history)
+      this.commit(next)
+      this.activePianoRoll()?.replaceNotes(result.notes)
+    } catch (error) {
+      this.statusTarget.textContent = `Não foi possível restaurar notas: ${error.message}`
+    }
+  }
+
+  /** Atalhos pertencem à área do editor, preservando desfazer nativo em campos. */
+  handleEditorKeydown(event) {
+    if (!(event.ctrlKey || event.metaKey) || event.altKey || event.key.toLowerCase() !== "z") return
+    if (event.target?.closest?.("input, textarea, select, [contenteditable]")) return
+    event.preventDefault()
+    if (event.shiftKey) this.redoNotes()
+    else this.undoNotes()
+  }
+
+  /** Mantém a instância fora da lane reconstruída e atualiza apenas contexto mutável. */
+  syncActiveEditor() {
+    if (!this.hasRegionEditorTarget) return
+    const host = this.regionEditorTarget
+    let region
+    try {
+      if (this.selectedRegionId) region = regionFor(this.music, this.selectedTrackId, this.selectedRegionId)
+    } catch {
+      this.noteHistories?.delete(this.selectedRegionId)
+      this.selectedRegionId = null
+      this.selectedTrackId = null
+    }
+    if (!region) {
+      this.activePianoRoll()?.stop()
+      host.querySelector("[data-region-editor-mount]").replaceChildren()
+      host.hidden = true
+      this.activeEditorKey = null
+      return
+    }
+    const track = this.music.tracks.find((item) => item.id === this.selectedTrackId)
+    const key = `${track.id}:${region.id}:${track.instrument_id}`
+    if (this.activeEditorKey !== key) {
+      this.activePianoRoll()?.stop()
+      const template = host.querySelector("template")
+      const node = template.content.firstElementChild.cloneNode(true)
+      node.dataset.pianoRollInitialNotesValue = JSON.stringify(toEditorNotes(region))
+      node.dataset.pianoRollTotalTicksValue = String(region.duration_ticks)
+      node.dataset.pianoRollTimeNumeratorValue = String(this.music.time_signature.numerator)
+      node.dataset.pianoRollTimeDenominatorValue = String(this.music.time_signature.denominator)
+      node.dataset.pianoRollPersistentModeValue = "true"
+      node.dataset.pianoRollPartNameValue = track.name
+      node.dataset.pianoRollInstrumentIdValue = track.instrument_id
+      node.dataset.pianoRollLayoutValue = track.instrument_id === "drums" ? "drums" : "pitched"
+      host.querySelector("[data-region-editor-mount]").replaceChildren(node)
+      this.activeEditorKey = key
+    } else {
+      const editor = this.activePianoRoll()
+      if (editor && (editor.totalTicks !== region.duration_ticks || editor.numerator() !== this.music.time_signature.numerator || editor.denominator() !== this.music.time_signature.denominator)) {
+        editor.setMusicalContext({ totalTicks: region.duration_ticks, numerator: this.music.time_signature.numerator, denominator: this.music.time_signature.denominator })
+      }
+    }
+    host.hidden = false
+    host.querySelector("[data-region-editor-title]").textContent = `Região de ${track.name}`
+  }
 
   /** Monta controles de forma segura: nomes do usuário entram somente por textContent/value. */
   element(tag, className, text) {
@@ -129,6 +262,10 @@ export default class extends Controller {
   render() {
     if (!this.music) return
     const tracks = this.music.tracks
+    const regionIds = new Set(tracks.flatMap((track) => track.regions.map((region) => region.id)))
+    for (const id of this.noteHistories?.keys() || []) {
+      if (!regionIds.has(id)) this.noteHistories.delete(id)
+    }
     const regions = tracks.reduce((count, track) => count + track.regions.length, 0)
     const notes = tracks.reduce((count, track) => count + track.regions.reduce((sum, region) => sum + region.notes.length, 0), 0)
     this.summaryTarget.textContent = `${tracks.length} ${tracks.length === 1 ? "faixa" : "faixas"} · ${regions} ${regions === 1 ? "região" : "regiões"} · ${notes} ${notes === 1 ? "nota" : "notas"}`
@@ -148,6 +285,7 @@ export default class extends Controller {
     }
     this.rulerTarget.append(marks)
     this.tracksTarget.replaceChildren(...tracks.map((track, index) => this.trackRow(track, index, width)))
+    this.syncActiveEditor()
   }
 
   /** Constrói controles da faixa e sua lane sem deslocar regras para o HTML. */
@@ -231,7 +369,7 @@ export default class extends Controller {
     grip.addEventListener("pointerdown", (event) => { event.stopPropagation(); this.startDrag(event, track, region, "resize") })
     node.append(grip)
     node.addEventListener("pointerdown", (event) => this.startDrag(event, track, region, "move"))
-    node.addEventListener("click", () => { this.selectedRegionId = region.id; this.render() })
+    node.addEventListener("click", () => this.selectRegion(track.id, region.id))
     node.addEventListener("keydown", (event) => this.regionKey(event, track, region))
     return node
   }
@@ -240,7 +378,7 @@ export default class extends Controller {
   startDrag(event, track, region, mode) {
     if (event.button !== 0) return
     event.preventDefault()
-    this.selectedRegionId = region.id
+    this.selectRegion(track.id, region.id)
     this.drag = { trackId: track.id, regionId: region.id, mode, x: event.clientX,
       start: region.start_tick, duration: region.duration_ticks }
     this.render()
