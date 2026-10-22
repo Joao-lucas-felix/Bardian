@@ -1,5 +1,19 @@
 # Cada entrega concluída possui uma descrição verificável e uma rota interna de teste.
 reports:
+  - slug: caminho-do-bardo-estrutura-inicial
+    title: Estrutura inicial do Caminho do Bardo
+    description: A trilha autenticada prepara aulas versionadas e registra a conclusão de cada usuário sem bloquear a leitura das aulas publicadas.
+    changes:
+      - Criou um catálogo versionado que só oferece aulas publicadas com conteúdo disponível.
+      - Vinculou conclusões individuais à conta e protegeu a primeira data contra envios repetidos.
+      - Adicionou rotas autenticadas para trilha, aula e conclusão, com testes de acesso, leitura livre e isolamento entre usuários.
+      - Manteve o catálogo sem aulas publicadas até a preparação do primeiro conteúdo.
+    delivered_on: "2026-10-22"
+    tags:
+      - Aprendizagem
+      - Interface
+    test_path: /caminho-do-bardo
+
   - slug: reproducao-composicao-loop-mvp1
     title: Reprodução contínua da composição com loop
     description: A timeline toca faixas juntas ou isoladas e incorpora edições futuras sem parar a agulha.
