@@ -13,10 +13,13 @@ module BardPath
       end
     end
 
-    # Carrega o catálogo versionado e confirma que cada partial publicado existe.
-    # Retorna um catálogo pronto para as rotas de leitura e conclusão.
-    def self.current
-      data = YAML.safe_load(Rails.root.join("config/bard_path_lessons.yml").read)
+    # Carrega o YAML versionado, ou um arquivo fornecido para verificação.
+    # Um documento vazio representa uma trilha ainda sem aulas publicadas.
+    def self.current(path: Rails.root.join("config/bard_path_lessons.yml"))
+      data = YAML.safe_load(File.read(path))
+      data = { "lessons" => [] } if data.nil?
+      raise ArgumentError, "catálogo deve ser um objeto" unless data.is_a?(Hash)
+
       new(entries: data.fetch("lessons"), template_exists: lambda { |slug|
         Rails.root.join("app/views/bard_path/lessons/_#{slug}.html.erb").file?
       })

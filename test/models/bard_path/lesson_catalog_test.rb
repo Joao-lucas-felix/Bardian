@@ -1,4 +1,5 @@
 require "test_helper"
+require "tempfile"
 
 # Garante que a trilha mostre somente aulas publicadas com conteúdo válido.
 class BardPath::LessonCatalogTest < ActiveSupport::TestCase
@@ -7,6 +8,16 @@ class BardPath::LessonCatalogTest < ActiveSupport::TestCase
     catalog = BardPath::LessonCatalog.new(entries: [], template_exists: ->(_) { false })
 
     assert_empty catalog.published
+  end
+
+  # Um arquivo editorial vazio deve manter a trilha acessível em preparação.
+  test "arquivo yaml vazio nao interrompe a trilha" do
+    Tempfile.create([ "bard_path_lessons", ".yml" ]) do |file|
+      file.write("# Aulas ainda não foram publicadas\n")
+      file.flush
+
+      assert_empty BardPath::LessonCatalog.current(path: file.path).published
+    end
   end
 
   # A ordem editorial organiza a trilha, mas não restringe a leitura de aulas.
