@@ -1,0 +1,23 @@
+<%# Estrutura da aula: orientação, conteúdo próprio e conclusão separada do texto. %>
+<% content_for :title, "#{@lesson.title} — Caminho do Bardo" %>
+<% content_for :main_class, "music-page" %>
+
+<article class="music-shell bard-lesson-page">
+  <header>
+    <%= link_to "Voltar ao Caminho do Bardo", bard_path_index_path, class: "music-back" %>
+    <h1><%= @lesson.title %></h1>
+    <p><%= @lesson.summary %></p>
+  </header>
+
+  <div class="bard-lesson-content">
+    <%= render "bard_path/lessons/#{@lesson.slug}" %>
+  </div>
+
+  <footer class="bard-lesson-footer">
+    <% if @completed %>
+      <p>Você concluiu esta aula. Pode voltar e reler quando quiser.</p>
+    <% else %>
+      <%= button_to "Concluir aula", complete_bard_path_lesson_path(slug: @lesson.slug), class: "product-button product-button-primary" %>
+    <% end %>
+  </footer>
+</article>

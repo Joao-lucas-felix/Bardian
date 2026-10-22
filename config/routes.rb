@@ -14,6 +14,11 @@ Rails.application.routes.draw do
   # Abre a primeira composição guiada, mantendo o protótipo independente.
   get "criar", to: "pages#compose", as: :compose
 
+  # Leitura livre das aulas publicadas e conclusão individual da conta.
+  get "caminho-do-bardo", to: "bard_path#index", as: :bard_path_index
+  get "caminho-do-bardo/:slug", to: "bard_path#show", as: :bard_path_lesson
+  post "caminho-do-bardo/:slug/conclusao", to: "bard_path#complete", as: :complete_bard_path_lesson
+
   # Abre a primeira lição independente do Caminho do Bardo.
   get "caminho-do-bardo/notas", to: "pages#notes_lesson", as: :notes_lesson
 

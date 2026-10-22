@@ -13,6 +13,9 @@
       <%= link_to notes_lesson_path, class: "product-nav-link #{'is-current' if current_page?(notes_lesson_path)}", aria: (current_page?(notes_lesson_path) ? { current: "page" } : {}) do %>
         <%= bard_icon(:book) %><span>Aprender</span>
       <% end %>
+      <%= link_to bard_path_index_path, class: "product-nav-link #{'is-current' if request.path.start_with?(bard_path_index_path)}", aria: (request.path.start_with?(bard_path_index_path) ? { current: "page" } : {}) do %>
+        <%= bard_icon(:home) %><span>Caminho do Bardo</span>
+      <% end %>
       <%= link_to compose_path, class: "product-nav-link #{'is-current' if current_page?(compose_path)}", aria: (current_page?(compose_path) ? { current: "page" } : {}) do %>
         <%= bard_icon(:create) %><span>Criar</span>
       <% end %>

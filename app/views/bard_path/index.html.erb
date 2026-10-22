@@ -1,0 +1,34 @@
+<%# A trilha apresenta aulas do catálogo e estados já preparados pelo controller. %>
+<% content_for :title, "Caminho do Bardo — Bardian" %>
+<% content_for :main_class, "music-page" %>
+
+<div class="music-shell">
+  <header class="music-library-heading">
+    <div>
+      <h1>Caminho do Bardo</h1>
+      <p>Aprenda música e descubra como criar com o Bardian, no seu ritmo.</p>
+    </div>
+  </header>
+
+  <% if @trail_entries.empty? %>
+    <section class="music-empty bard-path-empty" aria-label="Aulas em preparação">
+      <h2>Aulas em preparação</h2>
+      <p>A trilha está sendo construída. As aulas aparecerão aqui quando estiverem prontas.</p>
+    </section>
+  <% else %>
+    <ol class="music-list" aria-label="Aulas do Caminho do Bardo">
+      <% @trail_entries.each do |entry| %>
+        <% lesson = entry[:lesson] %>
+        <li data-lesson-slug="<%= lesson.slug %>" data-completed="<%= entry[:completed] %>">
+          <%= link_to bard_path_lesson_path(slug: lesson.slug), class: "music-path" do %>
+            <span>
+              <strong><%= lesson.title %></strong>
+              <span><%= lesson.summary %></span>
+            </span>
+            <span><%= entry[:completed] ? "Concluída" : "Abrir aula" %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ol>
+  <% end %>
+</div>
