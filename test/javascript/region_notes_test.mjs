@@ -1,6 +1,19 @@
 import assert from "node:assert/strict"
 import test from "node:test"
-import { regionFor, toEditorNotes, replaceRegionNotes, newNoteId } from "../../app/javascript/composition/region_notes.js"
+import { regionFor, toEditorNotes, replaceRegionNotes, newNoteId, addSuggestedChord } from "../../app/javascript/composition/region_notes.js"
+
+// A sugestão é uma leitura até a ação explícita; aplicar preserva e não duplica.
+test("aplicacao explicita acrescenta apenas alturas ausentes no mesmo inicio", () => {
+  const music = composition()
+  const before = structuredClone(music)
+  const suggestion = { pitches: [60, 64, 67], onset: 480, duration: 480 }
+  assert.deepEqual(music, before)
+  let serial = 0
+  const applied = addSuggestedChord(music, "track-1", "region-1", suggestion, () => `new-note-${++serial}`)
+  assert.deepEqual(music, before)
+  assert.deepEqual(applied.tracks[0].regions[0].notes.map((note) => note.pitch), [60, 64, 67])
+  assert.equal(applied.tracks[0].regions[0].notes[0].id, "note-1")
+})
 
 // Uma composição realista permite testar isolamento de faixas e IDs globais.
 function composition() {

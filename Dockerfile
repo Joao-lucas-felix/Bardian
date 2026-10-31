@@ -9,6 +9,27 @@
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=4.0.7
+FROM docker.io/library/node:22-slim AS audio-build
+WORKDIR /audio
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
+COPY vite.audio.config.js ./
+COPY app/audio_engine ./app/audio_engine
+# O motor e o Rails compartilham o mesmo catálogo de timbres locais.
+COPY config/harmony_instruments.json config/soundfonts.json ./config/
+COPY app/javascript/composition/opendaw_mapping.js ./app/javascript/composition/opendaw_mapping.js
+RUN npm run build:audio
+
+# Banco verificado em camada independente; não há download no boot ou na requisição.
+FROM docker.io/library/node:22-slim AS soundfont-build
+WORKDIR /soundfonts
+RUN apt-get update -qq && apt-get install --no-install-recommends -y curl ca-certificates && rm -rf /var/lib/apt/lists/*
+COPY config/soundfonts.json ./config/soundfonts.json
+COPY docs/third-party/ ./docs/third-party/
+COPY bin/setup-soundfonts ./bin/setup-soundfonts
+COPY package.json ./package.json
+RUN node bin/setup-soundfonts
+
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
@@ -46,6 +67,8 @@ RUN bundle install && \
 
 # Copy application code
 COPY . .
+COPY --from=audio-build /audio/public/audio-engine ./public/audio-engine
+COPY --from=soundfont-build /soundfonts/public/audio/soundfonts ./public/audio/soundfonts
 
 # Precompile bootsnap code for faster boot times.
 # -j 1 disable parallel compilation to avoid a QEMU bug: https://github.com/rails/bootsnap/issues/495

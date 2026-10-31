@@ -39,4 +39,81 @@ class UserTest < ActiveSupport::TestCase
       User.new(email: "aluno@example.com", password: "senha-segura", role: :editor)
     end
   end
+
+  # Simula apenas os dados de identidade recebidos do provedor externo.
+  def google_auth(uid:, email:, verified: true)
+    { "provider" => "google_oauth2", "uid" => uid, "info" => { "email" => email },
+      "extra" => { "id_info" => { "email_verified" => verified } } }
+  end
+
+  test "google cria conta comum e reutiliza a identidade estável" do
+    auth = google_auth(uid: "google-123", email: "novo@example.com")
+
+    assert_difference("User.count", 1) do
+      result = User.authenticate_with_google(auth)
+      assert_nil result.error
+      assert result.user.user?
+      assert_equal "google-123", result.user.google_uid
+    end
+
+    assert_equal User.find_by!(google_uid: "google-123"), User.authenticate_with_google(auth).user
+  end
+
+  test "google não vincula automaticamente email de conta local" do
+    local = User.create!(email: "aluno@example.com", password: "senha-segura")
+
+    result = User.authenticate_with_google(google_auth(uid: "google-123", email: "ALUNO@example.com"))
+
+    assert_equal :email_taken, result.error
+    assert_nil local.reload.google_uid
+  end
+
+  test "conta autenticada pode vincular google explicitamente" do
+    local = User.create!(email: "aluno@example.com", password: "senha-segura")
+
+    result = User.authenticate_with_google(google_auth(uid: "google-123", email: "outro@example.com"), current_user: local)
+
+    assert_nil result.error
+    assert_equal "google-123", local.reload.google_uid
+  end
+
+  test "google não autenticado por email não verificado" do
+    result = User.authenticate_with_google(google_auth(uid: "google-123", email: "novo@example.com", verified: false))
+
+    assert_equal :unverified_email, result.error
+    assert_nil result.user
+  end
+
+  test "identidade google vinculada a outra conta não muda o vínculo" do
+    owner = User.create!(email: "primeiro@example.com", password: "senha-segura", google_uid: "google-123")
+    local = User.create!(email: "segundo@example.com", password: "senha-segura")
+
+    result = User.authenticate_with_google(google_auth(uid: "google-123", email: owner.email), current_user: local)
+
+    assert_equal :identity_taken, result.error
+    assert_nil local.reload.google_uid
+  end
+
+  test "identidade google ausente não cria conta" do
+    assert_no_difference("User.count") do
+      result = User.authenticate_with_google(google_auth(uid: "", email: "novo@example.com"))
+      assert_equal :invalid_identity, result.error
+    end
+  end
+
+  test "email google malformado não cria conta" do
+    assert_no_difference("User.count") do
+      result = User.authenticate_with_google(google_auth(uid: "google-123", email: "sem-arroba"))
+      assert_equal :invalid_identity, result.error
+    end
+  end
+
+  test "conta já vinculada não troca a identidade google" do
+    local = User.create!(email: "aluno@example.com", password: "senha-segura", google_uid: "google-antigo")
+
+    result = User.authenticate_with_google(google_auth(uid: "google-novo", email: local.email), current_user: local)
+
+    assert_equal :already_linked, result.error
+    assert_equal "google-antigo", local.reload.google_uid
+  end
 end

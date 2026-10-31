@@ -14,7 +14,7 @@ import { createPhraseInstrument } from "audio/phrase_instruments"
 export default class extends Controller {
   static values = { initialNotes: Array, audioEnabled: { type: Boolean, default: true }, partName: { type: String, default: "Piano" }, layout: { type: String, default: "pitched" }, instrumentId: { type: String, default: "piano" }, totalTicks: Number, timeNumerator: Number, timeDenominator: Number, bpm: Number, persistentMode: Boolean }
   static targets = [
-    "duration", "keyboard", "loopButton", "loopEndLine", "loopEndMarker",
+    "duration", "expandButton", "keyboard", "loopButton", "loopEndLine", "loopEndMarker",
     "loopStartLine", "loopStartMarker", "playhead", "ruler", "roll",
     "rollViewport", "score", "snapButton", "status", "velocity", "velocityInput", "zoomLabel"
   ]
@@ -28,12 +28,14 @@ export default class extends Controller {
     this.currentBpm = this.hasBpmValue ? this.bpmValue : 120
     this.minPitch = this.isPersistentMode() ? 0 : 36
     this.maxPitch = this.isPersistentMode() ? 127 : 84
-    this.rowHeight = 22
-    this.pixelsPerQuarter = 88
+    this.rowHeight = this.initialRowHeight()
+    this.pixelsPerQuarter = Math.round(this.initialZoom() * 88)
+    this.zoomLabelTarget.textContent = `${Math.round(this.initialZoom() * 100)}%`
     this.gridQuarter = 1
     this.snapEnabled = true
     this.notes = []
     this.selectedNoteIds = new Set()
+    this.outOfContextNoteIds = new Set()
     this.nextNoteId = 1
     this.loadInitialNotes()
     this.keyboardCursor = { pitch: this.isDrumLayout() ? 38 : 60, onset: 0 }
@@ -58,7 +60,75 @@ export default class extends Controller {
     this.resizeCanvases()
     this.revealInitialPitch()
     this.render()
+    this.watchTheme()
     this.updateSummary()
+    // O shell externo recebe somente a disponibilidade; as notas já vieram em valores.
+    this.dispatch("ready")
+  }
+
+  /** Repinta apenas o editor persistido quando o usuário troca o tema global. */
+  watchTheme() {
+    if (!this.isPersistentMode()) return
+    this.themeObserver = new MutationObserver(() => this.render())
+    this.themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] })
+  }
+
+  /** Amplia ou restaura a mesma superfície, sem recriar notas ou o controller. */
+  toggleExpanded() {
+    if (this.element.classList.contains("is-expanded")) this.closeExpanded()
+    else this.openExpanded()
+  }
+
+  /** Isola o editor visualmente e tira do foco os irmãos de cada ancestral. */
+  openExpanded() {
+    if (!this.hasExpandButtonTarget || this.element.classList.contains("is-expanded")) return
+    this.backgroundInert = []
+    for (let child = this.element; child?.parentElement; child = child.parentElement) {
+      for (const sibling of child.parentElement.children || []) {
+        if (sibling === child) continue
+        this.backgroundInert.push([sibling, sibling.inert])
+        sibling.inert = true
+      }
+    }
+    this.previousBodyOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    this.element.classList.add("is-expanded")
+    this.element.setAttribute("role", "dialog")
+    this.element.setAttribute("aria-modal", "true")
+    this.expandButtonTarget.textContent = "Restaurar"
+    this.expandButtonTarget.setAttribute("aria-expanded", "true")
+    this.expandButtonTarget.setAttribute("aria-label", "Restaurar tamanho do piano roll")
+    this.expandButtonTarget.focus()
+    this.resizeCanvases()
+  }
+
+  /**
+   * Recoloca a página e a viewport em seu estado anterior, conservando a seleção.
+   * @param {{restoreFocus?: boolean, resize?: boolean}} options Evita foco e Canvas ao desmontar a view.
+   */
+  closeExpanded({ restoreFocus = true, resize = true } = {}) {
+    if (!this.element.classList.contains("is-expanded")) return
+    this.element.classList.remove("is-expanded")
+    this.element.removeAttribute("role")
+    this.element.removeAttribute("aria-modal")
+    for (const [element, wasInert] of this.backgroundInert || []) element.inert = wasInert
+    this.backgroundInert = null
+    document.body.style.overflow = this.previousBodyOverflow
+    this.expandButtonTarget.textContent = "Expandir"
+    this.expandButtonTarget.setAttribute("aria-expanded", "false")
+    this.expandButtonTarget.setAttribute("aria-label", "Expandir piano roll para tela toda")
+    if (restoreFocus) this.expandButtonTarget.focus()
+    if (resize) this.resizeCanvases()
+  }
+
+  /** Captura Esc antes do atalho da grade, que limparia a seleção de notas.
+   * @param {KeyboardEvent} event Tecla pressionada no documento.
+   */
+  handleExpandedKeyDown(event) {
+    if (!this.element.classList.contains("is-expanded") || event.key !== "Escape") return
+    event.preventDefault()
+    event.stopPropagation()
+    this.closeExpanded()
   }
 
   /** Copia notas recebidas da frase ativa e reserva IDs para novas notas. */
@@ -98,6 +168,33 @@ export default class extends Controller {
     this.score = this.buildScore()
     this.render()
     this.updateSummary()
+  }
+
+  /** Encaminha seek ao shell quando o editor usa transporte externo. */
+  beginExternalSeek(event) {
+    if (this.audioAvailable()) return
+    this.externalSeek = { previous: this.currentTick || 0 }
+    event.currentTarget.setPointerCapture(event.pointerId)
+    this.moveExternalSeek(event)
+  }
+
+  /** Usa a escala atual do canvas; seu retângulo já incorpora a rolagem horizontal. */
+  moveExternalSeek(event) {
+    if (!this.externalSeek) return
+    const tick = this.pixelsToMusic(event.clientX - event.currentTarget.getBoundingClientRect().left)
+    this.dispatch("seek", { detail: { tick } })
+  }
+
+  /** Cancela o gesto restaurando o tick anterior sem modificar notas. */
+  endExternalSeek(event) {
+    if (this.externalSeek && event.type === "pointercancel") this.dispatch("seek", { detail: { tick: this.externalSeek.previous } })
+    this.externalSeek = null
+  }
+
+  /** Recebe IDs da análise tonal para pintar alertas sem modificar eventos MIDI. */
+  setOutOfContextNotes(ids) {
+    this.outOfContextNoteIds = new Set(ids)
+    this.render()
   }
 
   /** Publica somente alterações reais e finalizadas, para um ponto de histórico por gesto. */
@@ -162,18 +259,25 @@ export default class extends Controller {
   /** Identifica o modo de três peças sem alterar o protótipo isolado. */
   isDrumLayout() { return this.hasLayoutValue && this.layoutValue === "drums" }
 
+  /** Enquadra mais compassos ao abrir uma composição, mantendo o protótipo em 100%. */
+  initialZoom() { return this.isPersistentMode() ? 0.75 : 1 }
+
+  /** Exibe mais alturas por janela no editor persistido sem mudar os pitches. */
+  initialRowHeight() { return this.isPersistentMode() ? 18 : 22 }
+
   /** Registra os gestos do Canvas e mantém a renderização responsiva. */
   bindCanvasEvents() {
     this.onPointerDown = this.pointerDown.bind(this)
     this.onPointerMove = this.pointerMove.bind(this)
     this.onPointerUp = this.pointerUp.bind(this)
-    this.onPointerCancel = this.pointerUp.bind(this)
+    this.onPointerCancel = this.pointerCancel.bind(this)
     this.onNoteContextMenu = this.handleNoteContextMenu.bind(this)
     this.onResize = this.resizeCanvases.bind(this)
     this.onScroll = this.syncViewport.bind(this)
     this.onWheel = this.handleWheel.bind(this)
     this.onKeyDown = this.handleKeyDown.bind(this)
     this.onTransportKeyDown = this.handleTransportKeyDown.bind(this)
+    this.onExpandedKeyDown = this.handleExpandedKeyDown.bind(this)
     this.onRollFocus = () => {
       this.statusTarget.textContent = this.keyboardCursorStatus()
       this.render()
@@ -195,6 +299,7 @@ export default class extends Controller {
     this.rollTarget.addEventListener("focus", this.onRollFocus)
     this.rollTarget.addEventListener("blur", this.onRollBlur)
     window.addEventListener("keydown", this.onTransportKeyDown)
+    if (this.hasExpandButtonTarget) window.addEventListener("keydown", this.onExpandedKeyDown, true)
   }
 
   /** Converte o estado atual para o Score imutável usado pelo domínio musical. */
@@ -266,13 +371,13 @@ export default class extends Controller {
     this.syncViewport()
   }
 
-  /** Ajusta Canvas e linhas auxiliares ao tamanho disponível e ao zoom atual. */
+  /** Estende os três Canvas até a borda visível sem alterar a duração musical. */
   resizeCanvases() {
-    const width = Math.max(720, this.totalTicks / this.ticksPerQuarter * this.pixelsPerQuarter)
+    const width = Math.max(720, this.rollViewportTarget?.clientWidth || 0, this.totalTicks / this.ticksPerQuarter * this.pixelsPerQuarter)
     const height = this.displayPitches().length * this.rowHeight
     this.canvasSize(this.rollTarget, width, height)
     this.canvasSize(this.rulerTarget, width, 36)
-    this.canvasSize(this.velocityTarget, width, 92)
+    this.canvasSize(this.velocityTarget, width, this.velocityTarget.parentElement?.clientHeight || 92)
     // A agulha pertence ao conteúdo rolável, não apenas à janela visível da grade.
     this.playheadTarget.style.height = `${height}px`
     this.loopStartLineTarget.style.height = `${height}px`
@@ -302,20 +407,44 @@ export default class extends Controller {
     this.syncLoopMarkers()
   }
 
+  /**
+   * Lê a paleta da superfície ativa para que o Canvas acompanhe o tema e os
+   * tokens visuais da página de composição, sem fixar cores na lógica MIDI.
+   */
+  canvasColors() {
+    const style = getComputedStyle(this.element)
+    const color = (name, fallback) => style.getPropertyValue(`--piano-roll-${name}`).trim() || fallback
+    return {
+      grid: color("grid-bg", "#f9fbfb"), row: color("grid-row", "#eef2f3"),
+      strongLine: color("strong-line", "#b9c9ce"), line: color("line", "#dce5e7"),
+      measure: color("measure-line", "#b6c8cc"), beat: color("beat-line", "#e1e9ea"),
+      ruler: color("ruler-bg", "#f2f6f6"), rulerText: color("ruler-text", "#385c65"),
+      beatText: color("beat-text", "#71858b"), velocity: color("velocity-bg", "#f7fafa"),
+      inactiveLoop: color("inactive-loop", "rgba(36, 55, 65, .09)"),
+      note: color("note", "#54a89a"), noteBorder: color("note-border", "#28786e"), noteText: color("note-text", "#164c45"),
+      selectedNote: color("selected-note", "#d79b5d"), selectedNoteBorder: color("selected-note-border", "#8a572d"),
+      selectedNoteText: color("selected-note-text", "#5b381d"),
+      outsideNote: color("outside-note", "#d18d38"), outsideNoteBorder: color("outside-note-border", "#765119"),
+      playhead: color("playhead", "#b93830"),
+      selection: color("selection", "rgba(47, 109, 125, .16)"), selectionBorder: color("selected-note-border", "#2f6d7d")
+    }
+  }
+
   /** Desenha o corpo principal em camadas previsíveis para facilitar manutenção. */
   drawRoll() {
     const context = this.rollTarget.getContext("2d")
+    const colors = this.canvasColors()
     const width = this.rollTarget.clientWidth
     const height = this.rollTarget.clientHeight
     context.clearRect(0, 0, width, height)
-    context.fillStyle = "#f9fbfb"
+    context.fillStyle = colors.grid
     context.fillRect(0, 0, width, height)
 
     for (const pitch of this.displayPitches()) {
       const y = this.pitchToPixels(pitch)
-      context.fillStyle = !this.isDrumLayout() && this.isBlackKey(pitch) ? "#eef2f3" : "#f9fbfb"
+      context.fillStyle = !this.isDrumLayout() && this.isBlackKey(pitch) ? colors.row : colors.grid
       context.fillRect(0, y, width, this.rowHeight)
-      context.strokeStyle = pitch % 12 === 0 ? "#b9c9ce" : "#dce5e7"
+      context.strokeStyle = pitch % 12 === 0 ? colors.strongLine : colors.line
       context.lineWidth = pitch % 12 === 0 ? 1.2 : 1
       context.beginPath()
       context.moveTo(0, y + this.rowHeight)
@@ -326,7 +455,7 @@ export default class extends Controller {
     for (let tick = 0; tick <= this.totalTicks; tick += this.gridTicks()) {
       const x = this.musicToPixels(tick)
       const major = tick % this.measureTicks() === 0
-      context.strokeStyle = major ? "#b6c8cc" : "#e1e9ea"
+      context.strokeStyle = major ? colors.measure : colors.beat
       context.lineWidth = major ? 1.4 : 1
       context.beginPath()
       context.moveTo(x, 0)
@@ -335,13 +464,13 @@ export default class extends Controller {
     }
 
     // A região escurecida permanece editável; apenas destaca o que não será ouvido.
-    context.fillStyle = "rgba(36, 55, 65, .09)"
+    context.fillStyle = colors.inactiveLoop
     context.fillRect(0, 0, this.musicToPixels(this.loopStartTick), height)
     context.fillRect(this.musicToPixels(this.loopEndTick), 0, width - this.musicToPixels(this.loopEndTick), height)
 
     this.notes.forEach((note) => this.drawNote(context, note))
     if (document.activeElement === this.rollTarget) {
-      context.strokeStyle = "#b93830"
+      context.strokeStyle = colors.playhead
       context.lineWidth = 3
       context.strokeRect(this.musicToPixels(this.keyboardCursor.onset) + 2, this.pitchToPixels(this.keyboardCursor.pitch) + 2, this.musicToPixels(this.gridTicks()) - 4, this.rowHeight - 4)
     }
@@ -351,8 +480,8 @@ export default class extends Controller {
       const y = Math.min(point.y, currentPoint.y)
       const width = Math.abs(point.x - currentPoint.x)
       const height = Math.abs(point.y - currentPoint.y)
-      context.fillStyle = "rgba(47, 109, 125, .16)"
-      context.strokeStyle = "#2f6d7d"
+      context.fillStyle = colors.selection
+      context.strokeStyle = colors.selectionBorder
       context.lineWidth = 1
       context.fillRect(x, y, width, height)
       context.strokeRect(x, y, width, height)
@@ -361,24 +490,31 @@ export default class extends Controller {
 
   /** Desenha a nota e evidencia as alças de duração quando ela está selecionada. */
   drawNote(context, note) {
+    const colors = this.canvasColors()
     const x = this.musicToPixels(note.onset) + 2
     const y = this.pitchToPixels(note.pitch) + 3
     const width = Math.max(6, this.musicToPixels(note.onset + note.duration) - this.musicToPixels(note.onset) - 4)
     const selected = this.selectedNoteIds.has(note.id)
-    context.fillStyle = selected ? "#d79b5d" : "#54a89a"
-    context.strokeStyle = selected ? "#8a572d" : "#28786e"
+    const outside = this.outOfContextNoteIds?.has(note.id)
+    context.fillStyle = selected ? colors.selectedNote : (outside ? colors.outsideNote : colors.note)
+    context.strokeStyle = outside ? colors.outsideNoteBorder : (selected ? colors.selectedNoteBorder : colors.noteBorder)
     context.lineWidth = selected ? 2 : 1
     context.beginPath()
     context.roundRect(x, y, width, this.rowHeight - 6, 4)
     context.fill()
     context.stroke()
+    if (outside) {
+      context.fillStyle = colors.outsideNoteBorder
+      context.font = "800 11px system-ui"
+      context.fillText("!", x + 4, y + 14)
+    }
     if (selected && width >= 22) {
-      context.fillStyle = "#75451f"
+      context.fillStyle = colors.selectedNoteText
       context.fillRect(x + 6, y + 4, 2, this.rowHeight - 14)
       context.fillRect(x + width - 8, y + 4, 2, this.rowHeight - 14)
     }
     if (width >= 34) {
-      context.fillStyle = selected ? "#5b381d" : "#164c45"
+      context.fillStyle = selected ? colors.selectedNoteText : colors.noteText
       context.font = "600 10px system-ui"
       context.fillText(this.pitchName(note.pitch), x + 12, y + 14, width - 24)
     }
@@ -387,11 +523,12 @@ export default class extends Controller {
   /** Desenha a régua com compassos e tempos sem acoplar o estado aos pixels. */
   drawRuler() {
     const context = this.rulerTarget.getContext("2d")
+    const colors = this.canvasColors()
     const width = this.rulerTarget.clientWidth
     context.clearRect(0, 0, width, 36)
-    context.fillStyle = "#f2f6f6"
+    context.fillStyle = colors.ruler
     context.fillRect(0, 0, width, 36)
-    context.fillStyle = "rgba(36, 55, 65, .09)"
+    context.fillStyle = colors.inactiveLoop
     context.fillRect(0, 0, this.musicToPixels(this.loopStartTick), 36)
     context.fillRect(this.musicToPixels(this.loopEndTick), 0, width - this.musicToPixels(this.loopEndTick), 36)
     context.font = "600 11px system-ui"
@@ -400,7 +537,7 @@ export default class extends Controller {
       const x = this.musicToPixels(tick)
       const measure = Math.floor(tick / this.measureTicks()) + 1
       const beat = Math.floor((tick % this.measureTicks()) / beatTicks) + 1
-      context.fillStyle = beat === 1 ? "#385c65" : "#71858b"
+      context.fillStyle = beat === 1 ? colors.rulerText : colors.beatText
       context.fillText(beat === 1 ? `Compasso ${measure}` : String(beat), x + 8, 22)
     }
   }
@@ -408,16 +545,18 @@ export default class extends Controller {
   /** Desenha a lane inferior com a intensidade MIDI de cada nota. */
   drawVelocity() {
     const context = this.velocityTarget.getContext("2d")
+    const colors = this.canvasColors()
     const width = this.velocityTarget.clientWidth
-    context.clearRect(0, 0, width, 92)
-    context.fillStyle = "#f7fafa"
-    context.fillRect(0, 0, width, 92)
+    const height = this.velocityTarget.clientHeight
+    context.clearRect(0, 0, width, height)
+    context.fillStyle = colors.velocity
+    context.fillRect(0, 0, width, height)
     this.notes.forEach((note) => {
       const x = this.musicToPixels(note.onset) + 4
       const barWidth = Math.max(4, this.musicToPixels(note.duration) - 8)
-      const barHeight = Math.max(4, (note.velocity / 127) * 72)
-      context.fillStyle = this.selectedNoteIds.has(note.id) ? "#d79b5d" : "#75bcb1"
-      context.fillRect(x, 84 - barHeight, barWidth, barHeight)
+      const barHeight = Math.max(4, (note.velocity / 127) * Math.max(8, height - 16))
+      context.fillStyle = this.selectedNoteIds.has(note.id) ? colors.selectedNote : colors.note
+      context.fillRect(x, height - barHeight - 4, barWidth, barHeight)
     })
   }
 
@@ -427,6 +566,7 @@ export default class extends Controller {
     event.preventDefault()
     this.rollTarget.focus({ preventScroll: true })
     const point = this.pointerPoint(event)
+    const selectionBefore = new Set(this.selectedNoteIds)
     const note = this.noteAt(point)
     const edge = note && this.noteEdge(point, note)
     this.rollTarget.setPointerCapture?.(event.pointerId)
@@ -438,7 +578,7 @@ export default class extends Controller {
         this.selectOnly(note.id)
       }
       if (this.selectedNoteIds.has(note.id)) {
-        this.interaction = { type: edge || "move", point, noteIds: edge ? [note.id] : [...this.selectedNoteIds], snapshot: this.snapshotSelection(), snapshotNotes: this.snapshotNotes() }
+        this.interaction = { type: edge || "move", point, noteIds: edge ? [note.id] : [...this.selectedNoteIds], snapshot: this.snapshotSelection(), snapshotNotes: this.snapshotNotes(), selectionBefore: new Set(this.selectedNoteIds) }
       }
       this.render()
       this.updateSummary()
@@ -459,7 +599,7 @@ export default class extends Controller {
     const noteData = { id: this.nextNoteIdForEditor(), pitch, onset, duration, velocity: 100 }
     this.notes.push(noteData)
     this.selectOnly(noteData.id)
-    this.interaction = { type: "draw", point, noteId: noteData.id, snapshot: { ...noteData }, beforeNotes }
+    this.interaction = { type: "draw", point, noteId: noteData.id, snapshot: { ...noteData }, beforeNotes, selectionBefore }
     this.commitScore()
     this.render()
     this.updateSummary()
@@ -546,6 +686,27 @@ export default class extends Controller {
     this.interaction = null
     this.commitScore()
     if (previous) this.confirmNotesChanged(previous)
+    this.render()
+    this.updateSummary()
+  }
+
+  /** Cancela gesto interrompido, restaura notas e publica o estado para reanálise. */
+  pointerCancel(event) {
+    if (!this.interaction) return
+    if (event?.pointerId != null && this.rollTarget.hasPointerCapture?.(event.pointerId)) this.rollTarget.releasePointerCapture(event.pointerId)
+    const interaction = this.interaction
+    this.interaction = null
+    if (interaction.type === "marquee") {
+      this.selectedNoteIds = new Set(interaction.baseSelection)
+    } else {
+      const current = this.snapshotNotes()
+      this.notes = (interaction.beforeNotes || interaction.snapshotNotes).map((note) => ({ ...note }))
+      this.selectedNoteIds = new Set(interaction.selectionBefore || [])
+      if (JSON.stringify(current) !== JSON.stringify(this.snapshotNotes())) {
+        this.commitScore()
+        this.confirmNotesChanged(current)
+      }
+    }
     this.render()
     this.updateSummary()
   }
@@ -1026,6 +1187,11 @@ export default class extends Controller {
   updateSummary() {
     this.scoreTarget.textContent = `Score inicial: 1 parte, ${Math.ceil(this.totalTicks / this.measureTicks())} compassos, ${this.notes.length} nota${this.notes.length === 1 ? "" : "s"}`
     const selected = this.notes.filter((note) => this.selectedNoteIds.has(note.id))
+    // A seleção é um evento de leitura para a orientação; não altera nem salva notas.
+    this.dispatch("selection-changed", { detail: { notes: selected.map((note) => ({
+      id: note.id, name: this.pitchName(note.pitch), pitch: note.pitch,
+      onset: note.onset, duration: note.duration, velocity: note.velocity
+    })) } })
     this.durationTarget.disabled = !selected.length
     const durations = new Set(selected.map((note) => note.duration))
     const quarters = selected.length && durations.size === 1 ? selected[0].duration / this.ticksPerQuarter : null
@@ -1075,6 +1241,8 @@ export default class extends Controller {
 
   /** Libera Canvas, listeners, transporte e instrumento ao sair da página. */
   disconnect() {
+    this.closeExpanded({ restoreFocus: false, resize: false })
+    this.themeObserver?.disconnect()
     this.rollTarget.removeEventListener("pointerdown", this.onPointerDown)
     this.rollTarget.removeEventListener("pointermove", this.onPointerMove)
     window.removeEventListener("pointerup", this.onPointerUp)
@@ -1090,6 +1258,7 @@ export default class extends Controller {
     this.rollTarget.removeEventListener("focus", this.onRollFocus)
     this.rollTarget.removeEventListener("blur", this.onRollBlur)
     window.removeEventListener("keydown", this.onTransportKeyDown)
+    if (this.hasExpandButtonTarget) window.removeEventListener("keydown", this.onExpandedKeyDown, true)
     this.stop()
   }
 }

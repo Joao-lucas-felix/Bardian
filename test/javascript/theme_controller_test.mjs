@@ -13,6 +13,34 @@ const ThemeController = vm.runInNewContext(`${source}\nThemeController`, {
   Controller: class {}
 })
 
+/** Conecta o controller real a uma preferência simulada, sem efeitos no navegador. */
+function connectTheme(saved, unavailable = false) {
+  const root = { dataset: {} }
+  const Controller = vm.runInNewContext(`${source}\nThemeController`, {
+    Controller: class {}, document: { documentElement: root },
+    window: { matchMedia: () => ({ matches: false }), get localStorage() {
+      if (unavailable) throw new Error("Armazenamento bloqueado")
+      return { getItem: () => saved, setItem() {} }
+    } }
+  })
+  const controller = new Controller()
+  controller.connect()
+  return { controller, root }
+}
+
+test("usa escuro por padrão e preserva preferência clara explícita", () => {
+  assert.equal(connectTheme(null).root.dataset.theme, "dark")
+  assert.equal(connectTheme("light").root.dataset.theme, "light")
+  assert.equal(connectTheme("invalid").root.dataset.theme, "dark")
+})
+
+test("permite alternar tema mesmo com armazenamento bloqueado", () => {
+  const { controller, root } = connectTheme(null, true)
+  assert.equal(root.dataset.theme, "dark")
+  controller.toggle()
+  assert.equal(root.dataset.theme, "light")
+})
+
 test("alterna o tema escuro e persiste a preferência", () => {
   const attributes = new Map()
   const storage = new Map()

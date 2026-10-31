@@ -1,0 +1,84 @@
+<%# Superfície do editor: a view organiza o shell e o controller desenha a música. %>
+<% audio_enabled = local_assigns.fetch(:audio_enabled, true) %>
+<section class="piano-roll-card" data-controller="piano-roll" data-piano-roll-audio-enabled-value="<%= audio_enabled %>" data-piano-roll-part-name-value="<%= local_assigns.fetch(:part_name, 'Piano') %>" aria-labelledby="piano-roll-title">
+  <div class="piano-roll-card-header">
+    <div>
+      <h2 id="piano-roll-title"><%= local_assigns.fetch(:editor_title, "Piano roll") %></h2>
+      <p class="piano-roll-subtitle">Cada bloco é uma nota. Arraste para escolher quando ela toca e quanto dura.</p>
+    </div>
+    <div class="piano-roll-card-actions">
+      <span class="piano-roll-state" data-piano-roll-target="status" role="status">Nenhuma nota selecionada</span>
+      <% if local_assigns[:external_transport] %>
+        <%# O botão amplia a instância ativa; as notas e o histórico permanecem no shell. %>
+        <button type="button" class="piano-roll-expand" data-piano-roll-target="expandButton" data-action="click->piano-roll#toggleExpanded" aria-expanded="false" aria-label="Expandir piano roll para tela toda">Expandir</button>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="piano-roll-toolbar" aria-label="Controles do editor MIDI">
+    <div class="piano-roll-transport" <%= "hidden" if local_assigns[:external_transport] %>>
+      <button class="piano-roll-play" type="button" data-action="click->piano-roll#play" <%= "disabled" unless audio_enabled %>><%= bard_icon(:play) %> Reproduzir</button>
+      <button class="piano-roll-stop" type="button" data-action="click->piano-roll#stop">Parar</button>
+      <button class="piano-roll-tool is-active" type="button" data-piano-roll-target="loopButton" data-action="click->piano-roll#toggleLoop" aria-pressed="true">Loop</button>
+    </div>
+
+    <label class="piano-roll-control">
+      <span>Espaço entre notas</span>
+      <select data-action="change->piano-roll#changeGrid" aria-label="Divisão da grade">
+        <option value="1">1 tempo</option>
+        <option value="0.5">½ tempo</option>
+        <option value="0.25">¼ de tempo</option>
+      </select>
+    </label>
+
+    <label class="piano-roll-control">
+      <span>Duração</span>
+      <select data-piano-roll-target="duration" data-action="change->piano-roll#changeDuration" aria-label="Duração das notas selecionadas" disabled>
+        <option value="custom">Personalizada</option>
+        <option value="0.25">¼ de tempo</option>
+        <option value="0.5">½ tempo</option>
+        <option value="1">1 tempo</option>
+        <option value="2">2 tempos</option>
+        <option value="4">4 tempos</option>
+      </select>
+    </label>
+
+    <label class="piano-roll-control">
+      <span>Intensidade</span>
+      <input type="number" min="1" max="127" step="1" value="100" data-piano-roll-target="velocityInput" data-action="change->piano-roll#changeVelocity" aria-label="Intensidade das notas selecionadas" disabled>
+    </label>
+
+    <button class="piano-roll-tool is-active" type="button" data-piano-roll-target="snapButton" data-action="click->piano-roll#toggleSnap" aria-pressed="true">Ajustar à grade</button>
+    <div class="piano-roll-zoom" aria-label="Zoom horizontal">
+      <button type="button" data-action="click->piano-roll#zoomOut" aria-label="Diminuir zoom">−</button>
+      <span data-piano-roll-target="zoomLabel">100%</span>
+      <button type="button" data-action="click->piano-roll#zoomIn" aria-label="Aumentar zoom">+</button>
+    </div>
+  </div>
+
+  <p class="piano-roll-keyboard-help" id="piano-roll-keyboard-help">Pelo teclado: foque a grade e use as setas para escolher o momento e a altura da nota. Enter cria ou seleciona uma nota; Delete remove a selecionada. Ajuste duração e intensidade nos controles acima.</p>
+  <div class="piano-roll-workspace" data-piano-roll-target="surface" role="application" aria-label="Editor de piano roll">
+    <div class="piano-roll-ruler" aria-label="Régua de tempo e marcadores do loop">
+      <canvas data-piano-roll-target="ruler" aria-hidden="true" data-action="pointerdown->piano-roll#beginExternalSeek pointermove->piano-roll#moveExternalSeek pointerup->piano-roll#endExternalSeek pointercancel->piano-roll#endExternalSeek"></canvas>
+      <button class="piano-roll-loop-marker is-start" type="button" data-piano-roll-target="loopStartMarker" data-loop-marker="start" hidden data-action="pointerdown->piano-roll#beginLoopMarkerDrag pointermove->piano-roll#moveLoopMarkerDrag pointerup->piano-roll#endLoopMarkerDrag pointercancel->piano-roll#endLoopMarkerDrag keydown->piano-roll#handleLoopMarkerKeyDown" aria-label="Início do loop">I</button>
+      <button class="piano-roll-loop-marker is-end" type="button" data-piano-roll-target="loopEndMarker" data-loop-marker="end" hidden data-action="pointerdown->piano-roll#beginLoopMarkerDrag pointermove->piano-roll#moveLoopMarkerDrag pointerup->piano-roll#endLoopMarkerDrag pointercancel->piano-roll#endLoopMarkerDrag keydown->piano-roll#handleLoopMarkerKeyDown" aria-label="Fim do loop">F</button>
+    </div>
+    <aside class="piano-roll-keyboard" data-piano-roll-target="keyboard" aria-label="Teclado virtual"></aside>
+    <div class="piano-roll-canvas-wrap" data-piano-roll-target="rollViewport">
+      <canvas data-piano-roll-target="roll" tabindex="0" aria-label="Grade de notas MIDI" aria-describedby="piano-roll-keyboard-help"></canvas>
+      <div class="piano-roll-loop-boundary is-start" data-piano-roll-target="loopStartLine" aria-hidden="true"></div>
+      <div class="piano-roll-loop-boundary is-end" data-piano-roll-target="loopEndLine" aria-hidden="true"></div>
+      <div class="piano-roll-playhead" data-piano-roll-target="playhead" aria-hidden="true"></div>
+    </div>
+    <div class="piano-roll-velocity-label">Intensidade</div>
+    <div class="piano-roll-velocity-wrap"><canvas data-piano-roll-target="velocity" aria-label="Intensidade das notas"></canvas></div>
+  </div>
+
+  <% unless audio_enabled || local_assigns[:external_transport] %><p class="piano-roll-audio-note">Sons de percussão ainda não estão disponíveis. Você pode editar os eventos MIDI desta frase.</p><% end %>
+  <% if local_assigns[:external_transport] %>
+    <details class="piano-roll-help"><summary>Como editar</summary><p>Arraste na grade para criar uma nota. Mova-a para mudar a altura ou o momento; puxe a ponta para mudar quanto ela dura. Use Ouvir na barra superior para escutar. Na camada Acordes, as notas ficam dentro dos acordes da sequência. Em Notas adicionais, você pode criar sons fora desses acordes.</p></details>
+  <% else %>
+    <p class="piano-roll-help">Espaço pausa ou retoma da posição atual. Dois toques rápidos voltam ao início da repetição. Arraste os marcadores I e F na régua para definir o início e o fim. Clique ou arraste para criar notas; clique com o botão direito remove a nota atingida. Ajuste duração e intensidade nos controles; as alças alteram a duração. Shift + arraste seleciona várias notas; Delete remove a seleção. Role sobre o teclado para percorrer alturas; Shift + roda na grade percorre o tempo.</p>
+  <% end %>
+  <output class="piano-roll-score" data-piano-roll-target="score" aria-live="polite"></output>
+</section>

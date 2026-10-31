@@ -60,6 +60,14 @@ marcadores. Um loop explícito pode terminar após a última região para inclui
 silêncio. A duração automática de reprodução, quando o campo está ausente,
 é calculada pelo cliente a partir das regiões e não é gravada no documento.
 
+O documento versão 1 pode incluir `context: { tonic, mode }`, declarado
+pela pessoa. `tonic` é uma classe escrita sem oitava dentre as doze grafias
+disponíveis no editor (`C`, `C#`, `D`, `Eb`, `E`, `F`, `F#`, `G`, `Ab`, `A`, `Bb`,
+`B`). `mode` é `major` ou `natural_minor`. A ausência da chave preserva
+composições antigas e não implica inferência tonal. O campo harmônico,
+funções, análise de notas e sugestões são projeções temporárias, nunca
+persistidas. A reprodução continua a ler os mesmos eventos MIDI.
+
 Este formato também é armazenado como documento JSON de cada composição no
 SQLite. O fluxo HTTP e o controle de versões estão descritos em
 [persistencia-composicoes-mvp1.md](persistencia-composicoes-mvp1.md).
@@ -72,8 +80,52 @@ O teste `test/models/music/composition_test.rb` cobre composição vazia,
 reconstrução após JSON, simultaneidade, ordem, regiões vazias, proteção contra
 mutação externa, IDs duplicados e valores MIDI/temporais inválidos.
 
-O domínio Ruby já possui `Note`, que preserva grafia musical. `NoteEvent`
-representa execução MIDI e não a substitui. A futura orientação contextual
-precisará de tonalidade declarada ou outra informação validada antes de afirmar
-um nome ou função harmônica. O editor Canvas ainda mantém seu estado próprio;
-essa integração pertence a uma etapa posterior.
+O domínio Ruby usa `Note` para preservar a grafia musical e `NoteEvent` para
+os eventos MIDI. A assistência só apresenta funções e notas fora da escala
+quando há contexto declarado; faixas de bateria não recebem análise tonal.
+O editor Canvas continua a consumir os mesmos eventos e destaca notas fora
+da escala sem modificá-las.
+
+## Rascunho guiado de harmonia
+
+`GET /harmonia` usa o mesmo documento versão 1, mas o mantém somente na memória
+do navegador. O exemplo inicial declara `context: { tonic: "C", mode: "major" }`,
+uma faixa harmônica de piano, uma região MIDI vazia, 4/4 e 120 BPM. Não há
+salvamento nem integração com as composições persistidas nesta etapa; sair ou
+recarregar elimina o rascunho.
+
+Cada acorde aplicado ocupa o próximo tempo de 480 ticks com três `NoteEvent`
+de duração igual. O quinto acorde começa no tick 1920, primeiro tempo do
+segundo compasso. A faixa comporta até 32 acordes. Cifra, grau e tensão são
+projeções de leitura das notas reais, não um segundo armazenamento musical.
+
+`POST /harmonia/assist` recebe `{ document, operation }`, onde `operation` é
+`analyze`, `generate` ou `continue`, e devolve `{ state, preview }`. `state`
+contém sete opções do campo, posições lidas da faixa, próximo tick e ações
+disponíveis. `preview` é `null` para análise ou quatro opções com `onset_tick`
+para geração/continuação. A resposta não altera o documento; só os comandos
+explícitos da interface criam eventos MIDI. Documentos inválidos retornam 422
+com `{ error }`.
+
+## Declaração harmônica persistida
+
+O documento versão 1 pode incluir `harmony: { blocks: [...] }`. Cada bloco
+declara `id`, `onset_tick`, `duration_ticks` e `chord: { root, quality }`.
+Blocos são contíguos desde o tick zero, têm IDs globalmente únicos e durações
+de 240, 480, 960 ou 1920 ticks; `quality` aceita `major`, `minor` e
+`diminished`. A chave ausente continua significando documento legado; uma lista
+vazia é uma declaração explícita vazia. `null`, campos desconhecidos, lacunas,
+sobreposições e notas que iniciam fora de um bloco declarado são rejeitados.
+
+O contrato escrito não substitui as notas MIDI. As duas faixas gerenciadas
+possuem IDs `harmony-<id>` e `harmony-extra-<id>`; faixas alheias são preservadas
+no merge. A faixa adicional conserva onsets absolutos. Reduzir um bloco não
+trunca notas: o pedido falha se algum início sair de seu intervalo, mas uma
+cauda sustentada pode ultrapassar seu fim. Remover um bloco remove sua
+realização, e desfazer restaura as duas partes. Atualizações usam
+`lock_version`; o cursor não é persistido.
+
+Na reabertura de documentos sem declaração, a recuperação pode propor uma
+partição somente se a sequência tonal for única. O GET não salva a proposta;
+casos ambíguos ficam intactos para seleção manual. Uma vez persistida a chave
+`harmony`, inclusive com `blocks: []`, nenhuma recuperação automática ocorre.

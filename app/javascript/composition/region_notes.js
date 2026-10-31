@@ -35,7 +35,7 @@ export function toEditorNotes(region) {
 
 /** Reúne todos os IDs musicais para evitar colisões entre regiões ou tipos. */
 function allIds(music) {
-  const ids = new Set([music.id])
+  const ids = new Set([music.id, ...(music.harmony?.blocks || []).map(block => block.id)])
   for (const track of music.tracks) {
     ids.add(track.id)
     for (const region of track.regions) {
@@ -73,4 +73,28 @@ export function newNoteId(music, generator) {
     if (typeof candidate === "string" && candidate.trim() && !occupied.has(candidate)) return candidate
   }
   throw new Error("Não foi possível gerar ID único para a nota")
+}
+
+/** Adiciona uma tríade escolhida à região sem alterar a entrada nem duplicar altura/início. */
+export function addSuggestedChord(music, trackId, regionId, suggestion, generator) {
+  const region = regionFor(music, trackId, regionId)
+  if (!Array.isArray(suggestion?.pitches) || suggestion.pitches.length !== 3 ||
+      !Number.isInteger(suggestion.onset) || !Number.isInteger(suggestion.duration) ||
+      suggestion.onset < 0 || suggestion.duration < 1 || suggestion.onset + suggestion.duration > region.duration_ticks) {
+    throw new Error("Sugestão inválida para a região")
+  }
+  const notes = toEditorNotes(region)
+  const occupied = new Set(notes.map((note) => `${note.pitch}:${note.onset}`))
+  let nextMusic = music
+  for (const pitch of suggestion.pitches) {
+    if (!Number.isInteger(pitch) || pitch < 0 || pitch > 127) throw new Error("Pitch sugerido inválido")
+    const key = `${pitch}:${suggestion.onset}`
+    if (occupied.has(key)) continue
+    const id = newNoteId(nextMusic, generator)
+    const note = { id, pitch, onset: suggestion.onset, duration: suggestion.duration, velocity: 90 }
+    notes.push(note)
+    occupied.add(key)
+    nextMusic = replaceRegionNotes(nextMusic, trackId, regionId, notes)
+  }
+  return nextMusic
 }

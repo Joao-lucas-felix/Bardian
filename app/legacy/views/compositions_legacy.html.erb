@@ -1,0 +1,31 @@
+<%# Preserva o editor anterior como referência, sobre o mesmo documento salvo. %>
+<% content_for :title, "Bardian — #{@composition.name}" %>
+<% content_for :main_class, "compositions-page compositions-editor-page" %>
+
+<div class="compositions-shell compositions-editor-shell" data-controller="composition-timeline" data-composition-timeline-url-value="<%= composition_path(@composition, format: :json) %>" data-composition-timeline-assistance-url-value="<%= assistance_composition_path(@composition, format: :json) %>">
+  <%# O cabeçalho reúne navegação, metadados e salvamento; a música ocupa o restante da janela. %>
+  <header class="compositions-editor-header">
+    <div class="compositions-editor-heading">
+      <div class="compositions-editor-title">
+        <%= link_to "← Voltar à composição", composition_path(@composition), class: "compositions-back" %>
+        <p>Editor avançado · versão de referência</p>
+        <h1><%= @composition.name %></h1>
+      </div>
+      <div class="compositions-danger">
+        <%= button_to "Excluir composição", composition_path(@composition), method: :delete,
+          form: { data: { turbo_confirm: "Excluir esta composição? Esta ação não pode ser desfeita." } } %>
+      </div>
+    </div>
+    <%= render "details_form" %>
+  </header>
+
+  <% if @error.present? %><p class="compositions-error" role="alert"><%= @error %></p><% end %>
+
+  <%# Timeline e piano roll são painéis irmãos: cada superfície administra a própria rolagem. %>
+  <div class="composition-workspace">
+    <%# O painel recebe apenas alvos de apresentação; a análise vem do documento validado. %>
+    <%= render "composition_assistance" %>
+    <%= render "timeline", track_count: @track_count, region_count: @region_count, note_count: @note_count %>
+    <%= render "region_editor" %>
+  </div>
+</div>

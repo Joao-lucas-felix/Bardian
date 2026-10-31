@@ -4,6 +4,177 @@ require "test_helper"
 class CompositionsControllerTest < ActionDispatch::IntegrationTest
   include Devise::Test::IntegrationHelpers
 
+  # A prévia consulta o domínio sem criar composição ou gravar uma escolha.
+  test "gera previas sem persistir e cria a escolha recebida" do
+    sign_in user
+    assert_no_difference("Composition.count") do
+      post preview_compositions_path, params: { composition: { bpm: 90, tonic: "D", mode: "major", instrument: "synth" } }, as: :json
+      assert_response :success
+      assert_equal 3, response.parsed_body.fetch("previews").length
+      assert_equal "D", response.parsed_body.fetch("previews").first.first.fetch("symbol")
+    end
+
+    assert_difference("Composition.count", 1) do
+      post compositions_path, params: { composition: { name: "Ideia", bpm: 90, tonic: "C", mode: "major",
+        instrument: "synth", preview_degrees: "0,3,4,0" } }
+    end
+    composition = user.compositions.order(:created_at).last
+    assert_equal 12, composition.document.dig("tracks", 0, "regions", 0, "notes").length
+    assert_equal "C", composition.document.dig("context", "tonic")
+    assert_redirected_to composition_harmony_path(composition)
+  end
+
+  # Dados adulterados não devem criar um documento parcialmente válido.
+  test "rejeita escolha ou contexto invalido na criacao" do
+    sign_in user
+    assert_no_difference("Composition.count") do
+      post compositions_path, params: { composition: { name: "Ideia", bpm: 90, tonic: "C", mode: "major",
+        instrument: "synth", preview_degrees: "0,7,4,0" } }
+      assert_response :unprocessable_entity
+      assert_select "input[name='composition[name]'][value='Ideia']"
+      assert_select "[role='alert']", text: /prévia selecionada inválida/
+    end
+    assert_no_difference("Composition.count") do
+      post compositions_path, params: { composition: { name: "Ideia", bpm: 90, tonic: "C", mode: "major",
+        instrument: "synth", preview_degrees: [ "0", "3", "4", "0" ] } }
+      assert_response :unprocessable_entity
+    end
+  end
+
+  # A criação expõe controles iniciais, seleção opcional e retorno legível da prévia.
+  test "formulario apresenta primeiros sons e permite criar sem acordes" do
+    sign_in user
+    get new_composition_path
+    assert_response :success
+    assert_select "section[aria-label='Primeiros sons']", count: 0
+    assert_select "input[name='composition[name]']"
+    assert_select "input[name='composition[cover]']"
+
+    post compositions_path, params: { composition: { name: "Sem acordes" } }
+    composition = user.compositions.order(:created_at).last
+    assert_redirected_to setup_composition_path(composition)
+    assert_equal [], composition.document.fetch("tracks")
+
+    get setup_composition_path(composition)
+    assert_response :success
+    assert_select ".flash-notice[data-controller='flash'][data-flash-auto-dismiss-value='true']"
+    assert_select ".flash-notice button[data-action='flash#dismiss'][aria-label='Fechar notificação']"
+    assert_select "a[href='#{edit_composition_path(composition, return_to: 'setup')}']", text: /Voltar aos dados/
+    assert_select "section[aria-label='Primeiros sons']"
+    assert_select "select[name='composition[tonic]']"
+    assert_select "select[name='composition[mode]']"
+    assert_select "select[name='composition[instrument]']"
+    assert_select "input[name='composition[preview_degrees]']"
+    assert_select "a[href='#{composition_harmony_path(composition)}']", text: /Pular por enquanto/
+
+    get composition_harmony_path(composition)
+    assert_response :success
+    assert_equal [], composition.reload.document.fetch("tracks")
+
+    patch configure_composition_path(composition), params: { lock_version: composition.lock_version, composition: { bpm: 100,
+      tonic: "A", mode: "natural_minor", instrument: "synth" } }
+    assert_redirected_to composition_harmony_path(composition)
+    assert_equal [], composition.reload.document.dig("tracks", 0, "regions", 0, "notes")
+    assert_equal "A", composition.document.dig("context", "tonic")
+  end
+
+  # Voltar à primeira etapa deve permitir corrigir nome/capa e retornar aos controles.
+  test "edicao de metadados retorna a configuracao inicial" do
+    sign_in user
+    post compositions_path, params: { composition: { name: "Rascunho" } }
+    composition = user.compositions.order(:created_at).last
+    get edit_composition_path(composition, return_to: "setup")
+    assert_response :success
+    assert_select "input[name='return_to'][value='setup']"
+    assert_select "a[href='#{setup_composition_path(composition)}']", text: /Voltar aos primeiros sons/
+    assert_select "a[href='#{setup_composition_path(composition)}']", text: /Cancelar/
+
+    patch composition_path(composition), params: { lock_version: composition.lock_version,
+      return_to: "setup", composition: { name: "Novo nome" } }
+    assert_redirected_to setup_composition_path(composition)
+    assert_equal "Novo nome", composition.reload.name
+  end
+
+  # Configurar uma proposta exige documento vazio e não pode substituir música existente.
+  test "configuracao valida entrada e protege a composicao existente" do
+    sign_in user
+    post compositions_path, params: { composition: { name: "Rascunho" } }
+    composition = user.compositions.order(:created_at).last
+
+    patch configure_composition_path(composition), params: { lock_version: composition.lock_version, composition: { bpm: 999,
+      tonic: "C", mode: "major", instrument: "synth", preview_degrees: "0,3,4,0" } }
+    assert_response :unprocessable_entity
+    assert_equal [], composition.reload.document.fetch("tracks")
+
+    patch configure_composition_path(composition), params: { lock_version: composition.lock_version, composition: { bpm: 90,
+      tonic: "C", mode: "major", instrument: "synth", preview_degrees: "0,3,4,0" } }
+    assert_redirected_to composition_harmony_path(composition)
+    assert_equal 12, composition.reload.document.dig("tracks", 0, "regions", 0, "notes").length
+
+    patch configure_composition_path(composition), params: { composition: { bpm: 100,
+      tonic: "D", mode: "major", instrument: "synth" } }
+    assert_response :conflict
+    assert_equal "C", composition.reload.document.dig("context", "tonic")
+
+    sign_out user
+    other = User.create!(email: "starter-other@example.com", password: "senha-segura")
+    sign_in other
+    get setup_composition_path(composition)
+    assert_response :not_found
+    sign_in other
+    patch configure_composition_path(composition), params: { composition: { bpm: 100,
+      tonic: "D", mode: "major", instrument: "synth" } }
+    assert_response :not_found
+  end
+
+  # O próximo passo pertence ao autor e apresenta somente o editor existente como ação.
+  test "proximo passo mostra escolhas e protege composicao alheia" do
+    sign_in user
+    composition = saved_composition
+    get next_step_composition_path(composition)
+    assert_response :success
+    assert_select "h1", text: /próximo passo/i
+    assert_select "a[href='#{composition_harmony_path(composition, panel: 'editor')}']", text: /Ornamentar harmonia/
+    assert_select "section", text: /Criar baixo/
+
+    sign_out user
+    sign_in User.create!(email: "next-other@example.com", password: "senha-segura")
+    get next_step_composition_path(composition)
+    assert_response :not_found
+  end
+
+  # A leitura usa o documento em memória, sem persistir análise ou notas.
+  test "analisa selecao atual sem salvar e restringe acesso ao proprietario" do
+    composition = saved_composition
+    document = composition.document.deep_dup
+    document["context"] = { "tonic" => "C", "mode" => "major" }
+    sign_in user
+    assert_no_changes -> { composition.reload.document } do
+      post assistance_composition_path(composition), params: {
+        document: document, track_id: "track-1", region_id: "region-1", note_ids: [ "note-1" ]
+      }, as: :json
+      assert_response :success
+      assert_equal "C", response.parsed_body.fetch("suggestions").first.fetch("symbol")
+    end
+    sign_out user
+    other = User.create!(email: "reader@example.com", password: "senha-segura")
+    sign_in other
+    post assistance_composition_path(composition), params: {
+      document: document, track_id: "track-1", region_id: "region-1", note_ids: []
+    }, as: :json
+    assert_response :not_found
+  end
+  # O formulário HTML mantém contexto e notas ao salvar sem JavaScript.
+  test "formulario salva contexto opcional e preserva notas" do
+    sign_in user
+    composition = saved_composition
+    patch composition_path(composition), params: { lock_version: composition.lock_version,
+      composition: { name: "Ideia", bpm: "120", numerator: "4", denominator: "4", tonic: "A", mode: "natural_minor" } }
+    assert_redirected_to composition_path(composition)
+    assert_equal({ "tonic" => "A", "mode" => "natural_minor" }, composition.reload.document["context"])
+    assert_equal 60, composition.document.dig("tracks", 0, "regions", 0, "notes", 0, "pitch")
+  end
+
   # O catálogo pertence ao usuário autenticado; visitantes vão para o login.
   test "visitante nao acessa composicoes" do
     get compositions_path
@@ -18,7 +189,8 @@ class CompositionsControllerTest < ActionDispatch::IntegrationTest
       post compositions_path, params: { name: "Minha ideia" }
     end
 
-    composition = Composition.last
+    created_id = response.location.split("/").last
+    composition = user.compositions.find(created_id)
     assert_redirected_to composition_path(composition)
     assert_equal user.id, composition.user_id
     assert_equal composition.id, composition.document["id"]
@@ -30,6 +202,25 @@ class CompositionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal composition.document, response.parsed_body.fetch("document")
     assert_equal 0, response.parsed_body.fetch("lock_version")
+  end
+
+  # A busca trata curingas de LIKE como parte literal do nome JSON.
+  test "busca nomes com sublinhado e porcentagem literalmente" do
+    sign_in user
+    underscore = empty_composition.tap { |item| item.update!(document: item.document.merge("name" => "Estudo_1")) }
+    percent = empty_composition.tap { |item| item.update!(document: item.document.merge("name" => "100% música")) }
+    wildcard_match = empty_composition.tap { |item| item.update!(document: item.document.merge("name" => "EstudoX1")) }
+
+    get compositions_path, params: { q: "Estudo_1" }
+    assert_response :success
+    assert_select "a[href='#{composition_path(underscore)}']", text: /Estudo_1/
+    assert_select "a[href='#{composition_path(percent)}']", count: 0
+    assert_select "a[href='#{composition_path(wildcard_match)}']", count: 0
+
+    get compositions_path, params: { q: "100% música" }
+    assert_response :success
+    assert_select "a[href='#{composition_path(percent)}']", text: /100% música/
+    assert_select "a[href='#{composition_path(underscore)}']", count: 0
   end
 
   # O formulário salva metadados sem descartar a árvore musical existente.
@@ -47,32 +238,6 @@ class CompositionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 3, composition.document.dig("time_signature", "numerator")
     assert_equal 60, composition.document.dig("tracks", 0, "regions", 0, "notes", 0, "pitch")
     assert_equal previous_version + 1, composition.lock_version
-  end
-
-  # A página entrega a timeline ligada ao mesmo formulário e endpoint JSON.
-  test "abre timeline editavel da composicao salva" do
-    sign_in user
-    composition = saved_composition
-
-    get composition_path(composition)
-
-    assert_response :success
-    assert_select "[data-controller='composition-timeline'][data-composition-timeline-url-value='#{composition_path(composition, format: :json)}']"
-    assert_select "form[data-action*='submit->composition-timeline#save']"
-    assert_select "[data-composition-timeline-target='tracks']"
-    assert_select "[data-action='click->composition-timeline#addTrack']", text: /Adicionar faixa/
-    assert_select "[data-composition-timeline-target='summary']", text: /1 faixa.*1 região.*1 nota/
-    assert_select "[data-composition-timeline-target='regionEditor'] template"
-    assert_select "[data-action*='piano-roll:notes-changed->composition-timeline#notesChanged']"
-    assert_select "[data-action='click->composition-timeline#playComposition']", text: /Tocar composição/
-    assert_select "[data-action='click->composition-timeline#stopComposition']", text: /Parar/
-    assert_select "[data-composition-timeline-target='transportStatus'][role='status']"
-    assert_select "[data-composition-timeline-target='playhead']"
-    assert_select "input[data-composition-timeline-target='loopStart'][data-action*='changeLoopMarker']"
-    assert_select "input[data-composition-timeline-target='loopEnd'][data-action*='changeLoopMarker']"
-    assert_select "[data-composition-timeline-target='loopStartHandle'][tabindex='0']"
-    assert_select "[data-composition-timeline-target='loopEndHandle'][tabindex='0']"
-    assert_select "[data-action*='piano-roll:playback-started->composition-timeline#previewStarted']"
   end
 
   # O endpoint JSON recebe o documento inteiro e reconstrói a mesma música.
@@ -121,7 +286,7 @@ class CompositionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal document["loop"], composition.reload.document["loop"]
   end
 
-  # O aceite cobre duas fontes no mesmo documento, reabertura e rotas legadas.
+  # O aceite cobre duas fontes no mesmo documento e sua reabertura.
   test "aceite da reproducao com duas faixas e loop persistido" do
     sign_in user
     composition = empty_composition
@@ -143,14 +308,6 @@ class CompositionsControllerTest < ActionDispatch::IntegrationTest
     get composition_path(composition, format: :json)
     assert_response :success
     assert_equal document, response.parsed_body.fetch("document")
-    get composition_path(composition)
-    assert_response :success
-    assert_select "[data-composition-timeline-target='transportStatus'][role='status']"
-    assert_select "[data-action='click->composition-timeline#playComposition']"
-    get "/criar"
-    assert_response :success
-    get "/caminho-do-bardo/notas"
-    assert_response :success
     sign_out user
     get composition_path(composition)
     assert_redirected_to new_user_session_path
@@ -183,11 +340,6 @@ class CompositionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 127, saved.dig("tracks", 0, "regions", 0, "notes", 0, "velocity")
     assert_equal 960, saved.dig("tracks", 0, "regions", 0, "notes", 0, "duration_ticks")
     assert_equal original_second, saved.dig("tracks", 1)
-
-    get "/criar"
-    assert_response :success
-    get "/caminho-do-bardo/notas"
-    assert_response :success
   end
 
   # Dados MIDI inválidos recebem erro e não substituem o documento salvo.

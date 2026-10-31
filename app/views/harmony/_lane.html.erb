@@ -1,0 +1,21 @@
+<%# Timeline horizontal; Stimulus aplica reordenação às notas e solicita nova análise. %>
+<section class="harmony-lane-section" aria-labelledby="harmony-lane-title">
+  <div class="harmony-timeline-heading">
+    <div class="harmony-section-heading"><h2 id="harmony-lane-title">Sua sequência</h2></div>
+    <% unless local_assigns[:external_transport] %>
+    <div class="harmony-lane-actions">
+      <button type="button" class="product-button product-button-primary" data-harmony-target="playButton" data-action="click->harmony#play" disabled>Ouvir sequência</button>
+      <button type="button" class="product-button product-button-secondary" data-action="click->harmony#stop">Parar</button>
+    </div>
+    <% end %>
+  </div>
+  <p class="harmony-timeline-help" id="harmony-timeline-help">Arraste os acordes para mudar a ordem da sequência.</p>
+  <p class="harmony-cursor-label" data-harmony-target="cursorText">Compasso 1 · tempo 1</p>
+  <div class="harmony-timeline-scroll" tabindex="0" role="region" aria-label="Sequência de acordes, rolagem horizontal">
+    <div class="harmony-ruler" data-harmony-target="ruler" tabindex="0" role="slider" aria-label="Posição de escuta" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"
+      data-action="pointerdown->harmony#beginSeek pointermove->harmony#moveSeek pointerup->harmony#endSeek pointercancel->harmony#endSeek keydown->harmony#rulerKey">
+      <span class="harmony-cursor" data-harmony-target="cursor" aria-hidden="true"></span>
+    </div>
+    <div class="harmony-lane" data-harmony-target="lane" aria-describedby="harmony-timeline-help"></div>
+  </div>
+</section>

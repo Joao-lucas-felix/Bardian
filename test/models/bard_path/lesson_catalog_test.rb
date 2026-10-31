@@ -1,7 +1,7 @@
 require "test_helper"
 require "tempfile"
 
-# Garante que a trilha mostre somente aulas publicadas com conteúdo válido.
+# Separa prévias da trilha e aulas publicadas com conteúdo válido.
 class BardPath::LessonCatalogTest < ActiveSupport::TestCase
   # Um catálogo vazio permite iniciar o produto sem publicar aulas incompletas.
   test "catalogo vazio nao oferece aulas" do
@@ -23,7 +23,7 @@ class BardPath::LessonCatalogTest < ActiveSupport::TestCase
   # A ordem editorial organiza a trilha, mas não restringe a leitura de aulas.
   test "lista aulas publicadas em ordem e encontra qualquer uma" do
     catalog = BardPath::LessonCatalog.new(
-      entries: [entry("ritmo", 2), entry("notas", 1), entry("harmonia", 3, published: false)],
+      entries: [ entry("ritmo", 2), entry("notas", 1), entry("harmonia", 3, published: false) ],
       template_exists: ->(_) { true }
     )
 
@@ -34,11 +34,12 @@ class BardPath::LessonCatalogTest < ActiveSupport::TestCase
   # A URL não pode revelar aulas planejadas ou páginas sem texto publicado.
   test "recusa aula desconhecida nao publicada ou sem template" do
     catalog = BardPath::LessonCatalog.new(
-      entries: [entry("notas", 1), entry("ritmo", 2, published: false), entry("harmonia", 3)],
+      entries: [ entry("notas", 1), entry("ritmo", 2, published: false), entry("harmonia", 3) ],
       template_exists: ->(slug) { slug == "notas" }
     )
 
-    assert_equal ["notas"], catalog.published.map(&:slug)
+    assert_equal [ "notas" ], catalog.published.map(&:slug)
+    assert_equal %w[notas ritmo], catalog.trail.map(&:slug)
     %w[desconhecida ritmo harmonia].each do |slug|
       assert_raises(ActiveRecord::RecordNotFound) { catalog.find_published!(slug) }
     end
@@ -48,12 +49,12 @@ class BardPath::LessonCatalogTest < ActiveSupport::TestCase
   test "recusa metadados invalidos" do
     valid = entry("notas", 1)
     invalid_cases = [
-      [entry("../segredo", 1)],
-      [valid, entry("notas", 2)],
-      [valid, entry("ritmo", 1)],
-      [valid.merge("title" => " ")],
-      [valid.merge("summary" => "")],
-      [valid.merge("published" => "yes")]
+      [ entry("../segredo", 1) ],
+      [ valid, entry("notas", 2) ],
+      [ valid, entry("ritmo", 1) ],
+      [ valid.merge("title" => " ") ],
+      [ valid.merge("summary" => "") ],
+      [ valid.merge("published" => "yes") ]
     ]
 
     invalid_cases.each do |entries|

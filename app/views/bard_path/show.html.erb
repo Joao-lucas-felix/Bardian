@@ -2,6 +2,10 @@
 <% content_for :title, "#{@lesson.title} — Caminho do Bardo" %>
 <% content_for :main_class, "music-page" %>
 
+<% content_for :head do %>
+  <%= stylesheet_link_tag "bard_path", "data-turbo-track": "reload" %>
+<% end %>
+
 <article class="music-shell bard-lesson-page">
   <header>
     <%= link_to "Voltar ao Caminho do Bardo", bard_path_index_path, class: "music-back" %>

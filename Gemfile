@@ -18,6 +18,8 @@ gem "stimulus-rails"
 gem "tailwindcss-rails"
 # Autenticação e gerenciamento de sessões de usuários e administradores.
 gem "devise"
+# Integra a identidade Google ao fluxo de sessão já gerenciado pelo Devise.
+gem "omniauth-google-oauth2"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 

@@ -1,0 +1,10 @@
+<%# A lista permitida no controller define quais partials podem ser renderizados. %>
+<turbo-frame id="harmony-panel" data-turbo="true" data-panel="<%= @panel %>" data-harmony-target="panel">
+  <% if @panel == "guided" %>
+    <%= render "harmony/guided_panel", options: @state.fetch("options"), saved: true %>
+  <% elsif @panel == "settings" %>
+    <%= render "harmony/settings_panel", tonics: @tonics %>
+  <% elsif @panel == "editor" %>
+    <%= render "harmony/editor_panel" %>
+  <% end %>
+</turbo-frame>

@@ -38,6 +38,12 @@ module BardPath
         .sort_by(&:position).freeze
     end
 
+    # Inclui prévias editoriais na trilha, sem tornar seu conteúdo acessível.
+    # Uma aula marcada como publicada sem corpo continua oculta por inconsistência.
+    def trail
+      @lessons.select { |lesson| !lesson.published? || @published.include?(lesson) }.sort_by(&:position)
+    end
+
     # Retorna aulas acessíveis em ordem de apresentação da trilha.
     def published
       @published

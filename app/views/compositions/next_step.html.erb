@@ -1,0 +1,18 @@
+<%# Apresenta destinos da composição; apenas a edição de notas já possui implementação. %>
+<% content_for :title, "Próximo passo — #{@composition.name} — Bardian" %>
+<% content_for :main_class, "music-page" %>
+<div class="music-shell music-next-shell">
+  <%= link_to "Voltar à harmonia", composition_harmony_path(@composition), class: "music-back", data: { turbo: false } %>
+  <header class="music-next-heading">
+    <h1>Qual será o próximo passo?</h1>
+    <p>Continue criando <strong><%= @composition.name %></strong>. Cada parte poderá ser construída sobre a harmonia que você já escolheu.</p>
+  </header>
+  <section class="music-paths" aria-label="Próximas partes da composição">
+    <%= link_to composition_harmony_path(@composition, panel: "editor"), class: "music-path music-path-primary", data: { turbo: false } do %>
+      <%= bard_icon(:score) %><div><h2>Ornamentar harmonia</h2><p>Abra o piano roll para ajustar e acrescentar notas aos acordes.</p></div><span>Abrir</span>
+    <% end %>
+    <% [["Criar baixo", "Uma linha grave para apoiar os acordes."], ["Criar batida", "Um padrão rítmico para marcar o pulso."], ["Compor melodias", "Uma linha musical sobre a harmonia."]].each do |title, description| %>
+      <div class="music-path music-path-pending"><div><h2><%= title %></h2><p><%= description %></p></div><span class="music-path-status">Em preparação</span></div>
+    <% end %>
+  </section>
+</div>

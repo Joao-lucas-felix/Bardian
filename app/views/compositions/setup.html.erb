@@ -1,0 +1,19 @@
+<%# Segunda página: os controles e a prévia são opcionais; pular preserva a composição vazia. %>
+<% content_for :title, "Primeiros sons — Bardian" %>
+<% content_for :main_class, "music-page" %>
+<div class="music-shell music-form-shell music-starter-shell">
+  <%= link_to "Voltar aos dados da composição", edit_composition_path(@composition, return_to: "setup"), class: "music-back" %>
+  <p class="music-step">Etapa 2 de 2</p>
+  <h1>Primeiros sons</h1>
+  <p class="music-form-intro">Experimente os ajustes e escolha uma proposta. Esta etapa é opcional.</p>
+  <%= link_to "Pular por enquanto", composition_harmony_path(@composition), class: "product-button product-button-secondary music-setup-skip" %>
+  <% if @error.present? %><p class="music-error" role="alert"><%= @error %></p><% end %>
+  <%= form_with url: configure_composition_path(@composition), method: :patch, scope: :composition,
+    class: "music-form", data: { controller: "composition-starter", composition_starter_preview_url_value: preview_compositions_path } do |form| %>
+    <%= hidden_field_tag :lock_version, @composition.lock_version %>
+    <%= render "starter_controls", form: form, catalogue: @catalogue, values: @starter_values %>
+    <div class="music-form-actions music-setup-actions">
+      <%= form.submit "Começar na harmonia", class: "product-button product-button-primary" %>
+    </div>
+  <% end %>
+</div>

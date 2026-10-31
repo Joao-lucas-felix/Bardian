@@ -1,0 +1,25 @@
+<%# Apresenta uma parada; aulas não publicadas e nil são prévias, sem rota de visita ou conclusão. %>
+<li class="bard-map-stop" data-bard-travel-target="stop" data-slug="<%= lesson.slug if lesson&.published? %>" data-preview="<%= !lesson&.published? %>" data-completed="<%= completed %>" data-visit-url="<%= visit_bard_path_lesson_path(slug: lesson.slug) if lesson&.published? %>">
+  <%# Reutiliza a arte original; a estrada e a porta compartilham coordenadas com a caminhada. %>
+  <%= image_tag "bard_path/trail_landscape.svg", class: "bard-map-road", alt: "", width: 400, height: 240 %>
+  <button type="button" class="bard-map-selector" data-action="bard-travel#select" aria-haspopup="dialog" aria-expanded="false" aria-controls="bard-summary-<%= number %>" aria-label="Visitar <%= lesson&.title || 'Sentindo os tempos da música' %>"><span><%= number %></span></button>
+  <div class="bard-map-tavern">
+    <span><%= lesson&.title || 'Sentindo os tempos da música' %></span>
+    <small><%= lesson&.published? ? (completed ? 'Concluída' : 'Disponível') : 'Em preparação' %></small>
+  </div>
+  <dialog id="bard-summary-<%= number %>" class="bard-map-summary" data-summary tabindex="-1" aria-labelledby="bard-summary-title-<%= number %>" data-action="cancel->bard-travel#close">
+    <h2 id="bard-summary-title-<%= number %>"><%= lesson&.title || 'Sentindo os tempos da música' %></h2>
+    <p><%= lesson&.summary || 'Descubra como acompanhar a batida de uma música e perceber os tempos, mesmo sem saber tocar um instrumento.' %></p>
+    <% if lesson&.published? %>
+      <%= link_to "Entrar na aula", bard_path_lesson_path(slug: lesson.slug), class: "product-button product-button-primary" %>
+    <% else %>
+      <p class="bard-path-empty">Esta aula está em preparação.</p>
+    <% end %>
+    <p data-visit-message role="status"></p>
+    <button type="button" class="bard-map-close" data-action="bard-travel#close">Voltar à estrada</button>
+  </dialog>
+  <%# Sem JavaScript, a aula publicada continua acessível por um link normal. %>
+  <% if lesson&.published? %>
+    <noscript><%= link_to "Entrar na aula: #{lesson.title}", bard_path_lesson_path(slug: lesson.slug) %></noscript>
+  <% end %>
+</li>

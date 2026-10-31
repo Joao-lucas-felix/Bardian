@@ -3,26 +3,31 @@ require "test_helper"
 # Verifica a criação segura e repetível do administrador inicial.
 class SeedsTest < ActiveSupport::TestCase
   test "seed cria administrador e pode ser executado novamente" do
-    run_seed(email: "admin@example.com", password: "senha-administrativa")
+    email = "seed-#{SecureRandom.uuid}@example.com"
+    initial_count = User.count
+    run_seed(email: email, password: "senha-administrativa")
 
-    assert_equal 1, User.count
-    admin = User.find_by!(email: "admin@example.com")
+    assert_equal initial_count + 1, User.count
+    admin = User.find_by!(email: email)
     assert admin.admin?
     assert admin.valid_password?("senha-administrativa")
 
     assert_no_difference("User.count") do
-      run_seed(email: "admin@example.com", password: "senha-nova")
+      run_seed(email: email, password: "senha-nova")
     end
 
-    assert User.find_by!(email: "admin@example.com").valid_password?("senha-nova")
+    assert User.find_by!(email: email).valid_password?("senha-nova")
   end
 
   test "seed falha sem as duas credenciais administrativas" do
-    assert_raises(ArgumentError) do
-      run_seed(email: "admin@example.com", password: nil)
+    email = "seed-#{SecureRandom.uuid}@example.com"
+    assert_no_difference("User.count") do
+      assert_raises(ArgumentError) do
+        run_seed(email: email, password: nil)
+      end
     end
 
-    assert_empty User.all
+    refute User.exists?(email: email)
   end
 
   private

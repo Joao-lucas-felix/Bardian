@@ -1,0 +1,480 @@
+/* A área musical reutiliza os papéis globais e define apenas seu layout. */
+.music-page, .harmony-page {
+  --music-accent: var(--p-accent); --music-soft: var(--p-accent-soft); --music-ink: var(--p-ink);
+  --music-muted: var(--p-muted); --music-line: var(--p-line); --music-bg: var(--p-bg); --music-surface: var(--p-surface);
+  min-height: var(--p-screen-height); padding: clamp(32px, 5vw, 72px) clamp(20px, 4vw, 64px) 80px;
+  color: var(--music-ink); background: var(--music-bg); accent-color: var(--music-accent);
+  caret-color: var(--music-accent); scrollbar-color: var(--music-line) var(--music-bg);
+}
+:is(.music-page, .harmony-page) * { box-sizing: border-box; }
+:is(.music-page, .harmony-page) ::selection { background: var(--music-soft); color: var(--music-ink); }
+:is(.music-page, .harmony-page) :focus-visible { outline: 3px solid var(--music-accent); outline-offset: 3px; }
+.music-shell, .harmony-shell { width: 100%; max-width: 1080px; margin-inline: auto; }
+:is(.music-page, .harmony-page) h1 { margin: 0; font-size: clamp(28px, 3.4vw, 40px); font-weight: 650; letter-spacing: -.025em; line-height: 1.2; overflow-wrap: anywhere; }
+:is(.music-page, .harmony-page) h2 { font-size: 20px; font-weight: 600; letter-spacing: -.015em; }
+/* A partitura e o mapa são marcas discretas junto aos títulos existentes. */
+.game-title-icon { display: inline-flex; align-items: center; vertical-align: middle; color: var(--music-accent); }
+.game-title-icon .ui-icon { width: 20px; height: 20px; margin-left: 3px; }
+:is(.music-page, .harmony-page) .product-button { min-height: 44px; border-radius: 4px; box-shadow: none; font-size: 14px; font-weight: 600; padding: 10px 18px; text-decoration: none; transform: none; }
+:is(.music-page, .harmony-page) .product-button-primary { background: var(--music-accent); border: 1px solid var(--music-accent); color: var(--p-on-accent); }
+:root[data-theme="dark"] :is(.music-page, .harmony-page) .product-button-primary { color: #17201c; }
+:is(.music-page, .harmony-page) .product-button-secondary { background: transparent; color: var(--music-ink); border: 1px solid var(--music-line); }
+:is(.music-page, .harmony-page) .product-button:hover:not(:disabled) { filter: brightness(.94); }
+:is(.music-page, .harmony-page) .product-button:disabled { opacity: .45; cursor: not-allowed; }
+.music-back { display: inline-block; color: var(--music-muted); font-size: 14px; text-decoration: underline; text-underline-offset: 4px; }
+.music-back:hover { color: var(--music-accent); }
+.music-library-heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 40px; }
+.music-filters { display: flex; gap: 12px; margin-bottom: 24px; }
+.music-page .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.music-search { flex: 1; }
+.music-page input:not([type="submit"]):not([type="checkbox"]), .music-page select, .harmony-controls select, .harmony-controls input { width: 100%; min-height: 44px; border: 1px solid var(--music-line); border-radius: 4px; padding: 10px 12px; font: inherit; font-size: 14px; color: var(--music-ink); background: var(--music-surface); }
+.music-page input::placeholder { color: var(--music-muted); }
+.music-filters select { width: auto; }
+.music-list { border-top: 1px solid var(--music-line); }
+.music-row { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto auto; align-items: center; gap: 20px; padding: 20px 8px; border-bottom: 1px solid var(--music-line); color: inherit; text-decoration: none; }
+.music-row:hover { background: var(--music-soft); }
+.music-row strong { font-size: 17px; font-weight: 550; overflow-wrap: anywhere; }
+.music-row time { color: var(--music-muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.music-row-open { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; color: var(--music-accent); }
+.music-row-open > span { display: inline-flex; align-items: center; }
+.music-row-open .ui-icon { width: 16px; height: 16px; margin-left: 4px; }
+.music-cover { display: grid; place-items: center; width: 52px; aspect-ratio: 1; background: var(--music-soft); color: var(--music-accent); border-radius: 3px; overflow: hidden; }
+.music-cover img { width: 100%; height: 100%; object-fit: cover; }
+.music-cover svg { width: 23px; height: 23px; }
+.music-project-heading { display: flex; align-items: center; gap: 24px; margin: 36px 0 48px; }
+.music-project-heading > div:last-child { min-width: 0; }
+.music-project-heading .music-cover { width: 88px; flex-shrink: 0; }
+.music-project-heading .music-back { margin-top: 12px; }
+.music-paths { border-top: 1px solid var(--music-line); }
+.music-path { display: flex; gap: 24px; align-items: center; min-height: 88px; padding: 20px 8px; border-bottom: 1px solid var(--music-line); text-decoration: none; color: inherit; }
+.music-path > svg { flex: 0 0 24px; width: 24px; height: 24px; color: var(--music-accent); }
+.music-path > span:last-child { margin-left: auto; color: var(--music-accent); }
+.music-path > span:last-child .ui-icon { width: 18px; height: 18px; }
+.music-path h2, .music-path p { margin: 0; }
+.music-path p { color: var(--music-muted); font-size: 14px; margin-top: 6px; line-height: 1.5; }
+.music-path:hover { background: var(--music-soft); }
+.music-path-primary h2 { color: var(--music-accent); }
+.music-more { margin-top: 32px; color: var(--music-muted); font-size: 14px; }
+.music-more summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; }
+.music-delete { min-height: 44px; margin-top: 18px; color: var(--p-danger); background: none; border: none; cursor: pointer; text-decoration: underline; }
+.music-empty { padding: 72px 0; border-top: 1px solid var(--music-line); }
+.music-empty h2 { margin: 0 0 10px; }
+.music-empty p { color: var(--music-muted); line-height: 1.6; }
+.music-form-shell { max-width: 640px; }
+.music-form-shell h1 { margin: 30px 0 36px; }
+.music-form { display: grid; gap: 30px; }
+.music-field { display: grid; gap: 10px; }
+.music-field > label { font-size: 14px; font-weight: 600; }
+.music-field p { color: var(--music-muted); font-size: 13px; margin: 0; }
+.music-cover-preview { width: 100px; height: 100px; object-fit: cover; }
+.music-checkbox { display: flex; align-items: center; gap: 8px; }
+.music-form-actions { display: flex; align-items: center; gap: 24px; padding-top: 12px; }
+.music-error { color: var(--p-danger); margin-bottom: 24px; }
+/* A criação destaca ajustes musicais sem tirar nome e capa do fluxo do formulário. */
+.music-page .music-starter-shell { max-width: 800px; }
+.music-form-intro { max-width: 62ch; margin: -18px 0 32px; color: var(--music-muted); line-height: 1.6; }
+.music-step { margin: 28px 0 -20px; color: var(--music-muted); font-size: 13px; }
+.music-setup-actions { flex-wrap: wrap; }
+.music-setup-skip { display: inline-flex; margin: -10px 0 26px; }
+.music-starter { display: grid; gap: 20px; border-top: 1px solid var(--music-line); padding-top: 30px; }
+.music-starter-heading h2, .music-starter-preview-heading h3 { margin: 0; }
+.music-starter-heading p, .music-starter-preview-heading p, .music-starter-hint { margin: 6px 0 0; color: var(--music-muted); font-size: 14px; line-height: 1.55; }
+.music-starter-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 20px; }
+.music-starter-preview-heading { display: flex; align-items: end; justify-content: space-between; gap: 18px; border-top: 1px solid var(--music-line); padding-top: 24px; }
+.music-starter-preview-heading h3 { font-size: 17px; font-weight: 600; }
+.music-starter-preview-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.music-starter-status { margin: 0; color: var(--music-muted); font-size: 13px; min-height: 20px; }
+.music-starter-previews { display: grid; border-top: 1px solid var(--music-line); }
+.music-starter-preview { display: flex; align-items: center; justify-content: space-between; gap: 18px; border-bottom: 1px solid var(--music-line); padding: 16px 0; }
+.music-starter-preview > div:first-child { display: grid; gap: 6px; min-width: 0; }
+.music-starter-preview strong { font-size: 14px; }
+.music-starter-preview span { color: var(--music-muted); font-size: 14px; overflow-wrap: anywhere; }
+.music-starter-preview > div:last-child { display: flex; gap: 8px; flex-shrink: 0; }
+.music-starter-preview button[aria-pressed="true"] { border-color: var(--music-accent); background: var(--music-soft); color: var(--music-accent); }
+.music-next-heading { max-width: 62ch; margin: 34px 0 40px; }
+.music-next-heading p { color: var(--music-muted); line-height: 1.6; }
+.music-path-pending { padding-left: 56px; }
+.music-path-pending:hover { background: transparent; }
+.music-path-status { margin-left: auto; color: var(--music-muted); font-size: 13px; white-space: nowrap; }
+@media (max-width: 620px) {
+  .music-starter-fields { grid-template-columns: 1fr; }
+  .music-starter-preview-heading, .music-starter-preview { align-items: stretch; flex-direction: column; }
+  .music-starter-preview-actions, .music-starter-preview > div:last-child { flex-wrap: wrap; }
+  .music-path-pending { padding-left: 8px; }
+  .music-path-status { white-space: normal; text-align: right; }
+}
+/* Ouvir, escolher e adicionar são ações separadas; ajustes ficam em disclosures. */
+.harmony-intro { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 32px; }
+.harmony-page { padding-top: 32px; }
+.harmony-intro { margin-bottom: 14px; }
+.harmony-intro h1 { margin-top: 12px; }
+.harmony-save { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+.harmony-save > span { color: var(--music-muted); font-size: 12px; }
+.harmony-session-note { max-width: 300px; color: var(--music-muted); font-size: 13px; }
+.harmony-composer-controls { display: flex; flex-wrap: wrap; align-items: start; gap: 28px; border-block: 1px solid var(--music-line); margin-bottom: 24px; }
+.harmony-composer-controls > details { min-width: 0; }
+.harmony-composer-controls > details[open] { flex-basis: 100%; }
+.harmony-settings { margin: 0; }
+.harmony-settings > summary, .harmony-suggestions > summary { display: flex; align-items: center; min-height: 44px; padding: 10px 0; cursor: pointer; font-size: 14px; color: var(--music-muted); }
+.harmony-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 16px; padding: 8px 0 24px; }
+.harmony-control-group { display: grid; gap: 8px; min-width: 120px; }
+.harmony-control-group label { font-size: 13px; }
+.harmony-control-group input { max-width: 140px; }
+.harmony-controls-note { flex-basis: 100%; font-size: 13px; color: var(--music-muted); margin: 0; }
+.harmony-main-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; }
+.harmony-main-grid > section { min-width: 0; }
+.harmony-section-heading h2 { margin: 0; }
+.harmony-section-heading p { margin: 7px 0 0; color: var(--music-muted); font-size: 14px; }
+.harmony-wheel-section > .harmony-section-heading { text-align: center; }
+/* O semicírculo preserva a ordem dos sete graus e mantém os alvos separados. */
+.harmony-wheel { position: relative; width: min(100%, 560px); height: 158px; margin: 12px auto 0; }
+.harmony-wheel-instruction { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.harmony-chord { position: absolute; display: flex; flex-direction: column-reverse; align-items: center; justify-content: center; gap: 3px; width: 60px; height: 60px; transform: translateX(-50%); border: 1px solid var(--music-line); border-radius: 50%; color: var(--music-ink); background: var(--music-surface); cursor: pointer; }
+.harmony-chord:nth-child(1) { left: 8%; top: 86px; }
+.harmony-chord:nth-child(2) { left: 22%; top: 43px; }
+.harmony-chord:nth-child(3) { left: 36%; top: 12px; }
+.harmony-chord:nth-child(4) { left: 50%; top: 0; }
+.harmony-chord:nth-child(5) { left: 64%; top: 12px; }
+.harmony-chord:nth-child(6) { left: 78%; top: 43px; }
+.harmony-chord:nth-child(7) { left: 92%; top: 86px; }
+.harmony-chord strong { font-size: 20px; font-weight: 550; }
+.harmony-chord small { color: var(--music-muted); font-size: 12px; }
+.harmony-chord:hover, .harmony-chord[aria-pressed="true"] { background: var(--music-soft); border-color: var(--music-accent); }
+.harmony-chord[aria-pressed="true"] strong { color: var(--music-accent); }
+.harmony-choice { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 12px; min-height: 52px; }
+.harmony-choice p { max-width: 460px; margin: 0; color: var(--music-muted); font-size: 14px; line-height: 1.6; }
+.harmony-choice button { flex-shrink: 0; }
+.harmony-lane-section { border-top: 1px solid var(--music-line); padding-top: 16px; }
+.harmony-timeline-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.harmony-timeline-help { margin: 8px 0 0; color: var(--music-muted); font-size: 12px; }
+.harmony-lane { display: flex; gap: 16px; overflow-x: auto; overscroll-behavior-x: contain; padding: 6px 4px 10px; margin: 10px -4px 0; }
+.harmony-measure { flex: 0 0 auto; }
+.harmony-measure h3 { margin: 0 0 10px; font-size: 12px; font-weight: 500; color: var(--music-muted); }
+.harmony-beats { display: grid; grid-template-columns: repeat(4, 136px); gap: 8px; }
+.harmony-beat { display: flex; flex-direction: column; align-items: start; text-align: left; gap: 6px; min-width: 0; min-height: 84px; padding: 10px; border: 1px solid var(--music-line); border-radius: 3px; background: var(--music-surface); color: var(--music-ink); }
+button.harmony-beat { cursor: grab; user-select: none; }
+button.harmony-beat:active { cursor: grabbing; }
+.harmony-beat[aria-pressed="true"] { background: var(--music-soft); border-color: var(--music-accent); }
+.harmony-beat small, .harmony-beat span { color: var(--music-muted); font-size: 12px; }
+.harmony-beat strong { font-size: 20px; font-weight: 550; overflow-wrap: anywhere; }
+.harmony-beat.is-empty { background: transparent; border-style: dashed; color: var(--music-muted); }
+.harmony-beat.is-empty strong { font-size: 13px; font-weight: 400; }
+.harmony-lane-free { display: grid; gap: 6px; max-width: 520px; padding: 16px; margin-top: 18px; border: 1px solid var(--music-line); background: var(--music-surface); }
+.harmony-lane-free strong { font-size: 16px; font-weight: 550; }
+.harmony-lane-free span, .harmony-lane-free p { margin: 0; color: var(--music-muted); font-size: 12px; }
+.harmony-lane-actions, .harmony-preview-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.harmony-suggestions { margin: 0; }
+.harmony-slot-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding: 12px 0; }
+.harmony-slot-actions[hidden] { display: none; }
+.harmony-slot-actions > span { margin-right: auto; color: var(--music-muted); font-size: 13px; }
+/* A coluna encolhe até a largura do painel; sequências extensas rolam só na timeline. */
+.harmony-guided-panel { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; min-width: 0; }
+.harmony-guided-panel > * { min-width: 0; }
+.harmony-preview-section { padding: 12px 0 24px; }
+.harmony-preview-actions { margin-top: 18px; }
+.harmony-preview { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+.harmony-preview > p { grid-column: 1 / -1; font-size: 14px; color: var(--music-muted); margin: 0; }
+.harmony-preview-card { display: grid; gap: 8px; padding: 12px 0; border-block: 1px solid var(--music-line); }
+.harmony-preview-card small, .harmony-preview-card span { color: var(--music-muted); font-size: 12px; }
+.harmony-preview-card strong { font-size: 20px; }
+.harmony-status { min-height: 20px; margin-top: 12px; color: var(--music-muted); font-size: 13px; }
+.harmony-recovery-summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; margin-bottom: 16px; border: 1px solid var(--music-line); border-left: 4px solid var(--music-accent); background: var(--music-soft); }
+.harmony-recovery-summary[hidden] { display: none; }
+.harmony-recovery-summary p { margin: 0; color: var(--music-ink); font-size: 14px; line-height: 1.5; }
+.harmony-guided-help { padding-block: 8px; border-top: 1px solid var(--music-line); color: var(--music-muted); font-size: 13px; }
+.harmony-guided-help summary { min-height: 32px; padding-block: 6px; cursor: pointer; }
+.harmony-guided-help p { margin: 4px 0 8px; }
+/* Recomendações e seleção têm sinais distintos; cor nunca é a única explicação. */
+.harmony-chord.is-recommended { background: var(--music-soft); border-color: var(--music-accent); }
+.harmony-recommendation { position: absolute; top: calc(100% + 3px); font-size: 10px; color: var(--music-accent); }
+.harmony-chord[aria-pressed="true"] { outline: 2px solid var(--music-accent); outline-offset: 3px; }
+.harmony-beats { display: flex; }
+.harmony-beat { flex-shrink: 0; }
+.harmony-duration, .harmony-instrument { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--music-muted); }
+.harmony-duration select, .harmony-instrument select { min-height: 44px; max-width: 200px; border: 1px solid var(--music-line); border-radius: 4px; background: var(--music-surface); color: var(--music-ink); padding: 6px 10px; }
+/* A composição cresce com seu conteúdo e usa uma única rolagem vertical da página. */
+.product-app > main.harmony-workspace { height: auto; min-height: var(--p-screen-height); padding: 16px clamp(16px, 4vw, 48px) 12px; overflow: visible; }
+.harmony-workspace .harmony-shell { height: auto; min-height: 0; display: block; }
+.harmony-workspace .harmony-intro { margin-bottom: 8px; }
+.harmony-workspace .harmony-intro > div:first-child { display: grid; grid-template-columns: max-content max-content; align-items: baseline; column-gap: 12px; }
+.harmony-workspace .harmony-intro > div > .music-back:first-child { grid-row: 1; grid-column: 1; }
+.harmony-workspace .harmony-intro > div > .music-back:last-child { grid-row: 1; grid-column: 2; }
+.harmony-workspace .harmony-intro h1 { grid-row: 2; grid-column: 1 / -1; font-size: 28px; margin-top: 2px; }
+.harmony-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; padding-block: 12px; border-block: 1px solid var(--music-line); }
+.harmony-panel-nav { display: flex; align-items: center; flex-wrap: wrap; gap: 20px; margin-left: auto; }
+.harmony-panel-nav a { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 10px; font-size: 14px; border-radius: 4px; text-decoration: none; }
+.harmony-panel-nav a.is-current, .harmony-panel-nav a[aria-current="page"] { background: var(--music-soft); color: var(--music-ink); box-shadow: inset 0 -2px var(--music-accent); }
+.harmony-workspace #harmony-panel { display: block; min-height: 0; min-width: 0; overflow: visible; padding: 24px 4px 10px; }
+.harmony-workspace #harmony-panel:empty { display: none; }
+.harmony-workspace #harmony-panel[busy] { opacity: .65; }
+.harmony-workspace .harmony-status { margin: 8px 0 0; }
+.harmony-workspace .harmony-status:empty { display: none; }
+.harmony-workspace .harmony-guided-panel { gap: 30px; }
+.harmony-workspace .harmony-wheel { margin-top: 12px; height: 158px; }
+.harmony-workspace .harmony-choice { margin-top: 12px; }
+.harmony-workspace .harmony-lane-section { padding-top: 16px; }
+.harmony-workspace .harmony-lane { margin-top: 10px; padding-bottom: 8px; }
+.harmony-workspace .harmony-timeline-help { margin-top: 8px; }
+.harmony-workspace .harmony-beat { min-height: 76px; padding-block: 6px; gap: 4px; }
+.harmony-editor-panel { min-width: 0; }
+.harmony-editor-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.harmony-editor-actions p { font-size: 12px; color: var(--music-muted); margin: 0; }
+.harmony-editor-panel .piano-roll-card { margin: 0; border: 0; box-shadow: none; padding: 0; border-radius: 0; background: var(--music-bg); color: var(--music-ink); }
+.harmony-editor-panel .piano-roll-transport[hidden],
+.harmony-editor-panel .piano-roll-loop-marker,
+.harmony-editor-panel .piano-roll-loop-boundary { display: none; }
+.harmony-editor-panel .piano-roll-help { font-size: 12px; cursor: pointer; }
+@media (max-width: 700px) {
+  .product-app > main.harmony-workspace { padding: 14px 16px 12px; }
+  .harmony-workspace .harmony-intro { flex-wrap: wrap; gap: 10px; }
+  .harmony-workspace .harmony-save { width: 100%; flex-direction: row; justify-content: flex-end; align-items: center; gap: 10px; }
+  .harmony-workspace .harmony-save > span { max-width: 120px; text-align: right; }
+  .harmony-workspace .harmony-intro h1 { font-size: 24px; }
+  .harmony-toolbar { gap: 12px 18px; }
+  .harmony-instrument { margin-left: auto; flex-direction: column; align-items: start; gap: 2px; }
+  .harmony-instrument select { max-width: 155px; }
+  .harmony-panel-nav { margin: 0; gap: 16px; }
+  .harmony-workspace .harmony-choice { flex-direction: row; }
+  .harmony-workspace .harmony-choice p { font-size: 12px; }
+  .harmony-slot-actions { align-items: flex-start; }
+  .harmony-workspace .harmony-chord { width: 44px; height: 44px; }
+  /* Reserva espaço para o rótulo "Sugerido" antes da área de seleção. */
+  .harmony-workspace .harmony-wheel { height: 126px; }
+  .harmony-workspace .harmony-chord:nth-child(1), .harmony-workspace .harmony-chord:nth-child(7) { top: 58px; }
+  .harmony-workspace .harmony-chord:nth-child(2), .harmony-workspace .harmony-chord:nth-child(6) { top: 30px; }
+  .harmony-workspace .harmony-chord:nth-child(3), .harmony-workspace .harmony-chord:nth-child(5) { top: 8px; }
+}
+@media (max-width: 700px) {
+  .music-page, .harmony-page { padding-top: 86px; }
+  .music-library-heading { flex-wrap: wrap; gap: 20px; margin-bottom: 28px; }
+  .music-filters { flex-wrap: wrap; }
+  .music-search { flex-basis: 100%; }
+  .music-filters select { flex: 1; min-width: 0; }
+  .music-row { grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; }
+  .music-row .music-cover { width: 44px; }
+  .music-row time { display: none; }
+  .music-project-heading { gap: 16px; }
+  .music-project-heading .music-cover { width: 64px; }
+  .music-path { gap: 16px; }
+  .harmony-intro { align-items: start; flex-wrap: wrap; gap: 20px; }
+  .harmony-save { width: 100%; justify-content: space-between; }
+  .harmony-chord { width: 44px; height: 44px; }
+  .harmony-chord strong { font-size: 18px; }
+  .harmony-choice { align-items: center; flex-direction: column; text-align: center; }
+  .harmony-beat { padding: 10px 7px; }
+  .harmony-beat strong { font-size: 16px; }
+  .harmony-beat span { font-size: 11px; }
+  .harmony-preview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* A harmonia ocupa a página; biblioteca e autenticação mantêm sua navegação. */
+.product-app-harmony > main { margin-left: 0; padding-top: 0; }
+.product-app-harmony .flash-messages { left: 20px; }
+/* A página fica fixa na janela; áreas musicais internas recebem a própria rolagem. */
+.product-app > main.harmony-workspace:has(#harmony-panel) { height: var(--p-screen-height); min-height: 0; overflow: hidden; padding-block: 12px; }
+.harmony-workspace:has(#harmony-panel) .harmony-shell { display: flex; flex-direction: column; height: 100%; max-width: 864px; min-height: 0; }
+.harmony-workspace:has(#harmony-panel) #harmony-panel { flex: 1; min-height: 0; overflow: hidden; padding: 8px 0 0; }
+/* Sugestões variam de altura; a área rola e mantém as ações ao alcance. */
+.harmony-workspace:has(#harmony-panel .harmony-settings-panel) #harmony-panel { overflow-y: auto; overscroll-behavior-y: contain; }
+.harmony-settings-panel .harmony-preview-section > .harmony-preview-actions:last-child { position: sticky; bottom: 0; z-index: 1; padding-block: 8px; background: var(--music-bg); }
+.harmony-workspace:has(.harmony-guided-panel) .harmony-guided-panel { min-height: 0; gap: 8px; }
+.harmony-account-bar { display: flex; justify-content: flex-end; align-items: center; gap: 24px; flex-wrap: wrap; padding-bottom: 12px; }
+.harmony-account-bar [data-controller="theme"] { display: flex; }
+.harmony-account-bar .theme-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--music-line); border-radius: 4px; background: var(--music-surface); color: var(--music-ink); font: inherit; white-space: nowrap; cursor: pointer; }
+.harmony-account-bar .theme-toggle .ui-icon { width: 16px; height: 16px; }
+.harmony-account-bar .account-nav { display: flex; align-items: center; gap: 20px; }
+.harmony-account-bar .account-nav button, .harmony-account-bar .account-nav a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 14px; border: 1px solid var(--music-line); border-radius: 4px; background: transparent; color: var(--music-ink); font: inherit; text-decoration: none; cursor: pointer; }
+.harmony-account-bar .account-nav button:hover, .harmony-account-bar .account-nav a:hover, .harmony-account-bar .theme-toggle:hover { background: var(--music-soft); }
+.harmony-workspace .harmony-main-grid { display: block; }
+.harmony-timeline-scroll { min-width: 0; max-width: 100%; overflow-x: auto; overflow-y: hidden; position: relative; padding-bottom: 8px; overscroll-behavior-inline: contain; }
+.harmony-workspace .harmony-lane { width: max-content; overflow: visible; gap: 0; padding: 0; }
+.harmony-workspace .harmony-measure { flex: 0 0 auto; padding: 0; border: 0; }
+.harmony-workspace .harmony-measure h3 { display: none; }
+.harmony-workspace .harmony-beats { gap: 0; }
+.harmony-workspace .harmony-beat { box-sizing: border-box; flex-shrink: 0; border-radius: 0; margin: 0; }
+.harmony-ruler { height: 32px; position: relative; touch-action: none; cursor: ew-resize; border-bottom: 1px solid var(--p-line); background: repeating-linear-gradient(90deg, var(--p-line) 0 1px, transparent 1px 136px); }
+.harmony-ruler:focus-visible { outline: 2px solid var(--p-accent); outline-offset: -2px; }
+.harmony-cursor { position: absolute; top: 0; width: 2px; height: 150px; z-index: 3; background: var(--p-accent); pointer-events: none; }
+.harmony-cursor::before { content: ''; position: absolute; width: 12px; height: 12px; left: -5px; top: 4px; background: var(--p-accent); border-radius: 2px; }
+.harmony-cursor-label { font-variant-numeric: tabular-nums; color: var(--p-muted); margin: 8px 0; }
+.harmony-recovery { padding: 20px 0; border-block: 1px solid var(--p-line); }
+.harmony-recovery[hidden] { display: none; }
+.harmony-recovery-row, .harmony-editor-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-block: 12px; }
+.harmony-toolbar .harmony-editor-actions { margin: 0; }
+.harmony-recovery-notes { display: grid; gap: 8px; max-height: 260px; overflow: auto; padding-block: 12px; }
+.harmony-recovery input, .harmony-recovery select, .harmony-editor-actions select { background: var(--p-surface); color: var(--p-ink); border: 1px solid var(--p-line); padding: 8px; border-radius: 6px; font-size: 16px; }
+
+/* A leitura guiada cabe na janela; somente a sequência extensa usa rolagem própria. */
+@media (min-width: 701px) {
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-account-bar { padding-bottom: 4px; gap: 16px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-intro { margin-bottom: 4px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-intro h1 { font-size: 24px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-toolbar { flex-wrap: nowrap; padding-block: 6px; margin-bottom: 0; gap: 8px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-toolbar .product-button { min-height: 36px; padding: 6px 10px; font-size: 12px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-instrument { gap: 5px; font-size: 11px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-instrument select { min-height: 36px; max-width: 148px; font-size: 11px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-panel-nav { gap: 6px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-panel-nav a { min-height: 36px; padding-inline: 6px; font-size: 11px; white-space: nowrap; }
+  /* Reserva espaço para o rótulo "Sugerido" antes da área de seleção. */
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-wheel { width: min(100%, 440px); height: 126px; margin-top: 6px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-chord { width: 44px; height: 44px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-chord strong { font-size: 16px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-chord small { font-size: 10px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-chord:nth-child(1), .harmony-workspace:has(.harmony-guided-panel) .harmony-chord:nth-child(7) { top: 58px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-chord:nth-child(2), .harmony-workspace:has(.harmony-guided-panel) .harmony-chord:nth-child(6) { top: 30px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-chord:nth-child(3), .harmony-workspace:has(.harmony-guided-panel) .harmony-chord:nth-child(5) { top: 8px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-choice { margin-top: 0; min-height: 44px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-choice .product-button { min-height: 36px; padding: 6px 12px; font-size: 12px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-slot-actions { padding-block: 0; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-slot-actions .product-button, .harmony-workspace:has(.harmony-guided-panel) .harmony-duration select { min-height: 36px; padding-block: 6px; font-size: 12px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-lane-section { padding-top: 8px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-timeline-help, .harmony-workspace:has(.harmony-guided-panel) .harmony-cursor-label { margin-block: 4px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-ruler { height: 28px; background: repeating-linear-gradient(90deg, var(--p-line) 0 1px, transparent 1px 108px); }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-lane { margin-top: 4px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-beat { min-height: 86px; padding: 5px; gap: 2px; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-beat strong { font-size: 16px; line-height: 1.15; }
+  .harmony-workspace:has(.harmony-guided-panel) .harmony-beat small, .harmony-workspace:has(.harmony-guided-panel) .harmony-beat span { font-size: 10px; line-height: 1.2; }
+}
+@media (max-height: 680px) {
+  .harmony-workspace:has(#harmony-panel) #harmony-panel { overflow-y: auto; }
+}
+
+/* No modo editor, a página é a moldura e a grade recebe a rolagem musical. */
+.product-app > main.harmony-workspace:has(.harmony-editor-panel) { height: var(--p-screen-height); min-height: 0; overflow: hidden; padding-inline: clamp(10px, 1.2vw, 20px); }
+.harmony-workspace:has(.harmony-editor-panel) .harmony-shell { display: flex; flex-direction: column; height: 100%; max-width: none; min-height: 0; }
+.harmony-workspace:has(.harmony-editor-panel) .harmony-toolbar { margin-bottom: 0; }
+.harmony-workspace:has(.harmony-editor-panel) #harmony-panel { display: flex; flex: 1; flex-direction: column; min-height: 0; padding: 12px 0 0; overflow: hidden; }
+.harmony-workspace:has(.harmony-editor-panel) .harmony-status:empty { display: none; }
+.harmony-editor-panel, .harmony-editor-panel [data-harmony-target="editorMount"] { display: flex; flex: 1; flex-direction: column; min-height: 0; }
+.harmony-editor-panel .harmony-editor-actions { flex: 0 0 auto; margin-block: 0 10px; }
+
+/* Estrutura ativa do piano roll, sem carregar a apresentação legada. */
+.harmony-workspace .piano-roll-card {
+  --piano-roll-grid-bg: #f8fbf9; --piano-roll-grid-row: #eaf1ed;
+  --piano-roll-strong-line: #aabdb2; --piano-roll-line: #dce6df;
+  --piano-roll-measure-line: #92ab9c; --piano-roll-beat-line: #cbdad0;
+  --piano-roll-ruler-bg: #e9f0ec; --piano-roll-ruler-text: #315447;
+  --piano-roll-beat-text: #5d7366; --piano-roll-velocity-bg: #eef4f0;
+  --piano-roll-inactive-loop: rgba(29, 55, 42, .08);
+  --piano-roll-note: #5aa897; --piano-roll-note-border: #287564; --piano-roll-note-text: #102f27;
+  --piano-roll-selected-note: #e1aa69; --piano-roll-selected-note-border: #91612e; --piano-roll-selected-note-text: #38230e;
+  --piano-roll-outside-note: #cf9955; --piano-roll-outside-note-border: #765123;
+  --piano-roll-playhead: #b8463e; --piano-roll-selection: rgba(39, 102, 87, .16);
+  min-width: 0; border: 1px solid var(--p-line); border-radius: 12px; overflow: hidden; background: var(--p-surface); color: var(--p-ink);
+}
+:root[data-theme="dark"] .harmony-workspace .piano-roll-card {
+  --piano-roll-grid-bg: #1b2821; --piano-roll-grid-row: #24342b;
+  --piano-roll-strong-line: #526b5c; --piano-roll-line: #33463a;
+  --piano-roll-measure-line: #769384; --piano-roll-beat-line: #40584a;
+  --piano-roll-ruler-bg: #25352c; --piano-roll-ruler-text: #d4e6d9;
+  --piano-roll-beat-text: #aec4b5; --piano-roll-velocity-bg: #202e25;
+  --piano-roll-inactive-loop: rgba(8, 16, 11, .25);
+  --piano-roll-note: #67b8a5; --piano-roll-note-border: #a3d8c9; --piano-roll-note-text: #10251e;
+  --piano-roll-selected-note: #e4b578; --piano-roll-selected-note-border: #f4ce9d; --piano-roll-selected-note-text: #30210f;
+  --piano-roll-outside-note: #d4a366; --piano-roll-outside-note-border: #f1c98f;
+  --piano-roll-playhead: #fa8f82; --piano-roll-selection: rgba(163, 216, 201, .22);
+}
+.harmony-editor-panel .piano-roll-card { display: flex; flex: 1; flex-direction: column; min-height: 0; }
+.harmony-editor-panel .piano-roll-card-header { flex: 0 0 auto; padding-block: 10px; }
+.harmony-editor-panel .piano-roll-card-header > div { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.harmony-editor-panel .piano-roll-toolbar { flex: 0 0 auto; padding-block: 8px; }
+.harmony-editor-panel .piano-roll-keyboard-help { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.harmony-editor-panel .piano-roll-workspace { flex: 1; min-height: 0; grid-template-rows: 30px minmax(0, 1fr) 52px; }
+.harmony-editor-panel .piano-roll-help { flex: 0 0 auto; padding-block: 6px; }
+@media (min-width: 701px) {
+  .harmony-workspace:has(.harmony-editor-panel) .harmony-account-bar { padding-bottom: 2px; gap: 16px; }
+  .harmony-workspace:has(.harmony-editor-panel) .harmony-account-bar :is(.theme-toggle, .account-nav button, .account-nav a) { min-height: 36px; padding-block: 5px; font-size: 12px; }
+  .harmony-workspace:has(.harmony-editor-panel) .harmony-intro { margin-bottom: 4px; }
+  .harmony-workspace:has(.harmony-editor-panel) .harmony-intro h1 { font-size: 24px; }
+  .harmony-workspace:has(.harmony-editor-panel) .harmony-intro .product-button { min-height: 36px; padding: 6px 12px; font-size: 12px; }
+  .harmony-workspace:has(.harmony-editor-panel) .harmony-toolbar { flex-wrap: nowrap; padding-block: 6px; gap: 8px; }
+  .harmony-workspace:has(.harmony-editor-panel) .harmony-toolbar .product-button { min-height: 36px; padding: 6px 10px; font-size: 12px; }
+  .harmony-workspace:has(.harmony-editor-panel) .harmony-instrument { gap: 5px; font-size: 11px; }
+  .harmony-workspace:has(.harmony-editor-panel) .harmony-instrument select { min-height: 36px; max-width: 148px; font-size: 11px; }
+  .harmony-workspace:has(.harmony-editor-panel) .harmony-panel-nav { gap: 8px; }
+  .harmony-workspace:has(.harmony-editor-panel) .harmony-panel-nav a { min-height: 36px; padding-inline: 6px; font-size: 11px; white-space: nowrap; }
+  /* A escolha da camada e as ferramentas ocupam só o necessário; a grade recebe a altura livre. */
+  .harmony-workspace:has(.harmony-editor-panel) .harmony-editor-panel .harmony-editor-actions { gap: 6px; margin-bottom: 5px; font-size: 11px; }
+  .harmony-workspace:has(.harmony-editor-panel) .harmony-editor-panel .harmony-editor-actions select { min-height: 26px; padding: 3px 22px 3px 6px; font-size: 11px; }
+  .harmony-workspace:has(.harmony-editor-panel) .piano-roll-card-header { gap: 8px; padding: 5px 12px; }
+  .harmony-workspace:has(.harmony-editor-panel) .piano-roll-card-header > div { gap: 8px; }
+  .harmony-workspace:has(.harmony-editor-panel) .piano-roll-card-header h2 { font-size: 16px; }
+  .harmony-workspace:has(.harmony-editor-panel) .piano-roll-subtitle,
+  .harmony-workspace:has(.harmony-editor-panel) .piano-roll-state { font-size: 11px; }
+  .harmony-workspace:has(.harmony-editor-panel) .piano-roll-toolbar { gap: 6px; padding: 2px 12px; font-size: 11px; }
+  .harmony-workspace:has(.harmony-editor-panel) .piano-roll-control { gap: 4px; }
+  .harmony-workspace:has(.harmony-editor-panel) .piano-roll-toolbar :is(button, select, input) { min-height: 26px; padding: 3px 6px; border-radius: 4px; font-size: 11px; }
+  .harmony-workspace:has(.harmony-editor-panel) .piano-roll-toolbar input { width: 46px; }
+  .harmony-workspace:has(.harmony-editor-panel) .piano-roll-zoom { gap: 4px; font-size: 11px; }
+  .harmony-workspace:has(.harmony-editor-panel) .piano-roll-zoom button { min-width: 26px; padding-inline: 0; }
+  .harmony-workspace:has(.harmony-editor-panel) .piano-roll-workspace { grid-template-rows: 26px minmax(0, 1fr) 42px; }
+  .harmony-workspace:has(.harmony-editor-panel) .piano-roll-help { padding: 4px 12px; }
+  .harmony-workspace:has(.harmony-editor-panel) #harmony-panel { padding-top: 4px; }
+}
+.piano-roll-card-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px; }
+.piano-roll-card-header h2 { margin: 0; font-size: 20px; }
+.piano-roll-card-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-left: auto; }
+.piano-roll-expand { min-height: 44px; padding: 6px 12px; border: 1px solid var(--p-line); border-radius: 4px; background: var(--p-surface); color: var(--p-ink); font: inherit; cursor: pointer; }
+.piano-roll-expand:hover { background: var(--p-surface-alt); }
+.piano-roll-expand:focus-visible { outline: 2px solid var(--p-accent); outline-offset: 2px; }
+.piano-roll-subtitle, .piano-roll-state, .piano-roll-help, .piano-roll-keyboard-help { color: var(--p-muted); font-size: 14px; }
+.piano-roll-keyboard-help, .piano-roll-help { padding: 12px 16px; margin: 0; }
+.piano-roll-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 16px; border-block: 1px solid var(--p-line); }
+.piano-roll-control { display: flex; gap: 6px; align-items: center; }
+.piano-roll-toolbar button, .piano-roll-toolbar select, .piano-roll-toolbar input { min-height: 44px; border: 1px solid var(--p-line); border-radius: 6px; background: var(--p-surface); color: var(--p-ink); padding: 6px 10px; font: inherit; }
+.piano-roll-toolbar input { width: 72px; }
+.piano-roll-toolbar button:disabled { opacity: .5; }
+.piano-roll-toolbar :focus-visible { outline: 2px solid var(--p-accent); outline-offset: 2px; }
+.piano-roll-zoom { display: flex; align-items: center; gap: 6px; }
+.piano-roll-workspace { display: grid; grid-template-columns: 78px minmax(0, 1fr); grid-template-rows: 36px minmax(240px, 42vh) 92px; overflow: hidden; background: var(--p-surface); }
+.piano-roll-ruler { grid-column: 2; position: relative; overflow: hidden; border-bottom: 1px solid var(--p-line); touch-action: none; }
+.piano-roll-ruler canvas, .piano-roll-velocity-wrap canvas { display: block; transform-origin: left top; }
+.piano-roll-keyboard { grid-row: 2; overflow: hidden; border-right: 1px solid var(--p-line); }
+.piano-roll-key-list { transform-origin: left top; }
+.piano-roll-key { display: block; width: 100%; height: var(--piano-roll-row-height); padding: 0 8px; border: 0; border-bottom: 1px solid var(--p-line); font: 600 11px system-ui; text-align: right; cursor: pointer; }
+.piano-roll-key.is-white { background: var(--p-surface-alt); color: var(--p-ink); }
+.piano-roll-key.is-black { width: 86%; background: var(--p-key-black); color: #fff; }
+.piano-roll-key:focus-visible { outline: 2px solid var(--p-accent); outline-offset: -2px; }
+.piano-roll-canvas-wrap { position: relative; grid-row: 2; overflow: auto; overscroll-behavior: contain; }
+.piano-roll-canvas-wrap canvas { display: block; cursor: crosshair; touch-action: none; }
+.piano-roll-canvas-wrap canvas:focus-visible { outline: 2px solid var(--p-accent); outline-offset: -2px; }
+.piano-roll-playhead { position: absolute; z-index: 3; top: 0; width: 2px; background: var(--piano-roll-playhead, var(--p-accent)); pointer-events: none; }
+.piano-roll-loop-boundary { display: none; }
+.piano-roll-velocity-label { display: grid; place-items: center; border-top: 1px solid var(--p-line); font-size: 12px; }
+.piano-roll-velocity-wrap { grid-column: 2; overflow: hidden; border-top: 1px solid var(--p-line); }
+.piano-roll-score { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* O card ampliado conserva o mesmo Canvas e cobre a janela sem alterar a música. */
+.harmony-workspace .piano-roll-card.is-expanded { position: fixed; z-index: 100; inset: 0; box-sizing: border-box; width: var(--p-screen-width); height: var(--p-screen-height-dynamic); max-height: var(--p-screen-height-dynamic); flex: none; margin: 0; border: 0; border-radius: 0; box-shadow: var(--p-shadow); }
+@media (min-width: 701px) {
+  .harmony-workspace:has(.harmony-editor-panel) .piano-roll-expand { min-height: 26px; padding: 3px 8px; font-size: 11px; }
+}
+@media (max-width: 620px) {
+  .piano-roll-card-header { align-items: flex-start; flex-direction: column; }
+  .piano-roll-workspace { grid-template-columns: 54px minmax(0, 1fr); }
+  .harmony-account-bar { justify-content: flex-start; }
+  .harmony-recovery-summary { align-items: stretch; flex-direction: column; }
+}
+
+/* Biblioteca, formulários e ajustes acompanham a escala compacta do editor. */
+@media (min-width: 861px) {
+  .music-page { padding: clamp(28px, 4vw, 56px) clamp(18px, 3vw, 48px) 48px; }
+  .music-page .music-shell { max-width: 960px; }
+  .music-page .music-form-shell { max-width: 576px; }
+  .music-page h1 { font-size: clamp(26px, 3vw, 34px); }
+  .music-page h2 { font-size: 18px; }
+  .music-page .product-button { min-height: 38px; padding: 7px 14px; font-size: 12px; }
+  .music-page input:not([type="submit"]):not([type="checkbox"]), .music-page select { min-height: 38px; padding: 8px 10px; font-size: 13px; }
+  .music-library-heading { margin-bottom: 28px; }
+  .music-filters { margin-bottom: 18px; }
+  .music-row { gap: 16px; padding-block: 16px; }
+  .music-project-heading { margin: 28px 0 34px; }
+  .music-path { min-height: 72px; padding-block: 16px; }
+  .music-more { margin-top: 24px; }
+  .music-form { gap: 22px; }
+  /* Ajustes e sugestões seguem a coluna estreita da referência em telas largas. */
+  .harmony-workspace:has(#harmony-panel .harmony-settings-panel) .harmony-shell { max-width: 780px; }
+  .harmony-workspace:has(.harmony-settings-panel) .harmony-toolbar { gap: 8px 12px; padding-block: 8px; }
+  .harmony-workspace:has(.harmony-settings-panel) .harmony-toolbar .product-button { min-height: 38px; padding: 7px 12px; font-size: 12px; }
+  .harmony-workspace:has(.harmony-settings-panel) .harmony-panel-nav { gap: 8px; }
+  .harmony-workspace:has(.harmony-settings-panel) .harmony-panel-nav a { min-height: 38px; font-size: 12px; }
+}

@@ -1,0 +1,10 @@
+<%# Recebe entry (:lesson, :completed) e number do index; não consulta nem altera progresso. %>
+<li data-controller="bard-travel" class="bard-journey-stop" data-lesson-slug="<%= entry[:lesson].slug %>" data-completed="<%= entry[:completed] %>">
+  <%= render "bard_path/scenery" %>
+  <div class="bard-journey-sign">
+    <span class="bard-journey-status">Parada <%= number %> · <%= entry[:completed] ? "Concluída" : "Disponível" %></span>
+    <h2><%= link_to entry[:lesson].title, bard_path_lesson_path(slug: entry[:lesson].slug), class: "bard-journey-lesson-link", data: { action: "click->bard-travel#enter" } %></h2>
+    <p><%= entry[:lesson].summary %></p>
+    <span class="bard-journey-note"><%= entry[:completed] ? "Uma descoberta para revisitar." : "Entre e descubra uma nova parte da música." %></span>
+  </div>
+</li>

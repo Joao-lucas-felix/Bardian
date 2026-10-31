@@ -1,0 +1,6 @@
+<%# Agrupa seletor e sequência como uma tela única, substituída pelos painéis do menu. %>
+<div class="harmony-guided-panel">
+  <%= render "harmony/chord_wheel", options: options %>
+  <%= render "harmony/slot_actions" if local_assigns[:saved] %>
+  <%= render "harmony/lane", external_transport: local_assigns[:saved] %>
+</div>

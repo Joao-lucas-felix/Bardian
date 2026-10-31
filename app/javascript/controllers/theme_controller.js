@@ -2,18 +2,22 @@ import { Controller } from "@hotwired/stimulus"
 
 /**
  * Alterna o tema visual global e preserva a escolha no navegador.
- * A preferência do sistema é usada apenas quando o usuário ainda não escolheu um tema.
+ * O tema de estúdio escuro é o padrão; uma escolha explícita anterior tem prioridade.
  */
 export default class extends Controller {
   static targets = ["toggle", "label"]
 
-  /** Aplica a preferência salva ou a preferência escura do sistema. @returns {void} */
+  /** Aplica a preferência salva, tolerando navegadores que bloqueiam armazenamento. @returns {void} */
   connect() {
     this.documentElement = document.documentElement
-    this.storage = window.localStorage
-    const storedTheme = this.storage.getItem("bardian-theme")
-    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
-    this.setTheme(storedTheme || systemTheme, false)
+    let storedTheme
+    try {
+      this.storage = window.localStorage
+      storedTheme = this.storage.getItem("bardian-theme")
+    } catch {
+      this.storage = null
+    }
+    this.setTheme(storedTheme === "light" ? "light" : "dark", false)
   }
 
   /** Alterna entre claro e escuro após uma ação explícita. @returns {void} */
@@ -30,7 +34,10 @@ export default class extends Controller {
    */
   setTheme(theme, persist = true) {
     this.documentElement.dataset.theme = theme
-    if (persist) this.storage.setItem("bardian-theme", theme)
+    // A escolha continua funcionando na sessão mesmo quando a persistência é bloqueada.
+    if (persist) {
+      try { this.storage?.setItem("bardian-theme", theme) } catch { /* Preferência aplicada apenas nesta página. */ }
+    }
     if (!this.hasToggleTarget) return
 
     const dark = theme === "dark"

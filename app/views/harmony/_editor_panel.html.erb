@@ -1,0 +1,10 @@
+<%# Monta a superfície existente sem transporte Tone; documento e histórico pertencem ao shell, que já oferece desfazer e refazer. %>
+<section class="harmony-editor-panel" aria-label="Piano roll">
+  <div class="harmony-editor-actions">
+    <label>Camada editada <select data-harmony-target="layer" data-action="change->harmony#changeLayer"><option value="realization">Acordes da timeline</option><option value="additional">Notas adicionadas por você</option></select></label>
+    <p>As alterações ficam na música. Use Salvar para guardá-las.</p>
+  </div>
+  <div data-harmony-target="editorMount">
+    <template><%= render "harmony/piano_roll_editor", editor_title: "Piano roll", audio_enabled: false, external_transport: true %></template>
+  </div>
+</section>

@@ -7,11 +7,11 @@ module Music
     TICKS_PER_QUARTER = 480
     VALID_DENOMINATORS = [ 1, 2, 4, 8, 16, 32, 64 ].freeze
 
-    attr_reader :id, :name, :bpm, :time_signature, :tracks, :loop_range
+    attr_reader :id, :name, :bpm, :time_signature, :tracks, :loop_range, :context, :harmony_blocks
 
     # Recebe faixas, métrica e marcadores opcionais; rejeita limites e IDs inválidos.
     # loop_range usa ticks absolutos e nil preserva o contrato anterior.
-    def initialize(id:, name:, bpm:, time_signature:, tracks:, loop_range: nil)
+    def initialize(id:, name:, bpm:, time_signature:, tracks:, loop_range: nil, context: nil, harmony_blocks: nil)
       @id = Contract.label(id, "id")
       @name = Contract.label(name, "name")
       @bpm = Contract.number(bpm, "bpm", min: 0, exclusive_min: true)
@@ -25,6 +25,8 @@ module Music
 
         track
       end.freeze
+      raise ArgumentError, "context inválido" if context && !context.is_a?(MusicalContext)
+      @context = context
       if loop_range
         raise ArgumentError, "loop inválido" unless loop_range.is_a?(Hash) &&
           loop_range.keys.sort == [ "end_tick", "start_tick" ]
@@ -35,6 +37,15 @@ module Music
 
         @loop_range = { "start_tick" => start_tick, "end_tick" => end_tick }.freeze
       end
+      @harmony_blocks = harmony_blocks&.dup&.freeze
+      unless @harmony_blocks.nil?
+        raise ArgumentError, "limite de 32 blocos" unless @harmony_blocks.is_a?(Array) && @harmony_blocks.length <= 32
+        expected = 0
+        @harmony_blocks.each do |block|
+          raise ArgumentError, "blocos devem ser contíguos desde zero" unless block.is_a?(HarmonyBlock) && block.onset_tick == expected
+          expected += block.duration_ticks
+        end
+      end
       validate_unique_ids!
       freeze
     end
@@ -43,12 +54,19 @@ module Music
     def self.from_h(data)
       raise ArgumentError, "versão do contrato desconhecida" unless Contract.required(data, "version") == VERSION
       raise ArgumentError, "loop inválido" if data.key?("loop") && !data["loop"].is_a?(Hash)
+      raise ArgumentError, "context inválido" if data.key?("context") && !data["context"].is_a?(Hash)
 
+      blocks = nil
+      if data.key?("harmony")
+        harmony = data["harmony"]
+        raise ArgumentError, "harmonia inválida" unless harmony.is_a?(Hash) && harmony.keys == [ "blocks" ]
+        blocks = Contract.items(harmony["blocks"], "blocks").map { |block| HarmonyBlock.from_h(block) }
+      end
       tracks = Contract.items(Contract.required(data, "tracks"), "tracks").map { |track| Track.from_h(track) }
       new(id: Contract.required(data, "id"), name: Contract.required(data, "name"),
         bpm: Contract.required(data, "bpm"),
         time_signature: Contract.required(data, "time_signature"), tracks: tracks,
-        loop_range: data["loop"])
+        loop_range: data["loop"], context: data["context"] && MusicalContext.from_h(data["context"]), harmony_blocks: blocks)
     end
 
     # Calcula ticks por batida a partir da semínima fixa; BPM muda segundos, não posições.
@@ -61,6 +79,8 @@ module Music
       result = { "version" => VERSION, "id" => id, "name" => name, "bpm" => bpm,
         "time_signature" => time_signature.dup, "tracks" => tracks.map(&:to_h) }
       result["loop"] = loop_range.dup if loop_range
+      result["context"] = context.to_h if context
+      result["harmony"] = { "blocks" => harmony_blocks.map(&:to_h) } unless harmony_blocks.nil?
       result
     end
 
@@ -68,7 +88,7 @@ module Music
 
     # IDs únicos evitam que seleção ou atualização alcance a entidade errada.
     def validate_unique_ids!
-      ids = [ id ]
+      ids = [ id ] + (harmony_blocks || []).map(&:id)
       tracks.each do |track|
         ids << track.id
         track.regions.each do |region|

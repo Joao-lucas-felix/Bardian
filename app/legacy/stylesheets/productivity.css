@@ -1,0 +1,717 @@
+/* Direção de produto: leitura clara, ações diretas e uma linguagem para aprender e criar. */
+:root {
+  color-scheme: light;
+  --p-bg: #f6f7fa;
+  --p-surface: #fff;
+  --p-surface-alt: #f0f2f7;
+  --p-ink: #202536;
+  --p-muted: #5b6475;
+  --p-line: #dfe3eb;
+  --p-accent: #b93830;
+  --p-accent-hover: #982f29;
+  --p-accent-soft: #fcebe8;
+  --p-shadow: 0 18px 44px rgba(29, 42, 70, .08);
+  --p-ease: cubic-bezier(.2, .75, .25, 1);
+  --p-fast: 160ms;
+  --p-medium: 240ms;
+  --p-font: "Lato", "Segoe UI", Arial, sans-serif;
+  --bard-surface: var(--p-bg);
+  --bard-panel: var(--p-surface);
+  --bard-panel-muted: var(--p-surface-alt);
+  --bard-text: var(--p-ink);
+  --bard-text-muted: var(--p-muted);
+  --bard-border: var(--p-line);
+  --bard-accent: var(--p-accent);
+  --bard-accent-soft: var(--p-accent-soft);
+  --bard-shadow: var(--p-shadow);
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --p-bg: #151a24;
+  --p-surface: #202735;
+  --p-surface-alt: #293244;
+  --p-ink: #f3f5fa;
+  --p-muted: #c0c8d6;
+  --p-line: #394355;
+  --p-accent: #ff8b7d;
+  --p-accent-hover: #ffac9f;
+  --p-accent-soft: #493138;
+  --p-shadow: 0 18px 48px rgba(0, 0, 0, .28);
+  --bard-surface: var(--p-bg);
+  --bard-panel: var(--p-surface);
+  --bard-panel-muted: var(--p-surface-alt);
+  --bard-text: var(--p-ink);
+  --bard-text-muted: var(--p-muted);
+  --bard-border: var(--p-line);
+  --bard-accent: var(--p-accent);
+  --bard-accent-soft: var(--p-accent-soft);
+  --bard-shadow: var(--p-shadow);
+}
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--p-bg); color: var(--p-ink); font-family: var(--p-font); }
+body, button, input, select { font-family: var(--p-font); }
+::selection { background: var(--p-accent-soft); color: var(--p-ink); }
+:where(a, button, input, select, summary, [tabindex="0"]):focus-visible { outline: 3px solid var(--p-accent); outline-offset: 3px; }
+.icon-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.ui-icon { width: 20px; height: 20px; flex: 0 0 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* A navegação global usa uma rail fixa para liberar altura e deixar a jornada sempre visível. */
+:root { --p-sidebar-width: 218px; }
+.product-header { position: fixed; z-index: 40; inset: 0 auto 0 0; width: var(--p-sidebar-width); background: var(--p-surface); border-right: 1px solid var(--p-line); }
+.product-sidebar { box-sizing: border-box; height: 100%; padding: 22px 14px 16px; display: flex; flex-direction: column; overflow-y: auto; }
+.product-brand { display: inline-flex; align-items: center; gap: 10px; padding: 3px 8px 20px; color: var(--p-ink); text-decoration: none; }
+.product-brand-mark { display: inline-grid; place-items: center; width: 36px; height: 36px; flex: 0 0 36px; border-radius: 10px; background: var(--p-accent); color: #fff; font-size: 21px; font-weight: 900; line-height: 1; }
+.product-brand-copy { display: grid; gap: 1px; }
+.product-brand-copy strong { font-size: 17px; letter-spacing: -.03em; }
+.product-brand-copy small { color: var(--p-muted); font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.product-nav-caption { margin: 8px 10px 7px; color: var(--p-muted); font-size: 10px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.product-nav { display: grid; gap: 3px; }
+.product-nav-link { position: relative; display: flex; align-items: center; gap: 10px; min-height: 39px; padding: 0 10px; border-radius: 8px; color: var(--p-muted); font-size: 13px; font-weight: 800; text-decoration: none; transition: background .16s ease, color .16s ease, transform .16s ease; }
+.product-nav-link:hover, .product-nav-link:focus-visible { background: var(--p-surface-alt); color: var(--p-ink); transform: translateX(2px); }
+.product-nav-link.is-current { background: var(--p-accent-soft); color: var(--p-accent); }
+.product-nav-link.is-current::before { position: absolute; left: -14px; width: 3px; height: 22px; border-radius: 0 4px 4px 0; background: var(--p-accent); content: ""; }
+.product-nav-link .ui-icon { width: 17px; height: 17px; flex-basis: 17px; }
+.product-sidebar-footer { display: grid; gap: 12px; margin-top: auto; padding-top: 20px; border-top: 1px solid var(--p-line); }
+.product-journey-meter { display: grid; gap: 7px; padding: 10px; border: 1px solid var(--p-line); border-radius: 9px; background: var(--p-surface-alt); }
+.product-journey-meter-label { color: var(--p-muted); font-size: 10px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.product-journey-meter-track { display: flex; gap: 4px; }
+.product-journey-meter-track i { height: 4px; flex: 1; border-radius: 99px; background: var(--p-line); }
+.product-journey-meter-track i:first-child, .product-journey-meter-track i:nth-child(2) { background: var(--p-accent); }
+.product-header .theme-control { position: static; }
+.product-header .theme-toggle { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 34px; padding: 0 10px; border: 1px solid transparent; border-radius: 8px; box-shadow: none; color: var(--p-muted); font-size: 12px; white-space: nowrap; }
+.product-header .theme-toggle:hover { border-color: var(--p-line); background: var(--p-surface-alt); }
+.product-header .theme-toggle .ui-icon { width: 16px; height: 16px; flex-basis: 16px; }
+.product-header .account-nav { display: grid; gap: 2px; }
+.product-header .account-nav a, .product-header .account-nav button { padding: 6px 10px; border: 0; border-radius: 7px; background: transparent; color: var(--p-muted); font-size: 12px; font-weight: 800; text-align: left; }
+.product-header .account-nav a:hover, .product-header .account-nav button:hover { background: var(--p-surface-alt); color: var(--p-ink); }
+.product-mobile-toggle, .product-sidebar-backdrop { display: none; }
+.product-app > main { min-height: 100svh; margin-left: var(--p-sidebar-width); animation: product-page-enter var(--p-medium) var(--p-ease) both; }
+.flash-messages { top: 18px; left: calc(var(--p-sidebar-width) + 20px); }
+
+@keyframes product-page-enter {
+  from { opacity: .82; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* A página inicial mostra os dois primeiros trabalhos possíveis antes da explicação. */
+.portal-page { min-height: calc(100svh - 72px); padding: 0 clamp(20px, 4vw, 64px) 96px; background: var(--p-bg); color: var(--p-ink); font-family: var(--p-font); }
+.portal-shell { width: min(100%, 1240px); }
+.portal-intro { display: grid; grid-template-columns: minmax(0, 1.04fr) minmax(360px, .96fr); gap: clamp(44px, 6vw, 90px); align-items: center; max-width: none; margin: 0; padding: clamp(70px, 10vw, 140px) 0 clamp(70px, 8vw, 110px); }
+.portal-intro-copy { max-width: 660px; }
+.portal-intro-label { margin: 0 0 18px !important; color: var(--p-accent) !important; font-size: 13px !important; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.portal-intro-label { display: none; }
+.portal-intro h1 { max-width: 13ch; margin: 0 0 22px; color: var(--p-ink); font-size: clamp(46px, 5.2vw, 78px); font-weight: 900; line-height: 1.02; letter-spacing: -.035em; text-wrap: balance; }
+.portal-intro-copy > p:last-of-type { max-width: 48ch; color: var(--p-muted); font-size: clamp(18px, 1.6vw, 21px); line-height: 1.55; }
+.portal-hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+.product-button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 18px; border-radius: 9px; font-size: 14px; font-weight: 800; text-decoration: none; transition: transform var(--p-fast) var(--p-ease), box-shadow var(--p-fast) var(--p-ease), background-color var(--p-fast) ease, border-color var(--p-fast) ease, color var(--p-fast) ease; }
+.product-button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(29, 42, 70, .1); }
+.product-button:active { transform: translateY(0); box-shadow: none; }
+.product-button-primary { background: var(--p-accent); color: #fff; }
+.product-button-primary:hover { background: var(--p-accent-hover); color: #fff; }
+.product-button-secondary { border: 1px solid var(--p-line); background: var(--p-surface); color: var(--p-ink); }
+.product-button-secondary:hover { border-color: var(--p-accent); color: var(--p-accent); }
+.product-button .ui-icon { width: 17px; height: 17px; flex-basis: 17px; }
+.portal-hero-demo { min-width: 0; padding: 0; border: 1px solid var(--p-line); border-radius: 16px; background: var(--p-surface); box-shadow: var(--p-shadow); overflow: hidden; transform: rotate(-2deg); }
+.portal-demo-bar, .portal-demo-footer { display: flex; align-items: center; gap: 10px; min-height: 55px; padding: 0 20px; color: var(--p-ink); font-size: 13px; font-weight: 800; }
+.portal-demo-bar { border-bottom: 1px solid var(--p-line); }
+.portal-demo-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--p-accent); }
+.portal-demo-label { margin-left: auto; color: var(--p-muted); font-size: 11px; font-weight: 700; }
+.portal-demo-staff { position: relative; height: clamp(250px, 26vw, 330px); margin: 20px; border-radius: 8px; background: repeating-linear-gradient(to bottom, transparent 0 47px, var(--p-line) 48px); }
+.portal-demo-note { position: absolute; height: 34px; border-radius: 7px; background: var(--p-accent); box-shadow: 0 5px 12px rgba(141, 55, 55, .15); }
+.portal-demo-note.is-one { top: 190px; left: 6%; width: 20%; }
+.portal-demo-note.is-two { top: 142px; left: 29%; width: 27%; background: #7868b7; }
+.portal-demo-note.is-three { top: 95px; left: 59%; width: 17%; background: #497b9c; }
+.portal-demo-note.is-four { top: 142px; left: 79%; width: 16%; }
+.portal-demo-footer { border-top: 1px solid var(--p-line); color: var(--p-muted); font-size: 12px; }
+.portal-demo-footer .ui-icon { color: var(--p-accent); }
+.portal-destinations { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; border: 0; }
+.portal-destination { display: flex; align-items: flex-start; gap: 14px; min-width: 0; padding: 22px; border: 1px solid var(--p-line); border-radius: 13px; background: var(--p-surface); color: var(--p-muted); box-shadow: none; transition: border-color 160ms ease, transform 160ms ease; }
+.portal-destination:hover { padding-left: 22px; border-color: var(--p-accent); background: var(--p-surface); transform: translateY(-3px); }
+.portal-destination-icon { display: grid; place-items: center; width: 38px; height: 38px; flex: 0 0 38px; border-radius: 10px; background: var(--p-accent-soft); color: var(--p-accent); }
+.portal-destination-copy { display: grid; gap: 7px; line-height: 1.45; }
+.portal-destination-name { color: var(--p-ink); font-size: 17px; font-weight: 800; }
+.portal-destination > .ui-icon { width: 17px; height: 17px; flex-basis: 17px; margin-left: auto; color: var(--p-accent); }
+
+/* CRUD de composições: mantém formulários legíveis sem misturar regras musicais à view. */
+.compositions-page { min-height: calc(100svh - 72px); padding: 48px clamp(20px, 4vw, 64px) 96px; background: var(--p-bg); color: var(--p-ink); }
+.compositions-shell { width: min(100%, 900px); margin: 0 auto; }
+.compositions-heading { margin-bottom: 32px; }
+.compositions-eyebrow { margin: 12px 0 8px; color: var(--p-accent); font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+.compositions-heading h1 { margin: 0 0 10px; font-size: clamp(34px, 4vw, 54px); line-height: 1.1; letter-spacing: -.035em; }
+.compositions-heading p:last-child { color: var(--p-muted); line-height: 1.5; }
+.compositions-back { color: var(--p-accent); font-weight: 700; text-decoration: none; }
+.compositions-panel { margin: 22px 0; padding: clamp(20px, 3vw, 32px); border: 1px solid var(--p-line); border-radius: 14px; background: var(--p-surface); box-shadow: var(--p-shadow); }
+.compositions-panel h2, .compositions-list h2 { margin: 0 0 20px; font-size: 21px; }
+.compositions-create-form, .compositions-details-form { display: grid; gap: 12px; }
+.compositions-create-form label, .compositions-field label { font-weight: 700; }
+.compositions-create-form input[type="text"], .compositions-field input, .compositions-field select { width: 100%; min-height: 44px; padding: 9px 12px; border: 1px solid var(--p-line); border-radius: 8px; background: var(--p-surface); color: var(--p-ink); box-sizing: border-box; }
+.compositions-create-form .product-button, .compositions-details-form .product-button { width: fit-content; border: 0; cursor: pointer; }
+.compositions-details-form { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.compositions-field { display: grid; gap: 7px; }
+.compositions-field:first-of-type, .compositions-save-state, .compositions-details-form .product-button { grid-column: 1 / -1; }
+.compositions-save-state { margin: 0; color: var(--p-muted); font-size: 14px; }
+.compositions-list { margin-top: 38px; }
+.compositions-cards { display: grid; gap: 12px; }
+.compositions-card { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 18px 22px; border: 1px solid var(--p-line); border-radius: 11px; background: var(--p-surface); transition: transform var(--p-fast) var(--p-ease), border-color var(--p-fast) ease, box-shadow var(--p-fast) ease; }
+.compositions-card:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--p-accent) 45%, var(--p-line)); box-shadow: var(--p-shadow); }
+.compositions-card h3 { margin: 0 0 5px; font-size: 18px; }
+.compositions-card h3 a { color: var(--p-ink); text-decoration: none; }
+.compositions-card h3 a:hover, .compositions-open:hover { color: var(--p-accent); }
+.compositions-card p, .compositions-empty { margin: 0; color: var(--p-muted); }
+.compositions-open { flex: 0 0 auto; color: var(--p-accent); font-weight: 800; text-decoration: none; }
+.compositions-error { padding: 14px 18px; border: 1px solid var(--p-accent); border-radius: 8px; background: var(--p-accent-soft); color: var(--p-ink); }
+.compositions-danger { margin-top: 28px; }
+.compositions-danger button { min-height: 42px; padding: 0 14px; border: 1px solid var(--p-accent); border-radius: 8px; background: transparent; color: var(--p-accent); font-weight: 800; cursor: pointer; }
+/* A timeline separa controles fixos de uma superfície temporal que pode rolar. */
+.compositions-editor-shell { width: min(100%, 1280px); }
+.composition-timeline { margin-top: 30px; border: 1px solid var(--p-line); border-radius: 14px; background: var(--p-surface); box-shadow: var(--p-shadow); overflow: hidden; }
+.composition-timeline-heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 24px 28px 15px; }
+.composition-timeline-heading h2 { margin: 0 0 4px; font-size: 24px; }
+.composition-timeline-heading p, .composition-timeline-help { margin: 0; color: var(--p-muted); font-size: 13px; line-height: 1.5; }
+.composition-timeline-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.composition-timeline-actions .product-button { border: 1px solid var(--p-line); cursor: pointer; }
+/* O transporte fica fora da área rolável; a agulha usa apenas a coordenada da régua. */
+.composition-transport { display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; padding: 0 28px 16px; }
+.composition-transport-buttons, .composition-loop-fields { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.composition-transport-buttons .product-button { cursor: pointer; }
+.composition-transport-primary svg { width: 16px; height: 16px; flex: 0 0 16px; }
+.composition-transport-primary:disabled { opacity: .6; cursor: wait; }
+.composition-loop-fields label { display: inline-flex; align-items: center; gap: 5px; color: var(--p-muted); font-size: 12px; font-weight: 700; }
+.composition-loop-fields input { width: 78px; padding: 6px; border: 1px solid var(--p-line); border-radius: 6px; background: var(--p-surface); color: var(--p-ink); font: inherit; }
+.composition-transport-status { color: var(--p-muted); font-size: 12px; font-weight: 700; }
+.composition-timeline-zoom { display: flex; align-items: center; gap: 6px; border: 1px solid var(--p-line); border-radius: 8px; }
+.composition-timeline-zoom button { width: 34px; height: 34px; border: 0; background: transparent; color: var(--p-ink); font-size: 20px; cursor: pointer; }
+.composition-timeline-zoom span { min-width: 42px; text-align: center; font-size: 12px; font-weight: 800; }
+.composition-timeline-help { padding: 0 28px 18px; }
+.composition-timeline-scroll { overflow: auto; max-height: 620px; border-top: 1px solid var(--p-line); }
+.composition-timeline-ruler, .composition-track-row { display: flex; width: max-content; min-width: 100%; }
+.composition-timeline-ruler { position: sticky; top: 0; z-index: 3; min-height: 35px; background: var(--p-surface-alt); }
+.composition-ruler-label, .composition-track-controls { position: sticky; left: 0; z-index: 2; flex: 0 0 248px; box-sizing: border-box; border-right: 1px solid var(--p-line); }
+.composition-ruler-label { z-index: 4; padding: 10px 15px; color: var(--p-muted); background: var(--p-surface-alt); font-size: 11px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+.composition-ruler-marks { position: relative; display: flex; flex: none; }
+.composition-playhead { position: absolute; top: 0; bottom: 0; left: 0; width: 2px; background: var(--p-accent); z-index: 1; pointer-events: none; }
+.composition-loop-handle { position: absolute; top: 2px; z-index: 2; width: 15px; height: 29px; padding: 0; border: 2px solid var(--p-accent); border-radius: 4px; background: var(--p-surface); cursor: ew-resize; transform: translateX(-50%); }
+.composition-loop-end { border-color: var(--p-ink); }
+.composition-loop-handle:focus-visible { outline: 3px solid var(--p-accent); outline-offset: 2px; }
+.composition-ruler-mark { box-sizing: border-box; padding: 10px 9px; border-left: 1px solid var(--p-line); color: var(--p-muted); font-size: 11px; font-weight: 800; }
+.composition-track-row { border-top: 1px solid var(--p-line); }
+.composition-track-controls { display: grid; gap: 7px; padding: 12px; background: var(--p-surface); }
+.composition-track-name, .composition-track-instrument { box-sizing: border-box; width: 100%; min-height: 33px; padding: 5px 8px; border: 1px solid var(--p-line); border-radius: 6px; background: var(--p-surface); color: var(--p-ink); font: inherit; font-size: 13px; }
+.composition-track-name { font-weight: 800; }
+.composition-track-volume { width: 100%; accent-color: var(--p-accent); }
+.composition-track-switches, .composition-track-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.composition-track-switch { display: flex; align-items: center; gap: 3px; color: var(--p-muted); font-size: 11px; font-weight: 700; }
+.composition-track-switch input { accent-color: var(--p-accent); }
+.composition-mini-button { min-height: 27px; padding: 3px 6px; border: 1px solid var(--p-line); border-radius: 5px; background: var(--p-surface-alt); color: var(--p-ink); font-size: 11px; font-weight: 700; cursor: pointer; }
+.composition-mini-button:hover { border-color: var(--p-accent); color: var(--p-accent); }
+.composition-mini-button:disabled { opacity: .4; cursor: default; }
+.composition-mini-danger { color: var(--p-accent); }
+.composition-track-lane { position: relative; flex: none; min-height: 177px; background-color: var(--p-surface-alt); background-image: linear-gradient(to right, var(--p-line) 1px, transparent 1px), linear-gradient(to right, color-mix(in srgb, var(--p-line) 55%, transparent) 1px, transparent 1px); background-size: var(--measure-width) 100%, var(--beat-width) 100%; }
+.composition-region { position: absolute; top: 36px; box-sizing: border-box; display: flex; align-items: center; min-width: 25px; height: 100px; padding: 10px; border: 1px solid var(--p-accent); border-radius: 6px; background: var(--p-accent-soft); color: var(--p-ink); font-size: 12px; font-weight: 800; cursor: grab; user-select: none; touch-action: none; transition: transform var(--p-fast) var(--p-ease), box-shadow var(--p-fast) ease, background-color var(--p-fast) ease; }
+.composition-region:hover { transform: translateY(-2px); box-shadow: 0 7px 16px color-mix(in srgb, var(--p-accent) 18%, transparent); }
+.composition-region[aria-pressed="true"] { outline: 2px solid var(--p-accent); outline-offset: 2px; }
+.composition-region:active { cursor: grabbing; }
+.composition-region-grip { position: absolute; top: 0; right: 0; width: 13px; height: 100%; border-left: 2px solid var(--p-accent); cursor: ew-resize; }
+.composition-timeline-empty { margin: 0; padding: 36px 28px; color: var(--p-muted); }
+.composition-timeline-empty[hidden] { display: none; }
+.composition-region-editor { margin-top: 24px; border: 1px solid var(--p-line); border-radius: 14px; background: var(--p-surface); overflow: hidden; }
+.composition-region-editor[hidden] { display: none; }
+.composition-region-editor-heading { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 22px 26px; }
+.composition-region-editor-heading h2 { margin: 4px 0 6px; font-size: 23px; }
+.composition-region-editor-heading p:last-child { margin: 0; color: var(--p-muted); font-size: 13px; line-height: 1.5; }
+.composition-region-editor-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.composition-region-editor-actions button { min-height: 38px; border: 1px solid var(--p-line); cursor: pointer; }
+.composition-region-editor .piano-roll-card { border: 0; border-top: 1px solid var(--p-line); border-radius: 0; }
+@media (max-width: 700px) { .composition-region-editor-heading { align-items: flex-start; flex-direction: column; padding: 20px; } }
+@media (max-width: 700px) { .composition-timeline-heading { align-items: flex-start; flex-direction: column; padding: 20px; } .composition-timeline-help { padding: 0 20px 16px; } .composition-ruler-label, .composition-track-controls { flex-basis: 205px; } }
+@media (max-width: 620px) { .compositions-details-form { grid-template-columns: 1fr; } .compositions-card { align-items: flex-start; } }
+
+/* Apenas a composição salva usa um arranjo de janela: controles fixos, superfícies musicais roláveis. */
+.compositions-editor-page { box-sizing: border-box; height: calc(100dvh - 74px); min-height: 0; padding: 12px clamp(12px, 2vw, 28px); overflow: hidden; }
+.compositions-editor-shell { display: flex; flex-direction: column; gap: 10px; height: 100%; min-height: 0; width: min(100%, 1600px); }
+.compositions-editor-header { flex: none; display: grid; gap: 8px; }
+.compositions-editor-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 36px; }
+.compositions-editor-title { display: flex; align-items: baseline; gap: 18px; min-width: 0; }
+.compositions-editor-title h1 { margin: 0; overflow: hidden; color: var(--p-ink); font-size: 20px; font-weight: 900; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.compositions-editor-header .compositions-back { flex: none; font-size: 13px; }
+.compositions-editor-header .compositions-danger { margin: 0; }
+.compositions-editor-header .compositions-danger button { min-height: 32px; font-size: 12px; }
+.compositions-editor-header .compositions-details-form { display: grid; grid-template-columns: minmax(160px, 1.6fr) repeat(3, minmax(66px, .5fr)) minmax(118px, .8fr) minmax(110px, .7fr) minmax(120px, 1fr) auto; align-items: end; gap: 8px; padding: 8px 12px; border: 1px solid var(--p-line); border-radius: 10px; background: var(--p-surface); }
+.compositions-editor-header .compositions-field { min-width: 0; gap: 3px; }
+.compositions-editor-header .compositions-field:first-of-type, .compositions-editor-header .compositions-save-state, .compositions-editor-header .compositions-details-form .product-button { grid-column: auto; }
+.compositions-editor-header .compositions-field label { color: var(--p-muted); font-size: 11px; }
+.compositions-editor-header .compositions-field input, .compositions-editor-header .compositions-field select { min-height: 32px; padding: 4px 8px; font-size: 13px; }
+.compositions-editor-header .compositions-save-state { align-self: center; font-size: 12px; line-height: 1.3; }
+.compositions-editor-header .compositions-details-form .product-button { min-height: 34px; white-space: nowrap; }
+.composition-workspace { display: flex; flex: 1; flex-direction: column; gap: 8px; min-height: 0; }
+.composition-workspace .composition-timeline { display: flex; flex: 1 1 53%; flex-direction: column; min-height: 0; margin: 0; border-radius: 10px; box-shadow: none; }
+.composition-workspace .composition-timeline-heading { flex: none; padding: 8px 14px 4px; }
+.composition-workspace .composition-timeline-heading h2 { font-size: 16px; }
+.composition-workspace .composition-timeline-heading p { font-size: 11px; }
+.composition-workspace .composition-transport { flex: none; gap: 6px 12px; padding: 4px 14px 8px; }
+.composition-workspace .composition-transport-buttons, .composition-workspace .composition-loop-fields { gap: 5px; }
+.composition-workspace .composition-transport .product-button { min-height: 30px; padding: 4px 9px; font-size: 12px; }
+.composition-workspace .composition-loop-fields input { width: 66px; padding: 4px; }
+.composition-workspace .composition-timeline-heading .composition-editor-guide p { width: min(360px, 70vw); padding: 12px; font-size: 12px; }
+.composition-workspace .composition-timeline-scroll { flex: 1; min-height: 0; max-height: none; overscroll-behavior: contain; }
+.composition-workspace .composition-track-controls { flex-basis: 400px; grid-template-columns: 80px 90px 90px minmax(0, 1fr); grid-template-rows: 28px 28px; grid-template-areas: "name name instrument switches" "volume actions actions actions"; gap: 4px; min-height: 68px; padding: 4px; align-items: center; }
+.composition-workspace .composition-track-heading { grid-area: name; min-width: 0; }
+.composition-workspace .composition-track-instrument { grid-area: instrument; }
+.composition-workspace .composition-track-volume { grid-area: volume; min-width: 0; margin: 0; }
+.composition-workspace .composition-track-switches { grid-area: switches; flex-wrap: nowrap; gap: 4px; }
+.composition-workspace .composition-track-switch { gap: 2px; white-space: nowrap; font-size: 11px; }
+.composition-workspace .composition-track-switch input { margin: 0; }
+.composition-workspace .composition-track-actions { grid-area: actions; flex-wrap: nowrap; gap: 4px; }
+.composition-workspace .composition-mini-button { min-height: 26px; padding: 2px 5px; white-space: nowrap; font-size: 11px; }
+.composition-workspace .composition-track-name, .composition-workspace .composition-track-instrument { min-height: 28px; padding: 3px 6px; font-size: 12px; }
+.composition-workspace .composition-ruler-label { flex-basis: 400px; }
+.composition-workspace .composition-track-lane { min-height: 68px; }
+.composition-workspace .composition-region { top: 10px; height: 48px; padding: 5px 9px; }
+.composition-workspace .composition-timeline-empty { padding: 8px 14px; font-size: 12px; }
+.composition-workspace .composition-region-editor:not([hidden]) { display: flex; flex: 1 1 47%; flex-direction: column; min-height: 0; margin: 0; border-radius: 10px; }
+.composition-workspace .composition-region-editor-heading { flex: none; padding: 4px 12px; }
+.composition-workspace .composition-region-editor-heading h2 { margin: 0; font-size: 15px; }
+.composition-workspace .composition-region-editor-actions { align-items: center; }
+.composition-workspace .composition-region-editor-actions button { min-height: 30px; padding: 4px 9px; font-size: 12px; }
+.composition-workspace .composition-guidance { flex: none; margin: 0 10px 6px; padding: 6px 10px; border: 1px solid var(--p-line); border-radius: 8px; background: var(--p-surface-alt); }
+.composition-workspace .composition-guidance h3 { margin: 0 0 2px; color: var(--p-ink); font-size: 12px; }
+.composition-workspace .composition-guidance p { margin: 0; color: var(--p-muted); font-size: 11px; line-height: 1.35; }
+/* Campo harmônico e seleção mantêm os rótulos musicais visíveis junto das cores. */
+.compositions-editor-page { --assist-tonic: #246d61; --assist-tonic-soft: #e3f3ed; --assist-predominant: #6b4b9a; --assist-predominant-soft: #efe9fa; --assist-dominant: #a64a34; --assist-dominant-soft: #f9eae4; --assist-outside: #8c5918; --piano-roll-outside-note: #f3c274; --piano-roll-outside-note-border: #765119; }
+:root[data-theme="dark"] .compositions-editor-page { --assist-tonic: #9de4d1; --assist-tonic-soft: #24453f; --assist-predominant: #d5b7ff; --assist-predominant-soft: #413354; --assist-dominant: #ffb39b; --assist-dominant-soft: #51362f; --assist-outside: #ffd58d; --piano-roll-outside-note: #f5d69a; --piano-roll-outside-note-border: #553a16; }
+.composition-assistance { flex: none; display: grid; gap: 8px; max-height: 170px; padding: 9px 14px; border: 1px solid var(--p-line); border-radius: 10px; background: var(--p-surface); overflow-x: hidden; overflow-y: auto; }
+.composition-assistance-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 3px 12px; }
+.composition-assistance-heading h2 { display: inline; margin: 0 8px 0 0; font-size: 14px; color: var(--p-ink); }
+.composition-assistance-heading p, .composition-assistance-heading [role="status"] { display: inline; margin: 0; color: var(--p-muted); font-size: 11px; }
+.composition-assistance-field { display: flex; gap: 7px; min-width: 0; overflow-x: auto; padding-bottom: 2px; }
+.composition-assistance-degree { display: grid; gap: 2px; flex: 1 0 108px; padding: 6px 8px; border: 1px solid currentColor; border-radius: 7px; background: var(--assist-tonic-soft); color: var(--assist-tonic); }
+.composition-assistance-degree strong { font-size: 12px; }
+.composition-assistance-degree small { font-size: 10px; }
+.composition-assistance-function { font-size: 10px; font-weight: 700; }
+.composition-assistance-degree.is-predominant, .composition-assistance-option.is-predominant { background: var(--assist-predominant-soft); color: var(--assist-predominant); }
+.composition-assistance-degree.is-dominant, .composition-assistance-option.is-dominant { background: var(--assist-dominant-soft); color: var(--assist-dominant); }
+.composition-assistance-suggestions { display: flex; align-items: center; gap: 6px; min-height: 25px; overflow-x: auto; }
+.composition-assistance-suggestions h3, .composition-assistance-suggestions p { flex: none; margin: 0; color: var(--p-muted); font-size: 11px; }
+.composition-assistance-option { display: inline-flex; align-items: center; flex: none; gap: 6px; padding: 3px 6px; border-radius: 6px; background: var(--assist-tonic-soft); color: var(--assist-tonic); font-size: 11px; font-weight: 700; }
+.composition-assistance-option button { min-height: 24px; background: var(--p-surface); color: var(--p-ink); }
+.composition-region.is-out-of-context { border-color: var(--assist-outside); box-shadow: inset 0 0 0 2px var(--assist-outside); }
+.composition-editor-guide { position: relative; font-size: 12px; }
+.composition-editor-guide summary { padding: 6px 8px; cursor: pointer; color: var(--p-accent); font-weight: 700; }
+.composition-editor-guide p { position: absolute; z-index: 10; right: 0; top: 100%; width: min(300px, 70vw); margin: 0; padding: 12px; border: 1px solid var(--p-line); border-radius: 8px; background: var(--p-surface); color: var(--p-ink); box-shadow: var(--p-shadow); line-height: 1.5; }
+.composition-workspace .composition-region-editor [data-region-editor-mount] { display: flex; flex: 1; min-height: 0; }
+.composition-workspace .piano-roll-card { display: flex; flex: 1; flex-direction: column; min-height: 0; }
+.composition-workspace .piano-roll-card-header { flex: none; padding: 3px 10px; }
+.composition-workspace .piano-roll-card h2 { font-size: 14px; }
+.composition-workspace .piano-roll-subtitle { display: none; }
+.composition-workspace .piano-roll-toolbar { flex: none; gap: 5px 10px; padding: 3px 10px; }
+.composition-workspace .piano-roll-workspace { flex: 1; min-height: 0; grid-template-rows: 28px minmax(0, 1fr) 54px; }
+.composition-workspace .piano-roll-keyboard-help, .composition-workspace .piano-roll-help { position: absolute; width: 1px; height: 1px; padding: 0; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.composition-workspace .piano-roll-keyboard, .composition-workspace .piano-roll-canvas-wrap { min-height: 0; }
+
+/* A grade Canvas usa as mesmas superfícies da composição, inclusive após trocar o tema. */
+.compositions-editor-page {
+  --piano-roll-grid-bg: #f6f7fa;
+  --piano-roll-grid-row: #eef0f5;
+  --piano-roll-strong-line: #b8c0ce;
+  --piano-roll-line: #dfe3eb;
+  --piano-roll-measure-line: #aeb7c7;
+  --piano-roll-beat-line: #e6e9ef;
+  --piano-roll-ruler-bg: #f0f2f7;
+  --piano-roll-ruler-text: #3d4658;
+  --piano-roll-beat-text: #697386;
+  --piano-roll-velocity-bg: #f6f7fa;
+  --piano-roll-inactive-loop: rgba(32, 37, 54, .08);
+  --piano-roll-note: #e5a0b5;
+  --piano-roll-note-border: #b96d88;
+  --piano-roll-note-text: #633044;
+  --piano-roll-selected-note: #c9574d;
+  --piano-roll-selected-note-border: #963a35;
+  --piano-roll-selected-note-text: #702c29;
+  --piano-roll-playhead: #b93830;
+  --piano-roll-selection: rgba(185, 56, 48, .14);
+}
+:root[data-theme="dark"] .compositions-editor-page {
+  --piano-roll-grid-bg: #151a24;
+  --piano-roll-grid-row: #202735;
+  --piano-roll-strong-line: #68758b;
+  --piano-roll-line: #394355;
+  --piano-roll-measure-line: #68758b;
+  --piano-roll-beat-line: #394355;
+  --piano-roll-ruler-bg: #293244;
+  --piano-roll-ruler-text: #f3f5fa;
+  --piano-roll-beat-text: #c0c8d6;
+  --piano-roll-velocity-bg: #151a24;
+  --piano-roll-inactive-loop: rgba(8, 12, 20, .34);
+  --piano-roll-note: #eea8bd;
+  --piano-roll-note-border: #c87895;
+  --piano-roll-note-text: #482332;
+  --piano-roll-selected-note: #ff8b7d;
+  --piano-roll-selected-note-border: #d96b61;
+  --piano-roll-selected-note-text: #421f20;
+  --piano-roll-playhead: #ff8b7d;
+  --piano-roll-selection: rgba(255, 139, 125, .16);
+}
+.compositions-editor-page .composition-timeline-scroll,
+.compositions-editor-page .piano-roll-canvas-wrap { scrollbar-color: var(--p-muted) var(--p-surface-alt); }
+.compositions-editor-page .piano-roll-workspace,
+.compositions-editor-page .piano-roll-canvas-wrap { background: var(--piano-roll-grid-bg); }
+.compositions-editor-page .piano-roll-loop-marker.is-start,
+.compositions-editor-page .piano-roll-loop-boundary.is-start { background: var(--p-accent); }
+.compositions-editor-page .piano-roll-loop-marker.is-end,
+.compositions-editor-page .piano-roll-loop-boundary.is-end { background: var(--p-muted); }
+.compositions-editor-page .piano-roll-playhead { background: var(--p-accent); }
+:root[data-theme="dark"] .compositions-editor-page .piano-roll-keyboard,
+:root[data-theme="dark"] .compositions-editor-page .piano-roll-velocity-label { border-color: var(--p-line); background: var(--p-surface-alt); color: var(--p-muted); }
+:root[data-theme="dark"] .compositions-editor-page .piano-roll-key { border-color: var(--p-line); }
+:root[data-theme="dark"] .compositions-editor-page .piano-roll-key.is-white { background: var(--p-surface); color: var(--p-ink); }
+:root[data-theme="dark"] .compositions-editor-page .piano-roll-key.is-black { background: #111722; color: var(--p-ink); }
+:root[data-theme="dark"] .compositions-editor-page .piano-roll-key:hover,
+:root[data-theme="dark"] .compositions-editor-page .piano-roll-key:focus-visible { background: var(--p-accent-soft); color: var(--p-ink); }
+:root[data-theme="dark"] .compositions-editor-page .piano-roll-ruler,
+:root[data-theme="dark"] .compositions-editor-page .piano-roll-velocity-wrap { border-color: var(--p-line); }
+:root[data-theme="dark"] .compositions-editor-page .product-button:not(.product-button-secondary),
+:root[data-theme="dark"] .compositions-editor-page .piano-roll-play { color: #151a24; }
+
+/* Janelas estreitas ou baixas priorizam alvos legíveis, mesmo que precisem rolar a página. */
+@media (max-width: 900px), (max-height: 820px) {
+  .compositions-editor-page { height: auto; min-height: calc(100dvh - 72px); overflow: visible; }
+  .compositions-editor-shell { height: auto; }
+  .composition-workspace { min-height: 0; }
+  .composition-workspace .composition-timeline { flex: none; min-height: 290px; }
+  .composition-workspace .composition-timeline-scroll { max-height: 330px; }
+  .composition-workspace .composition-region-editor:not([hidden]) { flex: none; height: 480px; min-height: 0; }
+  .composition-workspace .piano-roll-workspace { min-height: 0; }
+  .compositions-editor-header .compositions-details-form { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .compositions-editor-header .compositions-field:first-of-type { grid-column: span 2; }
+  .compositions-editor-header .compositions-save-state { grid-column: span 2; }
+}
+@media (max-width: 700px) {
+  .composition-assistance { max-height: 260px; }
+  .composition-assistance-heading { flex-direction: column; align-items: flex-start; }
+  .composition-assistance-heading > div, .composition-assistance-heading [role="status"] { width: 100%; }
+  .composition-workspace .composition-track-controls { flex-basis: 300px; grid-template-columns: 68px 68px minmax(0, 1fr); grid-template-rows: repeat(3, 28px); grid-template-areas: "name name instrument" "volume switches switches" "actions actions actions"; min-height: 100px; }
+  .composition-workspace .composition-track-lane { min-height: 100px; }
+  .composition-workspace .composition-region { top: 26px; }
+  .composition-workspace .composition-ruler-label { flex-basis: 300px; }
+}
+@media (max-width: 700px) {
+  .compositions-editor-title { display: grid; gap: 4px; }
+  .compositions-editor-header .compositions-details-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .compositions-editor-header .compositions-save-state { grid-column: auto; }
+  .composition-workspace .composition-timeline-heading { align-items: flex-start; }
+  .composition-workspace .composition-region-editor-heading { align-items: center; flex-direction: row; }
+}
+
+/* O modo ampliado preserva o mesmo Canvas e ocupa a janela sem alterar a faixa editada. */
+.composition-workspace .composition-region-editor.is-expanded:not([hidden]) {
+  position: fixed;
+  z-index: 40;
+  inset: 12px;
+  width: auto;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  border-radius: 10px;
+  background: var(--p-surface);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, .28);
+}
+.composition-workspace .composition-region-editor.is-expanded .composition-region-editor-heading {
+  padding: 10px 16px;
+}
+.composition-workspace .composition-region-editor.is-expanded .piano-roll-workspace {
+  grid-template-rows: 32px minmax(0, 1fr) 92px;
+}
+@media (max-width: 700px) {
+  .composition-workspace .composition-region-editor.is-expanded:not([hidden]) {
+    inset: 0;
+    border: 0;
+    border-radius: 0;
+  }
+  .composition-workspace .composition-region-editor.is-expanded .composition-region-editor-heading {
+    padding: 8px 12px;
+  }
+}
+
+/* A apresentação vira uma visão de produto com o piano como demonstração concreta. */
+.presentation { background: var(--p-bg); color: var(--p-ink); font-family: var(--p-font); font-size: 17px; }
+.presentation .story-scene { --story-gutter: clamp(24px, 7vw, 110px); min-height: auto; padding: clamp(68px, 8vw, 110px) var(--story-gutter); background: var(--p-bg); color: var(--p-ink); }
+.presentation .story-opening { position: relative; min-height: min(650px, 80svh); background: var(--p-surface); }
+.presentation .story-opening .story-copy { margin-block: auto; }
+.presentation .story-music-band, .presentation .piano-resonance, .presentation .title-flourish { display: none; }
+.presentation .story-copy { max-width: 760px; }
+.presentation .story-caption { display: none; }
+.presentation .story-copy h1, .presentation .story-copy h2 { max-width: 15ch; margin: 0 0 22px; color: var(--p-ink); font: 900 clamp(42px, 6vw, 78px)/1.05 var(--p-font); letter-spacing: -.035em; text-wrap: balance; }
+.presentation .story-handwriting { max-width: 42ch; color: var(--p-muted); font: 500 clamp(20px, 2vw, 25px)/1.45 var(--p-font); }
+.presentation .story-description { max-width: 60ch; color: var(--p-muted); font: 500 clamp(18px, 1.7vw, 21px)/1.58 var(--p-font); }
+.presentation .story-button { min-height: 46px; margin-right: 12px; border-color: var(--p-accent); border-radius: 9px; background: var(--p-accent); color: #fff; font: 800 14px var(--p-font); }
+.presentation .story-button:hover { background: var(--p-accent-hover); color: #fff; }
+.presentation .story-link { color: var(--p-accent); font-size: 14px; font-weight: 800; text-decoration-color: currentColor; }
+.presentation .story-note { background: var(--p-surface-alt); border-color: var(--p-line); gap: 34px; padding-bottom: 0; }
+.presentation .story-note .story-copy { margin-inline: 0; }
+.presentation .story-note .presentation-piano { margin: 0 calc(-1 * var(--story-gutter)); width: calc(100% + 2 * var(--story-gutter)); }
+.presentation .story-creation { background: var(--p-surface); }
+.presentation .story-bard-path { background: var(--p-bg); }
+.presentation .piano-status { color: var(--p-muted); font: 600 14px var(--p-font); }
+.presentation .piano-scroll { scrollbar-color: var(--p-accent) var(--p-line); }
+
+/* A lição usa ritmo editorial e liga sua explicação diretamente ao editor. */
+.bard-lesson-page { min-height: calc(100svh - 72px); padding: 58px clamp(20px, 5vw, 72px) 100px; background: var(--p-bg); color: var(--p-ink); font-family: var(--p-font); }
+.bard-lesson-shell { width: min(100%, 1120px); }
+.lesson-header { max-width: 800px; padding: 0; }
+.lesson-back-link { display: inline-flex; align-items: center; margin-bottom: 24px; color: var(--p-accent); font: 800 13px var(--p-font); }
+.lesson-header h1 { max-width: none; color: var(--p-ink); font: 900 clamp(46px, 6vw, 72px)/1.05 var(--p-font); letter-spacing: -.035em; }
+.lesson-lead { max-width: 62ch; margin: 18px 0 0; color: var(--p-muted); font: 500 clamp(18px, 2vw, 23px)/1.55 var(--p-font); }
+.lesson-section-nav { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 36px; padding: 12px; border: 1px solid var(--p-line); border-radius: 12px; background: var(--p-surface); }
+.lesson-section-nav a { padding: 9px 14px; border-radius: 7px; color: var(--p-muted); font-size: 13px; font-weight: 800; text-decoration: none; }
+.lesson-section-nav a:hover { background: var(--p-accent-soft); color: var(--p-accent); }
+.lesson-section { margin-top: clamp(70px, 8vw, 108px); scroll-margin-top: 100px; }
+.lesson-section-label { display: none; }
+.lesson-section h2 { color: var(--p-ink); font: 900 clamp(30px, 3.5vw, 46px)/1.15 var(--p-font); letter-spacing: -.025em; }
+.lesson-section-heading > p { color: var(--p-muted); font-size: 17px; line-height: 1.55; }
+.lesson-prose { color: var(--p-muted); font: 500 17px/1.7 var(--p-font); }
+.lesson-intro { gap: clamp(24px, 5vw, 70px); }
+.lesson-instrument { border: 1px solid var(--p-line); background: var(--p-surface); box-shadow: none; }
+.lesson-instrument .presentation-piano { margin-top: 26px; }
+.lesson-instrument .piano-status { color: var(--p-muted); font: 600 14px var(--p-font); }
+.lesson-instrument .piano-key-label { font: 800 22px var(--p-font); pointer-events: none; }
+.lesson-instrument .piano-key-label-white { fill: #263640; }
+.lesson-instrument .piano-key-label-black { fill: #fff; font-size: 16px; }
+.lesson-piano-guide { max-width: 72ch; margin: 24px 0 0; color: var(--p-muted); font: 500 16px/1.65 var(--p-font); }
+.lesson-piano-guide strong, .lesson-section-heading strong, .lesson-prose strong, .lesson-piano-practice strong { color: var(--p-ink); }
+.lesson-piano-practice { margin-top: 30px; padding-top: 25px; border-top: 1px solid var(--p-line); }
+.lesson-piano-practice h3 { margin: 0 0 14px; color: var(--p-ink); font: 800 22px/1.3 var(--p-font); }
+.lesson-piano-practice ol { display: grid; gap: 14px; max-width: 76ch; margin: 0; padding-left: 24px; color: var(--p-muted); font: 500 16px/1.6 var(--p-font); }
+.lesson-piano-practice li { padding-left: 6px; }
+.lesson-piano-practice li::marker { color: var(--p-accent); font-weight: 800; }
+.lesson-piano-practice details { max-width: 76ch; margin-top: 20px; color: var(--p-muted); font: 500 15px/1.6 var(--p-font); }
+.lesson-piano-practice summary { width: fit-content; color: var(--p-accent); font-weight: 800; cursor: pointer; }
+.lesson-piano-practice details p { margin: 12px 0 0; }
+.lesson-note { color: var(--p-muted); font: 500 15px/1.6 var(--p-font); }
+.lesson-roll-layout { gap: clamp(26px, 5vw, 70px); }
+.lesson-roll-example { min-width: 0; margin: 0; padding: 18px; border: 1px solid var(--p-line); border-radius: 12px; background: var(--p-surface); }
+.lesson-roll-example-plot { display: grid; gap: 0; }
+.lesson-roll-example-axis, .lesson-roll-example-time { color: var(--p-muted); font: 800 12px var(--p-font); }
+.lesson-roll-example-axis { margin: 0 0 8px 76px; }
+.lesson-roll-example-time { margin: 9px 0 0 76px; text-align: right; }
+.lesson-roll-example-row { display: grid; grid-template-columns: 76px minmax(0, 1fr); min-height: 48px; align-items: stretch; }
+.lesson-roll-example-row > span { display: flex; align-items: center; padding-left: 4px; color: var(--p-ink); font: 800 12px var(--p-font); white-space: nowrap; }
+.lesson-roll-example-row { position: relative; }
+.lesson-roll-example-row > i { position: relative; display: block; grid-column: 2; grid-row: 1; align-self: center; height: 26px; border-radius: 5px; background: var(--p-accent); z-index: 1; }
+.lesson-roll-example-row::before { position: absolute; inset: 0 0 0 76px; border: 1px solid var(--p-line); border-bottom: 0; background: repeating-linear-gradient(to right, transparent 0 24%, var(--p-line) calc(24% + 1px) 25%); content: ""; }
+.lesson-roll-example-row:nth-of-type(3)::before { border-bottom: 1px solid var(--p-line); }
+.lesson-roll-block-do { width: 18%; margin-left: 5%; }
+.lesson-roll-block-re { width: 18%; margin-left: 31%; }
+.lesson-roll-block-mi { width: 34%; margin-left: 57%; }
+.lesson-roll-example figcaption { margin-top: 16px; color: var(--p-muted); font: 500 13px/1.5 var(--p-font); }
+.lesson-roll-action { margin: 25px 0 0; color: var(--p-muted); font: 500 15px/1.6 var(--p-font); }
+.lesson-roll-action a { color: var(--p-accent); font-weight: 800; text-underline-offset: 3px; }
+.lesson-next-summary { max-width: 55ch; color: var(--p-muted); font: 500 16px/1.6 var(--p-font); }
+.lesson-roadmap li { color: var(--p-muted); }
+.lesson-next-steps { border-color: var(--p-line); }
+.lesson-roadmap li { border-color: var(--p-line); font-size: 15px; line-height: 1.55; }
+.lesson-roadmap strong { color: var(--p-ink); }
+
+/* O editor mantém as funções, mas deixa transporte e orientação na frente. */
+.components-page { min-height: calc(100svh - 72px); padding: 48px clamp(16px, 3vw, 54px) 90px; background: var(--p-bg); color: var(--p-ink); font-family: var(--p-font); }
+.components-shell { width: min(100%, 1380px); }
+.components-header { align-items: end; margin-bottom: 28px; }
+.components-header h1 { color: var(--p-ink); font-size: clamp(32px, 3.6vw, 48px); font-weight: 900; letter-spacing: -.03em; }
+.components-lead { max-width: 70ch; color: var(--p-muted); font-size: 16px; }
+.components-back-link { flex: 0 0 auto; color: var(--p-accent); font-size: 13px; font-weight: 800; }
+.piano-roll-card { border-color: var(--p-line); border-radius: 14px; background: var(--p-surface); box-shadow: none; }
+.piano-roll-card-header { align-items: center; border-color: var(--p-line); }
+.piano-roll-card h2 { color: var(--p-ink); font-size: 23px; font-weight: 900; }
+.piano-roll-subtitle { margin: 6px 0 0; color: var(--p-muted); font-size: 13px; }
+.piano-roll-state { color: var(--p-muted); font-size: 12px; }
+.piano-roll-toolbar { border-color: var(--p-line); color: var(--p-muted); }
+.piano-roll-play, .piano-roll-stop, .piano-roll-tool, .piano-roll-zoom button, .piano-roll-control select, .piano-roll-control input { border-color: var(--p-line); border-radius: 7px; background: var(--p-surface); color: var(--p-ink); font: 800 12px var(--p-font); }
+.piano-roll-control input { box-sizing: border-box; width: 72px; min-height: 32px; padding: 0 8px; border: 1px solid var(--p-line); }
+.piano-roll-control input:focus-visible { outline: 2px solid var(--p-accent); outline-offset: 2px; }
+.piano-roll-control input:disabled { opacity: .55; }
+.piano-roll-play { display: inline-flex; align-items: center; gap: 6px; border-color: var(--p-accent); background: var(--p-accent); color: #fff; }
+.piano-roll-play .ui-icon { width: 15px; height: 15px; flex-basis: 15px; fill: currentColor; }
+.piano-roll-tool.is-active { border-color: var(--p-accent); background: var(--p-accent-soft); color: var(--p-accent); }
+.piano-roll-help { color: var(--p-muted); font-size: 12px; line-height: 1.6; }
+.piano-roll-keyboard-help { margin: 12px 20px; color: var(--p-muted); font-size: 12px; line-height: 1.5; }
+.piano-roll-workspace { background: var(--p-surface-alt); }
+
+/* A criação mostra frases paralelas no mesmo trecho antes de abrir a grade detalhada. */
+.creation-page { min-height: calc(100svh - 72px); padding: 56px clamp(18px, 4vw, 64px) 110px; background: var(--p-bg); color: var(--p-ink); }
+.creation-shell { width: min(100%, 1320px); margin-inline: auto; }
+.creation-intro { display: flex; justify-content: space-between; align-items: end; gap: 28px; padding-bottom: 42px; }
+.creation-intro h1 { margin: 0; font-size: clamp(34px, 4.5vw, 58px); line-height: 1.08; font-weight: 900; letter-spacing: -.035em; }
+.creation-intro > div > p { max-width: 65ch; margin: 16px 0 0; color: var(--p-muted); font-size: 17px; line-height: 1.55; }
+.creation-save-note { flex: 0 0 260px; margin: 0; padding: 14px 17px; border-radius: 10px; background: var(--p-accent-soft); color: var(--p-ink); font-size: 13px; line-height: 1.5; }
+.creation-segment { border-top: 1px solid var(--p-line); padding-top: 28px; }
+.creation-segment-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 30px; }
+.creation-segment-heading h2 { margin: 0; font-size: 26px; font-weight: 900; }
+.creation-segment-heading p { margin: 7px 0 0; color: var(--p-muted); font-size: 14px; }
+.creation-segment-heading > span { color: var(--p-muted); font-size: 12px; font-weight: 700; white-space: nowrap; }
+.creation-layers { display: grid; gap: 26px; }
+.creation-layer { display: grid; grid-template-columns: minmax(150px, 205px) minmax(0, 1fr); gap: clamp(18px, 3vw, 36px); align-items: start; }
+.creation-layer-heading { padding-top: 19px; }
+.creation-layer-heading h3 { margin: 0; font-size: 18px; font-weight: 900; }
+.creation-layer-heading p { max-width: 26ch; margin: 7px 0 0; color: var(--p-muted); font-size: 13px; line-height: 1.5; }
+.creation-instrument-label, .creation-instrument-static { display: block; margin-top: 11px; color: var(--p-muted); font-size: 12px; font-weight: 700; }
+.creation-instrument-select { width: min(100%, 190px); margin-top: 5px; padding: 7px 9px; border: 1px solid var(--p-line); border-radius: 8px; background: var(--p-surface); color: var(--p-ink); font: inherit; font-size: 13px; }
+.creation-instrument-select:focus-visible { outline: 2px solid var(--p-accent); outline-offset: 2px; }
+.midi-phrase-card { min-width: 0; overflow: hidden; border: 1px solid var(--p-line); border-radius: 14px 14px 0 0; background: var(--p-surface); }
+.midi-phrase-toggle { display: flex; align-items: center; gap: 13px; width: 100%; min-height: 56px; padding: 12px 20px; border: 0; border-bottom: 1px solid var(--p-line); background: transparent; color: var(--p-ink); text-align: left; cursor: pointer; }
+.midi-phrase-toggle:hover, .midi-phrase-toggle[aria-expanded="true"] { background: var(--p-surface-alt); }
+.midi-phrase-title { font-size: 14px; font-weight: 900; }
+.midi-phrase-hint { color: var(--p-muted); font-size: 12px; }
+.midi-phrase-toggle-icon { margin-left: auto; color: var(--p-accent); transition: transform .2s ease; }
+.midi-phrase-toggle[aria-expanded="true"] .midi-phrase-toggle-icon { transform: rotate(90deg); }
+.midi-phrase-preview { position: relative; display: flex; align-items: center; min-height: 74px; padding: 16px 20px; background: var(--p-surface); }
+.midi-phrase-empty { color: var(--p-muted); font-size: 13px; }
+.midi-phrase-mini-roll { position: relative; flex: 1; height: 42px; overflow: hidden; border-radius: 5px; background: linear-gradient(to right, transparent calc(25% - 1px), var(--p-line) 25%, transparent calc(25% + 1px), transparent calc(50% - 1px), var(--p-line) 50%, transparent calc(50% + 1px), transparent calc(75% - 1px), var(--p-line) 75%, transparent calc(75% + 1px)), var(--p-surface-alt); }
+.midi-phrase-mini-note { position: absolute; height: 7px; min-width: 2px; border-radius: 3px; background: var(--p-accent); }
+.midi-phrase-count { flex: 0 0 auto; margin-left: 15px; color: var(--p-muted); font-size: 12px; font-weight: 800; }
+.midi-phrase-panel[hidden] { display: none; }
+.midi-phrase-panel { border-top: 1px solid var(--p-line); overflow: auto; }
+.midi-phrase-panel .piano-roll-card { border: 0; border-radius: 0; }
+.creation-ruler-row { display: grid; grid-template-columns: minmax(150px, 205px) minmax(0, 1fr); gap: clamp(18px, 3vw, 36px); align-items: end; margin-bottom: 12px; }
+.creation-ruler-label { color: var(--p-muted); font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+.creation-ruler-viewport, .midi-phrase-track-viewport { min-width: 0; overflow-x: auto; scrollbar-width: thin; }
+.creation-ruler { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); min-width: 660px; color: var(--p-muted); font-size: 12px; font-weight: 800; }
+.creation-ruler span { padding: 0 0 8px 10px; border-left: 1px solid var(--p-line); }
+.creation-layers { gap: 12px; }
+.creation-layer { align-items: center; }
+.creation-layer-heading { padding-top: 0; }
+.midi-phrase-card { --phrase-wave: #f1a34b; border: 0; border-radius: 13px 13px 0 0; background: transparent; }
+.midi-phrase-card[data-phrase-key^="bass"] { --phrase-wave: #4cabc5; }
+.midi-phrase-card[data-phrase-key^="melody"] { --phrase-wave: #8b81cf; }
+.midi-phrase-card[data-phrase-key^="drums"] { --phrase-wave: #78b982; }
+.midi-phrase-track { position: relative; min-width: 660px; min-height: 98px; overflow: hidden; border: 0; border-radius: 13px 13px 0 0; box-shadow: inset 0 0 0 1px var(--p-line); background: color-mix(in srgb, var(--phrase-wave) 13%, var(--p-surface)); }
+.midi-phrase-toggle { position: relative; z-index: 1; min-height: 35px; padding: 7px 15px; border-bottom-color: color-mix(in srgb, var(--phrase-wave) 30%, var(--p-line)); }
+.midi-phrase-toggle:hover, .midi-phrase-toggle[aria-expanded="true"] { background: color-mix(in srgb, var(--phrase-wave) 22%, var(--p-surface)); }
+.midi-phrase-toggle-icon { color: var(--phrase-wave); }
+.midi-phrase-preview { min-height: 62px; padding: 0 15px; background: transparent; }
+.midi-phrase-preview canvas { position: absolute; top: 50%; left: 0; display: block; width: 100%; height: 50px; transform: translateY(-50%); }
+.midi-phrase-empty { position: absolute; left: 16px; font-size: 12px; }
+.midi-phrase-empty[hidden] { display: none; }
+.midi-phrase-count { position: absolute; right: 15px; bottom: 7px; margin: 0; padding: 2px 5px; border-radius: 4px; background: var(--p-surface); }
+.midi-phrase-panel { border: 1px solid var(--p-line); border-top: 0; background: var(--p-surface); }
+.creation-page .piano-roll-card-header { padding: 13px 16px; }
+.creation-page .piano-roll-card h2 { font-size: 18px; }
+.creation-page .piano-roll-toolbar { padding: 9px 14px; }
+.creation-page .piano-roll-keyboard-help { margin: 7px 14px; }
+.creation-page .piano-roll-workspace { grid-template-rows: 30px 286px 62px; }
+.creation-page [data-piano-roll-layout-value="drums"] .piano-roll-workspace { grid-template-rows: 30px 66px 62px; }
+.creation-page .piano-roll-help { margin: 9px 14px 13px; }
+.piano-roll-play:disabled { opacity: .48; cursor: not-allowed; }
+.piano-roll-audio-note { margin: 14px 20px 0; color: var(--p-muted); font-size: 13px; line-height: 1.5; }
+@media (max-width: 760px) {
+  .creation-page { padding-top: 32px; }
+  .creation-intro { display: block; }
+  .creation-save-note { margin-top: 22px; }
+  .creation-segment-heading { display: block; }
+  .creation-segment-heading > span { display: block; margin-top: 8px; }
+  .creation-layer { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .creation-ruler-row { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .creation-ruler-label { display: none; }
+  .creation-layer-heading { padding-top: 0; }
+  .creation-layer-heading p { max-width: none; }
+  .midi-phrase-hint { display: none; }
+}
+
+/* A área administrativa compartilha superfícies, contraste e navegação do produto. */
+.dashboard-page, .dashboard-shell { min-height: calc(100svh - 72px); background: var(--p-bg); color: var(--p-ink); font-family: var(--p-font); }
+.dashboard-shell { --dashboard-ink: var(--p-ink); --dashboard-muted: var(--p-muted); --dashboard-line: var(--p-line); --dashboard-surface: var(--p-surface); --dashboard-accent: var(--p-accent); --dashboard-accent-soft: var(--p-accent-soft); }
+.dashboard-sidebar { top: 72px; bottom: 0; height: calc(100svh - 72px); width: 232px; background: var(--p-surface); border-right: 1px solid var(--p-line); }
+.dashboard-logo { color: var(--p-ink); font: 900 19px var(--p-font); }
+.dashboard-logo-mark { background: var(--p-accent); }
+.dashboard-eyebrow { color: var(--p-muted); }
+.dashboard-nav-link { color: var(--p-muted); font-weight: 700; }
+.dashboard-nav-link:hover, .dashboard-nav-link.is-active { background: var(--p-accent-soft); color: var(--p-accent); }
+.dashboard-nav-link .ui-icon { width: 18px; height: 18px; flex-basis: 18px; }
+.dashboard-sidebar-footer { color: var(--p-muted); }
+.dashboard-content { width: calc(100% - 232px); margin-left: 232px; padding: 52px clamp(24px, 4vw, 64px); background: var(--p-bg); color: var(--p-ink); }
+.dashboard-reports-heading h2 { color: var(--p-ink); font-size: 27px; font-weight: 900; }
+.dashboard-reports-heading p, .dashboard-report-count { color: var(--p-muted); }
+.dashboard-filters label { color: var(--p-muted); }
+.dashboard-filters input, .dashboard-filters select { border-color: var(--p-line); background: var(--p-surface); color: var(--p-ink); }
+.dashboard-button-primary, .dashboard-test-link { border-color: var(--p-accent); background: var(--p-accent); color: #fff; }
+.dashboard-button-primary:hover, .dashboard-test-link:hover { background: var(--p-accent-hover); color: #fff; }
+.dashboard-button-secondary { border-color: var(--p-line); background: var(--p-surface); color: var(--p-ink); }
+.dashboard-table-frame { border-color: var(--p-line); background: var(--p-surface); }
+.dashboard-table { color: var(--p-ink); }
+.dashboard-table th { background: var(--p-surface-alt); color: var(--p-muted); }
+.dashboard-table td { border-color: var(--p-line); }
+.dashboard-report-title { color: var(--p-ink); }
+.dashboard-report-description, .dashboard-report-row time, .dashboard-empty-state { color: var(--p-muted); }
+.dashboard-tag { border-color: var(--p-line); background: var(--p-surface-alt); color: var(--p-muted); }
+.dashboard-report-details td { background: var(--p-surface-alt); }
+.dashboard-report-details summary { color: var(--p-accent); }
+.dashboard-report-details ul { color: var(--p-muted); }
+
+/* Formulários seguem a mesma hierarquia de conteúdo e ações do restante do app. */
+.auth-page { min-height: calc(100svh - 72px); background: var(--p-bg); }
+.auth-card { border-color: var(--p-line); border-radius: 14px; background: var(--p-surface); color: var(--p-ink); font-family: var(--p-font); box-shadow: var(--p-shadow); }
+.auth-kicker { color: var(--p-accent); }
+.auth-card h1 { color: var(--p-ink); font-size: 34px; font-weight: 900; }
+.auth-description, .auth-secondary-action, .auth-field small { color: var(--p-muted); }
+.auth-field label { color: var(--p-ink); }
+.auth-field input { border-color: var(--p-line); border-radius: 7px; background: var(--p-surface); color: var(--p-ink); }
+.auth-field input:focus { border-color: var(--p-accent); outline-color: var(--p-accent-soft); }
+.auth-submit { border-radius: 8px; background: var(--p-accent); }
+.auth-submit:hover { background: var(--p-accent-hover); }
+.auth-secondary-action a, .auth-return a { color: var(--p-accent); }
+.auth-return { border-color: var(--p-line); }
+
+.audio-demo-page { min-height: calc(100svh - 72px); padding: clamp(40px, 7vw, 100px) 20px; background: var(--p-bg); color: var(--p-ink); }
+.audio-demo-card { width: min(100%, 540px); margin: 0 auto; padding: clamp(26px, 5vw, 46px); border: 1px solid var(--p-line); border-radius: 14px; background: var(--p-surface); }
+.audio-demo-card h1 { margin: 0; font-size: clamp(30px, 4vw, 42px); font-weight: 900; letter-spacing: -.03em; }
+.audio-demo-card p { margin: 12px 0 26px; color: var(--p-muted); line-height: 1.5; }
+.audio-demo-card .product-button { border: 0; cursor: pointer; }
+.audio-demo-card .product-button:disabled { opacity: .55; cursor: wait; }
+.audio-demo-card [role="status"] { margin-bottom: 0; font-size: 14px; }
+
+@media (max-width: 1080px) {
+  .portal-intro { grid-template-columns: 1fr 1fr; gap: 30px; }
+  .portal-destinations { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dashboard-sidebar { top: 116px; height: calc(100svh - 116px); }
+}
+@media (max-width: 800px) {
+  .dashboard-sidebar { position: static; width: 100%; height: auto; border-right: 0; border-bottom: 1px solid var(--p-line); }
+  .dashboard-content { width: 100%; margin-left: 0; }
+  .portal-intro { grid-template-columns: 1fr; }
+  .portal-hero-demo { width: min(100%, 650px); transform: none; }
+  .lesson-intro, .lesson-roll-layout, .lesson-next-steps { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .portal-page { padding-inline: 18px; }
+  .portal-intro { padding: 55px 0 60px; }
+  .portal-intro h1 { font-size: clamp(42px, 11vw, 58px); }
+  .portal-destinations { grid-template-columns: 1fr; }
+  .portal-destination { grid-template-columns: none; gap: 12px; }
+  .presentation .story-scene { padding: 70px 22px; }
+  .presentation .story-note .presentation-piano { margin-inline: -22px; width: calc(100% + 44px); }
+  .presentation .story-copy h1, .presentation .story-copy h2 { font-size: clamp(37px, 10vw, 58px); }
+  .bard-lesson-page { padding-top: 38px; }
+  .lesson-header h1 { font-size: 43px; }
+  .lesson-section-nav { gap: 3px; }
+  .lesson-section-nav a { padding: 8px 10px; }
+  .components-header { gap: 12px; }
+  .components-back-link { white-space: normal; }
+  .piano-roll-card-header { gap: 10px; }
+  .dashboard-content { padding: 30px 16px 48px; }
+}
+@media (max-width: 860px) {
+  .product-header { position: static; width: 0; height: 0; border: 0; }
+  .product-sidebar { position: fixed; z-index: 50; top: 0; bottom: 0; left: 0; width: min(82vw, 280px); height: 100%; background: var(--p-surface); box-shadow: 16px 0 44px rgba(20, 27, 43, .2); transform: translateX(-105%); transition: transform .2s ease; }
+  .product-sidebar.is-open { transform: translateX(0); }
+  .product-sidebar-backdrop { position: fixed; z-index: 45; inset: 0; display: block; background: rgba(12, 18, 29, .46); opacity: 0; visibility: hidden; transition: opacity .2s ease, visibility .2s ease; }
+  .product-sidebar-backdrop.is-visible { opacity: 1; visibility: visible; }
+  .product-mobile-toggle { position: fixed; z-index: 60; top: 12px; left: 14px; display: grid; width: 40px; height: 40px; padding: 9px; place-content: center; gap: 4px; border: 1px solid var(--p-line); border-radius: 9px; background: var(--p-surface); color: var(--p-ink); box-shadow: 0 7px 18px rgba(20, 27, 43, .12); cursor: pointer; }
+  .product-mobile-toggle span { display: block; width: 18px; height: 2px; border-radius: 99px; background: currentColor; }
+  .product-app > main { margin-left: 0; padding-top: 58px; }
+  .flash-messages { top: 62px; left: 14px; }
+  body.navigation-open { overflow: hidden; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  .portal-destination { transition: none; }
+  .portal-destination:hover { transform: none; }
+}

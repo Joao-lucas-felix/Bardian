@@ -1,5 +1,24 @@
 # Convenções do domínio musical
 
+## Assistência à composição (18/10/2026)
+
+`Music::MusicalContext` guarda a escolha explícita de tônica e modo.
+`Music::HarmonicField` usa a escala existente e constrói tríades por terças,
+preservando a grafia. Maior: `I ii iii IV V vi vii°`; menor natural:
+`i ii° III iv v VI VII`. A função tônica, predominante ou dominante é uma
+simplificação pedagógica da primeira versão. Em menor natural, `v` é menor;
+esta etapa não altera a escala para menor harmônica.
+
+`Music::CompositionAssistant` lê região e notas selecionadas do documento
+validado. Alturas MIDI são comparadas por classe cromática à escala escrita;
+isso não inventa grafia para o evento. Notas fora da escala são informadas,
+mas mantidas. Bateria e composições sem contexto ficam sem análise tonal.
+Uma fonte de sugestões implementa `call(field:, selected:, region:)` e devolve
+possibilidades; a fonte inicial `Music::HarmonicFieldSuggestions` ordena
+tríades por notas selecionadas em comum. Aplicar uma sugestão exige clique,
+acrescenta apenas alturas ainda ausentes no mesmo início e usa o autosave
+e histórico MIDI existentes. Nenhuma sugestão é regra obrigatória.
+
 Este documento registra as convenções implementadas em Note, Interval,
 IntervalSpec, ScalePattern e Scale. As escolhas delimitam o escopo atual
 e podem ser revistas explicitamente conforme as necessidades do projeto.
@@ -165,5 +184,26 @@ por grafias de mesma altura.
 Por exemplo, D##4 com o padrão maior exigiria F triplo sustenido
 na terceira posição, impedindo a construção dessa escala.
 
-A representação atual descreve uma sequência de alturas com grafia
-e oitava. Não define duração, ritmo, reprodução ou funções harmônicas.
+## 11. Declaração e realização da harmonia
+
+`Music::HarmonyBlock` representa um acorde escrito e sua posição na timeline,
+separado de qualquer execução MIDI. Sua fundamental não possui oitava e a
+qualidade pertence ao conjunto de tríades maior, menor e diminuta. O bloco não
+guarda notas: a faixa de realização continua sendo a fonte dos eventos
+reproduzidos. Assim, editar ou apagar essas notas não altera a declaração.
+
+`Music::Composition#harmony_blocks` distingue três casos: ausência da chave
+para documentos anteriores, lista vazia para declaração intencionalmente sem
+blocos e lista validada para harmonia declarada. A composição valida IDs
+globais, início em zero e continuidade. `Music::HarmonyLane` deriva cifra,
+grau e função a partir da declaração e expõe quando a realização diverge ou
+está vazia; essa interpretação não modifica as notas.
+
+`Music::HarmonyRecovery` fornece apenas uma proposta não persistida quando a
+partição das notas e a grafia no contexto tonal são únicas. Ambiguidade não é
+resolvida por heurística: exige escolha do usuário. Os detalhes do formato e
+das operações seguras estão em
+[`contrato-musical-mvp1.md`](contrato-musical-mvp1.md).
+
+A representação de `Scale` descreve alturas com grafia e oitava; ela, por si
+só, não define duração, ritmo, reprodução ou funções harmônicas.

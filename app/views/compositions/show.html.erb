@@ -1,51 +1,19 @@
-<%# Reúne metadados e timeline sobre o mesmo documento musical salvo. %>
-<% content_for :title, "Bardian — #{@composition.name}" %>
-<% content_for :main_class, "compositions-page" %>
-
-<div class="compositions-shell compositions-editor-shell" data-controller="composition-timeline" data-composition-timeline-url-value="<%= composition_path(@composition, format: :json) %>">
-  <header class="compositions-heading">
-    <%= link_to "← Minhas composições", compositions_path, class: "compositions-back" %>
-    <p class="compositions-eyebrow">Composição salva</p>
-    <h1><%= @composition.name %></h1>
-    <p>Organize suas faixas e regiões. Salve quando terminar para continuar depois.</p>
+<%# A entrada da música oferece as duas superfícies de edição sobre o mesmo documento. %>
+<% content_for :title, "#{@composition.name} — Bardian" %>
+<% content_for :main_class, "music-page" %>
+<div class="music-shell">
+  <%= link_to "Minhas composições", compositions_path, class: "music-back" %>
+  <header class="music-project-heading">
+    <%= render "cover", composition: @composition %>
+    <div><h1><%= @composition.name %></h1><%= link_to "Editar nome e capa", edit_composition_path(@composition), class: "music-back" %></div>
   </header>
-
-  <% if @error.present? %><p class="compositions-error" role="alert"><%= @error %></p><% end %>
-
-  <section class="compositions-panel" aria-labelledby="composition-details-title">
-    <h2 id="composition-details-title">Dados da composição</h2>
-    <%= form_with url: composition_path(@composition), method: :patch, scope: :composition,
-      data: { composition_timeline_target: "form", action: "input->composition-timeline#changeMetadata change->composition-timeline#changeMetadata submit->composition-timeline#save" },
-      class: "compositions-details-form" do |form| %>
-      <%= hidden_field_tag :lock_version, @composition.lock_version %>
-      <div class="compositions-field">
-        <%= form.label :name, "Nome" %>
-        <%= form.text_field :name, value: @composition.name, maxlength: 120, required: true, data: { composition_timeline_target: "name" } %>
-      </div>
-      <div class="compositions-field">
-        <%= form.label :bpm, "Andamento (BPM)" %>
-        <%= form.number_field :bpm, value: @composition.document["bpm"], min: 1, step: 1, required: true, data: { composition_timeline_target: "bpm" } %>
-      </div>
-      <div class="compositions-field">
-        <%= form.label :numerator, "Batidas por compasso" %>
-        <%= form.number_field :numerator, value: @composition.document.dig("time_signature", "numerator"), min: 1, step: 1, required: true, data: { composition_timeline_target: "numerator" } %>
-      </div>
-      <div class="compositions-field">
-        <%= form.label :denominator, "Valor da batida" %>
-        <%= form.select :denominator, Music::Composition::VALID_DENOMINATORS,
-          { selected: @composition.document.dig("time_signature", "denominator") }, data: { composition_timeline_target: "denominator" } %>
-      </div>
-      <p class="compositions-save-state" role="status" data-composition-timeline-target="status">Carregando composição…</p>
-      <noscript><p class="compositions-save-state">Sem JavaScript, este formulário salva nome, andamento e compasso. A timeline requer JavaScript.</p></noscript>
-      <%= form.submit "Salvar composição", class: "product-button product-button-primary", data: { composition_timeline_target: "saveButton" } %>
+  <section class="music-paths" aria-label="Como quer compor?">
+    <%= link_to composition_harmony_path(@composition), class: "music-path music-path-primary", data: { turbo: false } do %>
+      <%= bard_icon(:score) %><div><h2>Escrever harmonia</h2><p>Escolha acordes, ouça e monte sua sequência.</p></div><span aria-hidden="true"><%= bard_icon(:arrow) %></span>
     <% end %>
   </section>
-
-  <%= render "timeline", track_count: @track_count, region_count: @region_count, note_count: @note_count %>
-  <%= render "region_editor" %>
-
-  <div class="compositions-danger">
+  <details class="music-more"><summary>Mais opções</summary>
     <%= button_to "Excluir composição", composition_path(@composition), method: :delete,
-      form: { data: { turbo_confirm: "Excluir esta composição? Esta ação não pode ser desfeita." } } %>
-  </div>
+      form: { data: { turbo_confirm: "Excluir esta composição? Esta ação não pode ser desfeita." } }, class: "music-delete" %>
+  </details>
 </div>

@@ -7,7 +7,17 @@ class DevReportTest < ActiveSupport::TestCase
   test "carrega os relatorios da dashboard" do
     reports = DevReport.load
 
-    assert_equal 11, reports.length
+    assert_equal reports.length, reports.map(&:slug).uniq.length
+    expanded_report = reports.find { |item| item.slug == "piano-roll-regiao-ampliado" }
+    refute_nil expanded_report
+    assert_equal "/compositions", expanded_report.test_path
+    contextual_report = reports.find { |item| item.slug == "orientacao-contextual-autosave" }
+    refute_nil contextual_report
+    assert_equal "/compositions", contextual_report.test_path
+    density_report = reports.find { |item| item.slug == "editor-composicoes-densidade-tema" }
+    refute_nil density_report
+    assert_equal "/compositions", density_report.test_path
+    assert_equal "/compositions", reports.find { |item| item.slug == "editor-composicoes-janela-mvp1" }.test_path
     assert_equal "/compositions", reports.find { |item| item.slug == "reproducao-composicao-loop-mvp1" }.test_path
     assert_equal "/compositions", reports.find { |item| item.slug == "piano-roll-regioes-persistidas" }.test_path
     assert_equal "/criar", reports.find { |item| item.slug == "arranjo-canvas-instrumentos-iniciais" }.test_path
@@ -44,7 +54,7 @@ class DevReportTest < ActiveSupport::TestCase
     assert_empty DevReport.filter(reports: reports, query: "", tag: "Inexistente")
     assert_equal [ reports.find { |item| item.slug == "piano-roll-webmusic-score" } ], DevReport.filter(reports: reports, query: "BandLab", tag: "Interface")
     assert_equal reports, DevReport.filter(reports: reports, query: "", tag: "")
-    assert_equal [ "Acessibilidade", "Administração", "Aprendizagem", "Composição", "Interface", "MIDI", "Notas", "Tema", "Áudio" ], DevReport.tags(reports: reports)
+    assert_equal [ "Acessibilidade", "Administração", "Aprendizagem", "Autenticação", "Busca", "Composição", "Google", "Harmonia", "Interface", "MIDI", "Notas", "Piano roll", "Responsividade", "Ritmo", "Segurança", "Tema", "Áudio" ], DevReport.tags(reports: reports)
   end
 
   # Um catálogo incompleto deve falhar antes de gerar uma linha sem sentido.

@@ -1,0 +1,31 @@
+#!/usr/bin/env node
+/** Instala o banco versionado. Aceita --archive <arquivo> para builds sem rede;
+ * verifica origem e resultado, extrai só o SF2 esperado e publica por renomeação.
+ * Erros de download/checksum encerram com código não zero sem trocar banco válido. */
+import { readFileSync, mkdirSync, mkdtempSync, rmSync, renameSync, copyFileSync, existsSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { execFileSync } from 'node:child_process'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const bank = JSON.parse(readFileSync(resolve(root, 'config/soundfonts.json'))).fluid_r3
+/** Calcula SHA-256 do arquivo local antes de autorizar sua publicação. */
+const hash = path => createHash('sha256').update(readFileSync(path)).digest('hex')
+const target = resolve(root, `public${bank.path}`)
+mkdirSync(dirname(target), { recursive: true })
+const scratch = mkdtempSync(resolve(dirname(target), '.install-'))
+try {
+  if (!existsSync(target) || hash(target) !== bank.sha256) {
+    const args = process.argv.slice(2)
+    if (args.length && (args.length !== 2 || args[0] !== '--archive')) throw new Error('Uso: bin/setup-soundfonts [--archive arquivo.tar.gz]')
+    const archive = args.length ? resolve(args[1]) : resolve(scratch, 'source.tar.gz')
+    if (!args.length) execFileSync('curl', ['--fail', '--location', '--retry', '2', '--max-time', '300', '--output', archive, bank.source_url], { stdio: 'inherit' })
+    if (hash(archive) !== bank.archive_sha256) throw new Error('Checksum da distribuição FluidR3 inválido')
+    execFileSync('tar', ['-xzf', archive, '-C', scratch, bank.archive_entry])
+    const extracted = resolve(scratch, bank.archive_entry)
+    if (hash(extracted) !== bank.sha256) throw new Error('Checksum do SoundFont inválido')
+    renameSync(extracted, target)
+  }
+  for (const name of ['COPYING', 'README']) copyFileSync(resolve(root, `docs/third-party/FluidR3-${name}`), resolve(dirname(target), name))
+  console.log(`FluidR3 ${bank.version} instalado e verificado: ${target}`)
+} finally { rmSync(scratch, { recursive: true, force: true }) }

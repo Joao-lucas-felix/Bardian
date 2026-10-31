@@ -7,14 +7,13 @@ class ApplicationController < ActionController::Base
 
   protected
 
-  # Direciona cada perfil para o ponto de entrada correspondente após o login.
-  # Usuários comuns permanecem na apresentação até existir uma área própria.
-  def after_sign_in_path_for(resource)
-    resource.admin? ? dashboard_path : root_path
+  # Direciona qualquer perfil para a biblioteca de composições após o login.
+  def after_sign_in_path_for(_resource)
+    compositions_path
   end
 
-  # Impede que usuários autenticados sem perfil administrativo vejam a dashboard.
-  # A mensagem não revela detalhes sobre a estrutura interna da autorização.
+  # Mantido para controllers administrativos históricos até a remoção completa.
+  # Nenhuma rota ativa utiliza esta proteção nesta versão do produto.
   def require_admin!
     return if current_user&.admin?
 

@@ -35,6 +35,7 @@
 /app/assets/builds/*
 !/app/assets/builds/.keep
 /public/assets
+/public/audio-engine
 
 # Ignore CI service files.
 /.github
@@ -49,3 +50,7 @@
 # Ignore Docker-related files
 /.dockerignore
 /Dockerfile*
+
+# Banco instalado por bin/setup-soundfonts; conteúdo não versionado no Git.
+/public/audio/soundfonts/*/
+/.superpowers/

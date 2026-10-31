@@ -1,0 +1,36 @@
+<%# Recebe o formulário e o catálogo preparados pelo controller; apenas apresenta as escolhas iniciais. %>
+<section class="music-starter" aria-label="Primeiros sons">
+  <div class="music-starter-fields">
+    <div class="music-field">
+      <%= form.label :bpm, "Velocidade (BPM)" %>
+      <%= form.number_field :bpm, value: values[:bpm] || 120, min: 30, max: 240, required: true,
+        data: { composition_starter_target: "bpm", action: "change->composition-starter#updateSound" } %>
+    </div>
+    <div class="music-field">
+      <%= form.label :instrument, "Instrumento" %>
+      <%= form.select :instrument, catalogue.map { |item| [item.fetch(:label), item.fetch(:id)] },
+        { selected: values[:instrument] || "synth" },
+        data: { composition_starter_target: "instrument", action: "change->composition-starter#updateSound" } %>
+    </div>
+    <div class="music-field">
+      <%= form.label :tonic, "Tônica" %>
+      <%= form.select :tonic, Music::MusicalContext::TONICS.map { |tonic| [tonic, tonic] },
+        { selected: values[:tonic] || "C" },
+        data: { composition_starter_target: "tonic", action: "change->composition-starter#refreshContext" } %>
+    </div>
+    <div class="music-field">
+      <%= form.label :mode, "Modo" %>
+      <%= form.select :mode, [["Maior", "major"], ["Menor natural", "natural_minor"]],
+        { selected: values[:mode] || "major" },
+        data: { composition_starter_target: "mode", action: "change->composition-starter#refreshContext" } %>
+    </div>
+  </div>
+  <div class="music-starter-preview-heading">
+    <div><h3>Ouça uma ideia de harmonia</h3><p>Quatro acordes por proposta. Ouvir não adiciona nada à música.</p></div>
+    <div class="music-starter-preview-actions"><button type="button" class="product-button product-button-secondary" data-action="composition-starter#stopPreview">Parar</button><button type="button" class="product-button product-button-secondary" data-action="composition-starter#refreshContext">Gerar outras</button></div>
+  </div>
+  <p class="music-starter-status" data-composition-starter-target="status" role="status" aria-live="polite">Preparando propostas…</p>
+  <div class="music-starter-previews" data-composition-starter-target="previews"></div>
+  <%= form.hidden_field :preview_degrees, value: "", data: { composition_starter_target: "degrees" } %>
+  <p class="music-starter-hint">Escolher uma proposta é opcional. Você também pode começar com a harmonia vazia.</p>
+</section>

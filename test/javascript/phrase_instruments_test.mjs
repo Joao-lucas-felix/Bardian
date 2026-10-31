@@ -6,11 +6,21 @@ import vm from "node:vm"
 // A borda de áudio é substituída; o contrato do catálogo permanece real.
 const source = readFileSync(new URL("../../app/javascript/audio/phrase_instruments.js", import.meta.url), "utf8")
   .replace(/^import .*$/gm, "")
+  .replace("export const INSTRUMENT_CATALOG", "const INSTRUMENT_CATALOG")
   .replace("export function createPhraseInstrument", "function createPhraseInstrument")
 const samplers = []
 const players = []
 let failLoad = false
 const Tone = {
+  Synth: class {},
+  PolySynth: class {
+    constructor(type, options) { this.type = type; this.options = options; this.events = [] }
+    toDestination() { players.push(this); return this }
+    connect(destination) { this.destination = destination; players.push(this); return this }
+    triggerAttackRelease(...args) { this.events.push(args) }
+    releaseAll() { this.released = true }
+    dispose() { this.disposed = true }
+  },
   Sampler: class {
     constructor(options) { this.options = options; this.events = []; samplers.push(this) }
     toDestination() { return this }
@@ -28,6 +38,32 @@ const Tone = {
   }
 }
 const createPhraseInstrument = vm.runInNewContext(`${source}\ncreatePhraseInstrument`, { Tone })
+
+const catalog = vm.runInNewContext(`${source}\nINSTRUMENT_CATALOG`, { Tone })
+
+test("timbre exclusivo openDAW nao recebe fallback silencioso no legado", () => {
+  assert.throws(() => createPhraseInstrument("harmony_pad"), /openDAW.*harmonia/i)
+})
+
+test("catálogo organiza as famílias previstas e mantém IDs estáveis", () => {
+  assert.deepEqual(Object.keys(catalog), ["piano", "keyboard", "strings", "guitar", "bass", "winds", "synth", "drums"])
+  assert.equal(catalog.keyboard.category, "teclados")
+  assert.equal(catalog.guitar.category, "cordas dedilhadas")
+  assert.equal(catalog.bass.category, "baixo")
+  assert.equal(catalog.winds.category, "sopros")
+  assert.equal(catalog.synth.category, "sintetizadores e pads")
+  assert.ok(catalog.keyboard.label)
+  assert.ok(catalog.keyboard.source)
+})
+
+test("instrumentos procedurais carregam e aceitam notas MIDI", async () => {
+  for (const id of ["keyboard", "guitar", "bass", "winds", "synth"]) {
+    const instrument = createPhraseInstrument(id)
+    await instrument.load()
+    assert.equal(instrument.trigger(60, 0.5, 10), true)
+    instrument.dispose()
+  }
+})
 
 test("piano e cordas apontam para amostras locais de instrumentos distintos", async () => {
   const piano = createPhraseInstrument("piano")
@@ -52,6 +88,7 @@ test("piano e cordas apontam para amostras locais de instrumentos distintos", as
 })
 
 test("kit toca só as três alturas mapeadas e descarta seus players", async () => {
+  const before = players.length
   const kit = createPhraseInstrument("drums")
   await kit.load()
   const loaded = players.slice(-3)
@@ -69,7 +106,7 @@ test("kit toca só as três alturas mapeadas e descarta seus players", async () 
   kit.dispose()
   assert.ok([...loaded, ...voices].every((player) => player.disposed))
   kit.trigger(36, 1, 14)
-  assert.equal(players.length, 6)
+  assert.equal(players.length, before + 6)
 })
 
 test("batidas próximas da mesma peça mantêm vozes independentes", async () => {

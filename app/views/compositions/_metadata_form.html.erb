@@ -1,0 +1,24 @@
+<%# Recebe composição/URL; a capa é validada no modelo e notas não são reenviadas. %>
+<% if @error.present? %><p class="music-error" role="alert"><%= @error %></p><% end %>
+<%= form_with url: url, method: composition.persisted? ? :patch : :post, scope: :composition, multipart: true,
+  class: "music-form" do |form| %>
+  <%= hidden_field_tag :lock_version, composition.lock_version if composition.persisted? %>
+  <%= hidden_field_tag :return_to, "setup" if local_assigns[:return_to_setup] %>
+  <div class="music-field">
+    <%= form.label :name, "Nome" %>
+    <%= form.text_field :name, value: composition.persisted? ? composition.name : local_assigns.fetch(:starter_values, {})[:name], placeholder: "Nome da sua música", maxlength: 120, required: true, autofocus: true %>
+  </div>
+  <div class="music-field">
+    <%= form.label :cover, "Capa (opcional)" %>
+    <%= form.file_field :cover, accept: "image/jpeg,image/png,image/webp", aria: { describedby: "cover-help" } %>
+    <p id="cover-help">JPG, PNG ou WebP. Até 5 MB.</p>
+    <% if composition.persisted? && composition.cover.attached? %>
+      <%= image_tag cover_composition_path(composition), class: "music-cover-preview", alt: "Capa atual" %>
+      <label class="music-checkbox"><%= form.check_box :remove_cover %> Remover capa atual</label>
+    <% end %>
+  </div>
+  <div class="music-form-actions">
+    <%= form.submit composition.persisted? ? "Salvar alterações" : "Continuar", class: "product-button product-button-primary" %>
+    <%= link_to "Cancelar", local_assigns[:return_to_setup] ? setup_composition_path(composition) : (composition.persisted? ? composition_path(composition) : compositions_path), class: "music-back" %>
+  </div>
+<% end %>

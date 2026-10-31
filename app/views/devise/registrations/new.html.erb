@@ -3,7 +3,7 @@
 <% content_for :main_class, "auth-page" %>
 
 <section class="auth-card" aria-labelledby="auth-title">
-  <p class="auth-kicker">Bardian</p>
+  <p class="auth-kicker">Bardian <%= bard_icon(:spark) %></p>
   <h1 id="auth-title">Criar conta</h1>
   <p class="auth-description">Comece a explorar seu espaço musical.</p>
 
@@ -29,6 +29,8 @@
     <%= f.submit "Criar conta", class: "auth-submit" %>
   <% end %>
 
+  <%= render "devise/shared/google_button", label: "Continuar com Google" %>
+
   <p class="auth-secondary-action">
     Já possui uma conta?
     <%= link_to "Entrar", new_session_path(resource_name) %>
@@ -36,6 +38,6 @@
   <%# Oferece caminhos de retorno sem depender do histórico do navegador. %>
   <nav class="auth-return" aria-label="Explorar o Bardian">
     <%= link_to "Início", root_path %>
-    <%= link_to "Apresentação", presentation_path %>
+    <%= link_to "Minhas composições", compositions_path %>
   </nav>
 </section>

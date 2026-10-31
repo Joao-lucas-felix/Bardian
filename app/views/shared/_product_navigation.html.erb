@@ -1,40 +1,35 @@
-<%# Navegação global entre áreas existentes; a administração só aparece a administradores. %>
-<header class="product-header">
-  <div class="product-header-inner">
-    <%= link_to root_path, class: "product-brand", aria: { label: "Bardian — início" } do %>
-      <span class="product-brand-mark" aria-hidden="true">b.</span>
-      <span>Bardian</span>
+<%# Navegação global fixa no desktop e recolhível no celular; permissões continuam no servidor. %>
+<header class="product-header" data-controller="product-navigation">
+  <button type="button" class="product-mobile-toggle" data-product-navigation-target="toggle" data-action="click->product-navigation#toggle" aria-expanded="false" aria-controls="product-sidebar" aria-label="Abrir navegação">
+    <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+  </button>
+
+  <div class="product-sidebar-backdrop" data-product-navigation-target="backdrop" data-action="click->product-navigation#close" aria-hidden="true"></div>
+
+  <aside id="product-sidebar" class="product-sidebar" data-product-navigation-target="sidebar">
+    <%= link_to root_path, class: "product-brand", aria: { label: "Bardian — início" }, data: { action: "click->product-navigation#close" } do %>
+      <span class="product-brand-mark" aria-hidden="true"><%= render "shared/sound_mark" %></span>
+      <span class="product-brand-copy"><strong>Bardian <%= bard_icon(:spark) %></strong><small>jornada musical</small></span>
     <% end %>
 
+    <p class="product-nav-caption">Navegar</p>
     <nav class="product-nav" aria-label="Navegação principal">
-      <%= link_to root_path, class: "product-nav-link #{'is-current' if current_page?(root_path)}", aria: (current_page?(root_path) ? { current: "page" } : {}) do %>
+      <%= link_to root_path, class: "product-nav-link #{'is-current' if current_page?(root_path)}", aria: (current_page?(root_path) ? { current: "page" } : {}), data: { action: "click->product-navigation#close" } do %>
         <%= bard_icon(:home) %><span>Início</span>
       <% end %>
-      <%= link_to notes_lesson_path, class: "product-nav-link #{'is-current' if current_page?(notes_lesson_path)}", aria: (current_page?(notes_lesson_path) ? { current: "page" } : {}) do %>
-        <%= bard_icon(:book) %><span>Aprender</span>
+      <%= link_to compositions_path, class: "product-nav-link #{'is-current' if request.path.start_with?(compositions_path)}", aria: (request.path.start_with?(compositions_path) ? { current: "page" } : {}), data: { action: "click->product-navigation#close" } do %>
+        <%= bard_icon(:score) %><span>Minhas composições</span>
       <% end %>
-      <%= link_to bard_path_index_path, class: "product-nav-link #{'is-current' if request.path.start_with?(bard_path_index_path)}", aria: (request.path.start_with?(bard_path_index_path) ? { current: "page" } : {}) do %>
-        <%= bard_icon(:home) %><span>Caminho do Bardo</span>
-      <% end %>
-      <%= link_to compose_path, class: "product-nav-link #{'is-current' if current_page?(compose_path)}", aria: (current_page?(compose_path) ? { current: "page" } : {}) do %>
-        <%= bard_icon(:create) %><span>Criar</span>
-      <% end %>
-      <% if user_signed_in? %>
-        <%= link_to compositions_path, class: "product-nav-link #{'is-current' if request.path.start_with?(compositions_path)}", aria: (request.path.start_with?(compositions_path) ? { current: "page" } : {}) do %>
-          <%= bard_icon(:create) %><span>Minhas músicas</span>
-        <% end %>
-      <% end %>
-      <%= link_to presentation_path, class: "product-nav-link #{'is-current' if current_page?(presentation_path)}", aria: (current_page?(presentation_path) ? { current: "page" } : {}) do %>
-        <%= bard_icon(:compass) %><span>Sobre</span>
-      <% end %>
-      <% if user_signed_in? && current_user.admin? %>
-        <%= link_to dashboard_path, class: "product-nav-link #{'is-current' if current_page?(dashboard_path)}", aria: (current_page?(dashboard_path) ? { current: "page" } : {}) do %>
-          <%= bard_icon(:admin) %><span>Painel</span>
-        <% end %>
+      <%= link_to bard_path_index_path, class: "product-nav-link #{'is-current' if request.path.start_with?(bard_path_index_path)}", aria: (request.path.start_with?(bard_path_index_path) ? { current: "page" } : {}), data: { action: "click->product-navigation#close" } do %>
+        <%= bard_icon(:map) %><span>Caminho do Bardo</span>
       <% end %>
     </nav>
 
-    <div class="product-header-actions">
+    <div class="product-sidebar-footer">
+      <div class="product-journey-meter" aria-label="Jornada musical visual">
+        <span class="product-journey-meter-label">Jornada musical</span>
+        <span class="product-journey-meter-track" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      </div>
       <div class="theme-control" data-controller="theme">
         <button type="button" class="theme-toggle" data-theme-target="toggle"
                 data-action="click->theme#toggle" aria-pressed="false" aria-label="Ativar tema escuro">
@@ -43,5 +38,5 @@
       </div>
       <%= render "shared/account_navigation" %>
     </div>
-  </div>
+  </aside>
 </header>

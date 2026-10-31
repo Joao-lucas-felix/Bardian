@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Configura o Devise para autenticação por e-mail e senha.
+# Configura o Devise para autenticação por senha e por identidade Google.
 # Os módulos de recuperação, confirmação, bloqueio e autenticação multifator
 # permanecem fora do primeiro incremento do sistema.
 Devise.setup do |config|
@@ -30,4 +30,13 @@ Devise.setup do |config|
 
   # Mantém tokens de lembrar-me inválidos depois do logout.
   config.expire_all_remember_me_on_sign_out = true
+
+  # Usa apenas dados básicos de identidade; as credenciais reais vêm do ambiente.
+  config.omniauth :google_oauth2, ENV.fetch("GOOGLE_CLIENT_ID", ""),
+    ENV.fetch("GOOGLE_CLIENT_SECRET", ""), scope: "openid,email,profile",
+    prompt: "select_account"
 end
+
+# A autorização usa POST e valida o token CSRF gerado pelo Rails.
+OmniAuth.config.allowed_request_methods = [ :post ]
+OmniAuth.config.request_validation_phase = OmniAuth::AuthenticityTokenProtection.new(key: :_csrf_token)

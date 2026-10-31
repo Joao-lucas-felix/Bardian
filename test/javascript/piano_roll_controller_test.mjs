@@ -29,7 +29,7 @@ const createPhraseInstrument = (id) => {
   instruments.push(instrument)
   return instrument
 }
-const dom = { createElement: (tagName) => ({ tagName: tagName.toUpperCase(), className: "", dataset: {}, attributes: {}, children: [], addEventListener() { this.listens = true }, setAttribute(name, value) { this.attributes[name] = value }, append(child) { this.children.push(child) } }) }
+const dom = { documentElement: {}, createElement: (tagName) => ({ tagName: tagName.toUpperCase(), className: "", dataset: {}, attributes: {}, children: [], addEventListener() { this.listens = true }, setAttribute(name, value) { this.attributes[name] = value }, append(child) { this.children.push(child) } }) }
 // Mantém o teste nos cálculos do controller; o pacote externo só recebe medidas.
 class Rational { constructor(numerator, denominator = 1) { this.numerator = numerator; this.denominator = denominator } }
 class Duration { constructor(options) { this.base = options.base } }
@@ -45,6 +45,12 @@ class ScoreBuilder {
 }
 const PianoRollController = vm.runInNewContext(`${source}\nPianoRollController`, {
   Controller: class {}, Tone, createPhraseInstrument,
+  getComputedStyle: (element) => ({ getPropertyValue: (name) => element.palette?.[name] || "" }),
+  MutationObserver: class {
+    constructor(callback) { this.callback = callback }
+    observe() {}
+    disconnect() { this.disconnected = true }
+  },
   CustomEvent: class { constructor(type, options) { this.type = type; this.detail = options.detail } },
   document: dom,
   Rational, Duration, ScoreBuilder,
@@ -105,6 +111,71 @@ test("calcula score e limites de um compasso 6 por 8", () => {
   assert.equal(score.measures[0].timeSignature.numerator, 6)
   assert.equal(score.measures[0].durationQuarters.numerator, 3)
   assert.equal(score.measures[0].durationQuarters.denominator, 1)
+})
+
+test("grade MIDI usa a cor do tema ativo em vez de pintar o fundo claro", () => {
+  const instance = editor([])
+  instance.element.palette = { "--piano-roll-grid-bg": "#1d2533", "--piano-roll-grid-row": "#283143" }
+  instance.displayPitches = () => [60]
+  const fills = []
+  const context = {
+    fillStyle: "", clearRect() {}, fillRect() { fills.push(this.fillStyle) },
+    beginPath() {}, moveTo() {}, lineTo() {}, stroke() {}
+  }
+  instance.rollTarget = { clientWidth: 720, clientHeight: 22, getContext: () => context }
+
+  instance.drawRoll()
+
+  assert.equal(fills[0], "#1d2533")
+})
+
+test("troca de tema redesenha o piano roll persistido sem alterar as notas", () => {
+  const instance = editor()
+  instance.hasPersistentModeValue = true
+  instance.persistentModeValue = true
+  let renders = 0
+  instance.render = () => { renders += 1 }
+
+  instance.watchTheme()
+  instance.themeObserver.callback()
+
+  assert.equal(renders, 1)
+  assert.equal(instance.notes[0].pitch, 60)
+})
+
+// O destaque informativo acompanha os tokens dos dois temas sem editar MIDI.
+test("nota fora do contexto conserva o evento e usa indicador do tema", () => {
+  const instance = editor()
+  instance.element.palette = { "--piano-roll-outside-note": "#abc123", "--piano-roll-outside-note-border": "#123abc" }
+  const before = instance.snapshotNotes()
+  let redraws = 0
+  instance.render = () => { redraws += 1 }
+  instance.setOutOfContextNotes(["note-1"])
+  assert.equal(instance.outOfContextNoteIds.has("note-1"), true)
+  assert.equal(instance.canvasColors().outsideNote, "#abc123")
+  assert.equal(instance.canvasColors().outsideNoteBorder, "#123abc")
+  assert.equal(redraws, 1)
+  assert.deepEqual(instance.snapshotNotes(), before)
+})
+
+// Uma mudança de seleção deve informar a composição sem transformar o gesto em edição MIDI.
+test("resumo publica notas selecionadas com nomes usados pelo piano roll", () => {
+  const instance = editor()
+  instance.selectedNoteIds.add("note-1")
+  instance.scoreTarget = { textContent: "" }
+  instance.durationTarget = { disabled: true, value: "" }
+  instance.hasVelocityInputTarget = false
+  const events = []
+  instance.dispatch = (name, options) => { events.push([name, options.detail]) }
+
+  PianoRollController.prototype.updateSummary.call(instance)
+
+  assert.equal(events.length, 1)
+  assert.equal(events[0][0], "selection-changed")
+  assert.equal(events[0][1].notes[0].name, "C4")
+  assert.equal(events[0][1].notes[0].pitch, 60)
+  assert.equal(events[0][1].notes[0].onset, 480)
+  assert.equal(events[0][1].notes[0].velocity, 100)
 })
 
 test("compasso parcial e grade grande nao criam nota alem da regiao", () => {
@@ -171,6 +242,32 @@ test("arraste sem snap mantém deslocamento em ticks inteiros", () => {
   instance.pointerMove(pointer(137, y))
   instance.pointerUp(pointer(137, y))
   assert.equal(Number.isInteger(instance.notes[0].onset), true)
+})
+
+test("cancelar gesto restaura notas e publica confirmação para reanalisar o estado", () => {
+  const instance = editor()
+  let committed = 0
+  instance.commitScore = () => {}
+  instance.confirmNotesChanged = () => { committed += 1 }
+  const before = instance.snapshotNotes()
+  instance.pointerDown(pointer(130, instance.pitchToPixels(60) + 11))
+  instance.pointerMove(pointer(218, instance.pitchToPixels(62) + 11))
+  instance.pointerCancel(pointer(218, instance.pitchToPixels(62) + 11))
+
+  assert.deepEqual(instance.snapshotNotes(), before)
+  assert.equal(instance.interaction, null)
+  assert.equal(committed, 1)
+})
+
+test("cancelar desenho restaura notas selecionadas antes de criar outra", () => {
+  const instance = editor()
+  instance.selectedNoteIds = new Set(["note-1"])
+  instance.commitScore = () => {}
+  instance.pointerDown(pointer(420, instance.pitchToPixels(60) + 11))
+  instance.pointerCancel(pointer(420, instance.pitchToPixels(60) + 11))
+
+  assert.deepEqual(instance.snapshotNotes().map((note) => note.id), ["note-1"])
+  assert.deepEqual([...instance.selectedNoteIds], ["note-1"])
 })
 
 test("prévia e agulha respeitam BPM da composição persistida", async () => {
@@ -491,6 +588,92 @@ test("a agulha cobre a altura inteira da grade após o redimensionamento", () =>
   instance.syncViewport = () => {}
   instance.resizeCanvases()
   assert.equal(instance.playheadTarget.style.height, "1078px")
+})
+
+// Canvas, régua e velocity precisam alcançar a borda do card ampliado.
+test("a grade do piano roll ocupa toda a largura visível do editor", () => {
+  const instance = editor()
+  const widths = []
+  instance.rollTarget = {}
+  instance.rulerTarget = {}
+  instance.velocityTarget = {}
+  instance.rollViewportTarget = { clientWidth: 1600 }
+  instance.playheadTarget = { style: {} }
+  instance.keyboardTarget = { style: { setProperty() {} } }
+  instance.canvasSize = (_canvas, width) => widths.push(width)
+  instance.syncViewport = () => {}
+  instance.render = () => {}
+
+  instance.resizeCanvases()
+
+  assert.deepEqual(widths, [1600, 1600, 1600])
+})
+
+/** A expansão muda somente a viewport e deixa a composição fora do foco até restaurar. */
+test("expande o mesmo piano roll e restaura foco, fundo e notas ao usar Esc", () => {
+  const instance = editor()
+  const original = instance.snapshotNotes()
+  const classes = new Set()
+  const attributes = {}
+  let focused = 0
+  let resized = 0
+  const button = { textContent: "Expandir", attributes: {}, setAttribute(name, value) { this.attributes[name] = value }, focus() { focused += 1 } }
+  const background = { inert: false }
+  const parent = { children: [instance.element, background], parentElement: null }
+  const previousBody = dom.body
+  dom.body = { style: { overflow: "auto" } }
+  parent.parentElement = dom.body
+  instance.element.parentElement = parent
+  instance.element.classList = { add(name) { classes.add(name) }, remove(name) { classes.delete(name) }, contains(name) { return classes.has(name) } }
+  instance.element.setAttribute = (name, value) => { attributes[name] = value }
+  instance.element.removeAttribute = (name) => { delete attributes[name] }
+  instance.hasExpandButtonTarget = true
+  instance.expandButtonTarget = button
+  instance.resizeCanvases = () => { resized += 1 }
+
+  try {
+    instance.toggleExpanded()
+    assert.equal(classes.has("is-expanded"), true)
+    assert.equal(background.inert, true)
+    assert.equal(dom.body.style.overflow, "hidden")
+    assert.equal(attributes["aria-modal"], "true")
+    assert.equal(button.attributes["aria-expanded"], "true")
+    assert.equal(resized, 1)
+
+    let prevented = false
+    let stopped = false
+    instance.handleExpandedKeyDown({ key: "Escape", preventDefault() { prevented = true }, stopPropagation() { stopped = true } })
+    assert.equal(classes.has("is-expanded"), false)
+    assert.equal(background.inert, false)
+    assert.equal(dom.body.style.overflow, "auto")
+    assert.equal(button.attributes["aria-expanded"], "false")
+    assert.equal(focused, 2)
+    assert.equal(resized, 2)
+    assert.equal(prevented && stopped, true)
+    assert.deepEqual(instance.snapshotNotes(), original)
+  } finally {
+    dom.body = previousBody
+  }
+})
+
+// O editor da composição abre com cinco compassos mais fáceis de inspecionar.
+test("a composição persistida abre o piano roll em 75 por cento", () => {
+  const instance = editor()
+  instance.hasPersistentModeValue = true
+  instance.persistentModeValue = true
+  assert.equal(instance.initialZoom(), 0.75)
+  instance.persistentModeValue = false
+  assert.equal(instance.initialZoom(), 1)
+})
+
+// Linhas mais baixas deixam mais alturas acessíveis sem alterar os pitches MIDI.
+test("a composição persistida mostra mais alturas na mesma janela", () => {
+  const instance = editor()
+  instance.hasPersistentModeValue = true
+  instance.persistentModeValue = true
+  assert.equal(instance.initialRowHeight(), 18)
+  instance.persistentModeValue = false
+  assert.equal(instance.initialRowHeight(), 22)
 })
 
 test("redimensionar uma nota no último passo não ultrapassa o quarto compasso", () => {

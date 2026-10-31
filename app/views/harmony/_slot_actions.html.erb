@@ -1,0 +1,15 @@
+<%# Ajusta o acorde selecionado fora do canvas, mas dentro da tela Harmonia. %>
+<div class="harmony-slot-actions" data-harmony-target="slotActions" role="group" aria-label="Ações do acorde selecionado" hidden>
+  <span data-harmony-target="slotLabel"></span>
+  <label class="harmony-duration">Duração
+    <select data-harmony-target="duration" data-action="change->harmony#changeDuration" aria-label="Duração do acorde selecionado">
+      <option value="240">½ tempo</option>
+      <option value="480">1 tempo</option>
+      <option value="960">2 tempos</option>
+      <option value="1920">4 tempos</option>
+    </select>
+  </label>
+  <button type="button" class="product-button product-button-secondary" data-harmony-target="moveEarlier" data-offset="-1" data-action="click->harmony#moveSelected">Antes</button>
+  <button type="button" class="product-button product-button-secondary" data-harmony-target="moveLater" data-offset="1" data-action="click->harmony#moveSelected">Depois</button>
+  <button type="button" class="product-button product-button-secondary" data-harmony-target="removeButton" data-action="click->harmony#removeSelected">Remover acorde e suas notas</button>
+</div>

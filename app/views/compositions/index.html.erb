@@ -1,33 +1,22 @@
-<%# Lista documentos próprios e oferece uma criação vazia para começar. %>
-<% content_for :title, "Bardian — Minhas composições" %>
-<% content_for :main_class, "compositions-page" %>
-
-<div class="compositions-shell">
-  <header class="compositions-heading">
-    <p class="compositions-eyebrow">Meu espaço de criação</p>
-    <h1>Minhas composições</h1>
-    <p>Guarde suas ideias musicais e continue de onde parou.</p>
-  </header>
-
-  <section class="compositions-panel" aria-labelledby="new-composition-title">
-    <h2 id="new-composition-title">Começar uma composição</h2>
-    <%= form_with url: compositions_path, method: :post, class: "compositions-create-form" do %>
-      <%= label_tag :name, "Nome da composição" %>
-      <%= text_field_tag :name, nil, maxlength: 120, placeholder: "Minha nova ideia" %>
-      <%= submit_tag "Criar composição", class: "product-button product-button-primary" %>
-    <% end %>
-  </section>
-
-  <section class="compositions-list" aria-labelledby="saved-compositions-title">
-    <h2 id="saved-compositions-title">Salvas</h2>
-    <% if @compositions.any? %>
-      <div class="compositions-cards">
-        <% @compositions.each do |composition| %>
-          <%= render "composition_card", composition: composition %>
-        <% end %>
-      </div>
-    <% else %>
-      <p class="compositions-empty">Você ainda não salvou nenhuma composição.</p>
-    <% end %>
-  </section>
+<%# Biblioteca própria: filtros no controller, apresentação em linhas e criação dedicada. %>
+<% content_for :title, "Composições — Bardian" %>
+<% content_for :main_class, "music-page" %>
+<div class="music-shell">
+  <header class="music-library-heading"><h1>Composições <span class="game-title-icon"><%= bard_icon(:score) %></span></h1><%= link_to "Nova composição", new_composition_path, class: "product-button product-button-primary" %></header>
+  <%= form_with url: compositions_path, method: :get, class: "music-filters" do |form| %>
+    <div class="music-search"><%= form.label :q, "Buscar", class: "visually-hidden" %><%= form.search_field :q, value: @query, placeholder: "Buscar composição", maxlength: 120 %></div>
+    <%= form.label :sort, "Ordenar", class: "visually-hidden" %>
+    <%= form.select :sort, [["Atualizadas recentemente", "recent"], ["Nome", "name"], ["Mais antigas", "oldest"]], selected: @sort %>
+    <%= form.submit "Filtrar", class: "product-button product-button-secondary" %>
+  <% end %>
+  <% if @compositions.any? %>
+    <div class="music-list" aria-label="Suas composições">
+      <% @compositions.each do |composition| %><%= render "composition_row", composition: composition %><% end %>
+    </div>
+  <% else %>
+    <div class="music-empty"><h2><%= @query.present? ? "Nenhuma composição encontrada" : "Sua próxima música começa aqui" %></h2>
+      <p><%= @query.present? ? "Tente outro nome ou limpe a busca." : "Crie uma composição para começar a escolher seus acordes." %></p>
+      <%= link_to "Limpar busca", compositions_path if @query.present? %>
+    </div>
+  <% end %>
 </div>

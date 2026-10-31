@@ -1,0 +1,19 @@
+<%# Recebe aulas e última visita já validadas no controller; a prévia não é aula publicada. %>
+<div class="bard-map-viewport" tabindex="0" role="region" aria-label="Mapa do Caminho do Bardo">
+<div class="bard-map" data-controller="bard-travel" data-bard-travel-last-value="<%= last_slug %>">
+  <div class="bard-map-origin"><%= image_tag "bard_path/trail_origin.svg", alt: "", width: 400, height: 100 %></div>
+  <div class="bard-map-traveller" data-bard-travel-target="traveller" aria-hidden="true">
+    <svg viewBox="-16 -48 32 52" width="24" height="39" shape-rendering="crispEdges"><path d="M-7-22h14v20H-7" fill="#69b593"/><path d="M-5-31h10v10H-5" fill="#edbd83"/><path d="M-10-33h20v5h-20zm4-7h12v7H-6" fill="#398765"/><path d="M-7-4h5v5h-5zm9 0h5v5H2" fill="#e6c995"/><path d="M6-18h9v12H6zm6-9h3v10h-3" fill="#bc874c"/></svg>
+  </div>
+  <ol class="bard-map-stops" aria-label="Paradas da jornada">
+    <% if entries.empty? %>
+      <%= render "bard_path/map_stop", lesson: nil, completed: false, number: 1 %>
+    <% else %>
+      <% entries.each_with_index do |entry, index| %>
+        <%= render "bard_path/map_stop", lesson: entry[:lesson], completed: entry[:completed], number: index + 1 %>
+      <% end %>
+    <% end %>
+  </ol>
+  <p class="bard-map-message" role="status" data-bard-travel-target="message"></p>
+</div>
+</div>

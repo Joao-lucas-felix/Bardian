@@ -3,6 +3,14 @@ require "json"
 
 # Verifica o contrato musical que será compartilhado com persistência e editor.
 class MusicCompositionTest < ActiveSupport::TestCase
+  # Documentos antigos não ganham contexto; os novos preservam a escolha declarada.
+  test "contexto opcional sobrevive ao json sem mudar documento antigo" do
+    old = composition_data
+    assert_equal old, Music::Composition.from_h(old).to_h
+    chosen = old.merge("context" => { "tonic" => "A", "mode" => "natural_minor" })
+    assert_equal chosen, Music::Composition.from_h(JSON.parse(JSON.generate(chosen))).to_h
+    assert_raises(ArgumentError) { Music::Composition.from_h(old.merge("context" => { "tonic" => "H", "mode" => "major" })) }
+  end
   # Uma composição vazia precisa sobreviver ao transporte em JSON sem inventar faixas.
   test "reconstroi uma composicao vazia apos serializacao" do
     source = { "version" => 1, "id" => "song-1", "name" => "Ideia", "bpm" => 96,

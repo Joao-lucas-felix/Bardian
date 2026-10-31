@@ -1,0 +1,26 @@
+<%# O shell mantém o editor fora das lanes; a timeline injeta somente dados da região ativa. %>
+<section id="composition-region-editor" class="composition-region-editor" data-composition-timeline-target="regionEditor" aria-labelledby="composition-region-editor-title"
+  data-action="piano-roll:request-note-id->composition-timeline#provideNoteId piano-roll:notes-changed->composition-timeline#notesChanged piano-roll:notes-committed->composition-timeline#notesCommitted piano-roll:selection-changed->composition-timeline#selectionChanged piano-roll:playback-started->composition-timeline#previewStarted keydown->composition-timeline#handleEditorKeydown" hidden>
+  <div class="composition-region-editor-heading">
+    <div>
+      <h2 id="composition-region-editor-title" data-region-editor-title>Selecione uma região</h2>
+    </div>
+    <div class="composition-region-editor-actions" aria-label="Histórico de notas da região">
+      <%# A mesma instância MIDI ocupa a janela maior; voltar não descarta a edição em memória. %>
+      <button type="button" class="product-button product-button-secondary" data-composition-timeline-target="expandEditorButton" data-action="click->composition-timeline#toggleRegionEditor" aria-expanded="false" aria-controls="composition-region-editor">Ampliar editor</button>
+      <details class="composition-editor-guide">
+        <summary>Ajuda</summary>
+        <p>As notas são relativas ao início da região. Arraste na grade para criá-las; clique para selecionar. Ajuste duração e velocity nos controles, use Shift para seleção múltipla e Delete para remover. Salve a composição para persistir as mudanças.</p>
+      </details>
+      <button type="button" class="product-button product-button-secondary" data-action="click->composition-timeline#undoNotes">Desfazer</button>
+      <button type="button" class="product-button product-button-secondary" data-action="click->composition-timeline#redoNotes">Refazer</button>
+    </div>
+  </div>
+  <%# A orientação descreve somente dados observáveis da seleção MIDI atual. %>
+  <aside class="composition-guidance" aria-labelledby="composition-guidance-title">
+    <h3 id="composition-guidance-title">Orientação musical</h3>
+    <p data-composition-timeline-target="guidanceText">Selecione uma ou mais notas para ver sua posição MIDI, duração e intensidade.</p>
+  </aside>
+  <template><%= render "pages/piano_roll", editor_title: "Piano roll da região" %></template>
+  <div data-region-editor-mount></div>
+</section>

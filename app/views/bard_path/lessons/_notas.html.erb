@@ -1,0 +1,34 @@
+<%# Aula 5: apresenta os sete nomes naturais e as letras usadas na interface. %>
+<nav class="bard-lesson-outline" aria-label="Nesta aula"><a href="#notas-nomes">Nomes</a><a href="#notas-teclado">Teclado</a><a href="#notas-pratica">Experimentar</a><a href="#notas-revisao">Revisar</a></nav>
+<section id="notas-nomes">
+  <h2>1. Sete nomes para começar</h2>
+  <p>Depois de perceber quando um som acontece, podemos perguntar <strong>qual altura</strong> ouvimos. As notas naturais recebem sete nomes que se repetem: Dó, Ré, Mi, Fá, Sol, Lá e Si. No Bardian, você também verá letras: <strong>C, D, E, F, G, A, B</strong>, respectivamente.</p>
+  <aside class="bard-lesson-callout"><strong>Ao final, você poderá</strong><p>Relacionar os sete nomes às letras, encontrar um Dó no teclado e reconhecer uma sequência curta de notas sem confundir letra, altura e intensidade.</p></aside>
+  <table class="bard-lesson-table"><caption>Nomes naturais e letras correspondentes</caption><thead><tr><th scope="col">Nome</th><th scope="col">Dó</th><th scope="col">Ré</th><th scope="col">Mi</th><th scope="col">Fá</th><th scope="col">Sol</th><th scope="col">Lá</th><th scope="col">Si</th></tr></thead><tbody><tr><th scope="row">Letra</th><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>A</td><td>B</td></tr></tbody></table>
+  <p>A ordem das letras começa em A porque essa é outra convenção de nomeação; a ordem que cantamos aqui começa em Dó. A letra identifica o nome, mas uma nota concreta também pode precisar de oitava e acidente. Conhecer apenas as teclas brancas não esgota as alturas disponíveis.</p>
+</section>
+<section id="notas-teclado">
+  <h2>2. Encontre Dó pelos grupos de teclas pretas</h2>
+  <p>Observe um teclado: as teclas pretas formam grupos de duas e de três. O <strong>Dó</strong> é a tecla branca imediatamente antes de um grupo de duas. Ré fica entre as duas pretas; Mi vem depois. Fá inicia o grupo seguinte, antes das três pretas. Sol e Lá ficam entre as três; Si vem depois.</p>
+  <p>Quando o mesmo desenho aparece mais adiante no teclado, os nomes se repetem em outro registro. As teclas pretas também têm nomes musicais, com acidentes; vamos deixar essa explicação detalhada para uma etapa própria. Elas não são teclas “erradas”, e tocar só as brancas não é regra para compor.</p>
+  <%= render "bard_path/lessons/keyboard", octave: 4 %>
+</section>
+<section id="notas-pratica">
+  <h2>3. Ouça cada nome e monte uma ordem</h2>
+  <p>Ouça Dó, Ré e Mi separadamente, com o mesmo timbre e volume. Depois compare a sequência Dó–Mi–Ré. O nome de cada evento aparece na legenda mesmo quando o áudio estiver parado. Use as outras notas para reconhecer os sete nomes, sem obrigação de decorar tudo de uma vez.</p>
+  <%= render "bard_path/lessons/examples", examples: @examples, lesson_slug: @lesson.slug %>
+  <ol class="bard-lesson-steps"><li>Localize Dó antes do grupo de duas teclas pretas.</li><li>Leia “C”, “D” e “E” e associe a Dó, Ré e Mi antes de ouvir.</li><li>Na sequência Dó–Mi–Ré, diga o nome de cada som na ordem em que começa. Tente uma segunda vez usando as letras C–E–D.</li></ol>
+  <p>Uma resposta possível é “C, E, D”. Se você ouviu a sequência como uma pequena melodia, essa também é uma descrição válida; os nomes ajudam a comunicá-la.</p>
+</section>
+<section>
+  <h2>4. O que aparece no Bardian</h2>
+  <p>No piano roll, a posição vertical de uma nota representa sua altura: notas mais altas ficam acima. Os rótulos em letras ajudam a identificar os sons. Uma cifra de acorde também usa letras, mas contém mais informações que o nome de uma nota isolada; não leia todo acorde como se fosse uma única tecla.</p>
+  <p>Esta prática usa exemplos locais e não escreve notas na sua composição. Quando abrir uma frase para editar, procure primeiro um C e depois observe como a posição de D e E muda no eixo vertical.</p>
+</section>
+<section id="notas-revisao">
+  <h2>5. Relembre sem decorar uma lista inteira</h2>
+  <details><summary>Qual letra representa Dó? E qual representa Sol?</summary><p>Dó corresponde a C; Sol corresponde a G. A sequência completa é Dó–C, Ré–D, Mi–E, Fá–F, Sol–G, Lá–A, Si–B.</p></details>
+  <details><summary>Um som mais alto em volume muda de Dó para Ré?</summary><p>Não. Volume ou intensidade não muda o nome da nota. Para ir de Dó a Ré, a altura musical precisa mudar.</p></details>
+  <details><summary>As teclas pretas ficam fora da música?</summary><p>Não. Elas representam alturas nomeadas com acidentes. Nesta primeira leitura, usamos as notas naturais para localizar o padrão do teclado.</p></details>
+  <p>Os nomes vão se repetir em regiões mais graves e mais agudas. Essa repetição será a próxima experiência.</p>
+</section>

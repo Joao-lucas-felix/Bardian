@@ -31,7 +31,10 @@ dispensa o inventário de licenças de cada componente incorporado.
   A qualidade sonora depende também de instrumentos, samples e mixagem, não
   apenas da biblioteca que controla o áudio.
 - O frontend usa Rails Importmap e não possui `package.json` ou pipeline Vite.
-  O openDAW exige avaliar build de TypeScript, WASM/Rust, worker e AudioWorklet.
+  O pacote npm do openDAW oferece artefatos WASM pré-compilados, mas exige
+  avaliar empacotamento de módulos, worker, AudioWorklet e cabeçalhos de
+  isolamento COOP/COEP. Compilar o engine do repositório upstream também exige
+  Rust; consumir o pacote publicado não implica necessariamente compilar Rust.
 
 ## Direção proposta
 
@@ -54,6 +57,13 @@ faixas e loop, o sprint deve parar nesse ponto e registrar a decisão. Não se
 troca automaticamente para outra arquitetura.
 
 ## Prova de compatibilidade
+
+Na consulta de 18/10/2026, o pacote publicado era
+`@opendaw/studio-sdk` 0.0.174. A prova deve fixar a versão exata testada. O
+pacote inclui o engine WASM pré-compilado e documenta um fallback TypeScript,
+mas a configuração padrão usa WASM e requer contexto cross-origin isolated
+para o `SharedArrayBuffer`. A prova deve testar os cabeçalhos COOP/COEP com os
+assets locais do Bardian e verificar `crossOriginIsolated` no navegador.
 
 O primeiro incremento deve usar uma composição real do Bardian com ao menos
 duas faixas, notas de durações diferentes, andamento e loop. A prova deve
@@ -129,8 +139,12 @@ Se a prova for aprovada, o sprint de base deve:
 
 ## Riscos e decisões
 
-- O SDK pode impor uma migração do pipeline de assets e do build, hoje baseado
-  em Importmap.
+- O SDK pode impor uma migração parcial do pipeline de assets e do build, hoje
+  baseado em Importmap, para resolver módulos, WASM, worker e worklet.
+- Os cabeçalhos COOP/COEP necessários ao engine podem alterar o comportamento
+  de recursos cross-origin usados por outras páginas.
+- O SDK é publicado em versões `0.0.x`; a integração deve fixar uma versão e
+  registrar o custo de acompanhar mudanças de API.
 - A estrutura de sessão do SDK pode divergir do contrato Rails e gerar duas
   representações que precisam de sincronização.
 - A licença AGPL pode aplicar obrigações ao trabalho combinado; a fronteira

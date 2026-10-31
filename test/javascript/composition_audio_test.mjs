@@ -6,6 +6,7 @@ import vm from "node:vm"
 // Tone.js é a borda externa; ambos os módulos de produção são executados juntos.
 const phraseSource = readFileSync(new URL("../../app/javascript/audio/phrase_instruments.js", import.meta.url), "utf8")
   .replace(/^import .*$/gm, "")
+  .replace("export const INSTRUMENT_CATALOG", "const INSTRUMENT_CATALOG")
   .replace("export function createPhraseInstrument", "function createPhraseInstrument")
 const audioSource = readFileSync(new URL("../../app/javascript/audio/composition_audio.js", import.meta.url), "utf8")
   .replace(/^import .*$/gm, "")
@@ -29,6 +30,15 @@ function harness() {
   }
   const Tone = {
     Transport: transport, start: async () => {}, now: () => wallTime,
+    Synth: class {},
+    PolySynth: class {
+      constructor(type, options) { this.type = type; this.options = options; this.events = [] }
+      toDestination() { return this }
+      connect(destination) { this.destination = destination; return this }
+      triggerAttackRelease(...args) { this.events.push(args) }
+      releaseAll() { this.released = true }
+      dispose() { this.disposed = true }
+    },
     Gain: class {
       constructor(value) { this.gain = { value }; gains.push(this) }
       toDestination() { return this }
