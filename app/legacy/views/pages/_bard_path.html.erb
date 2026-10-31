@@ -1,0 +1,32 @@
+<%# Apresenta a futura trilha de aprendizagem musical.
+    Não recebe locals; as lições ainda não estão disponíveis. %>
+<section
+  id="caminho-do-bardo"
+  class="story-scene story-bard-path"
+  aria-labelledby="bard-path-title"
+>
+  <div class="story-copy">
+    <h2 id="bard-path-title">O Caminho do Bardo</h2>
+
+    <p class="story-description">
+      Descubra a música, uma lição de cada vez. Comece pelos primeiros
+      sons e avance pelos conceitos que vão ajudar você a entender
+      suas escolhas e dar forma às suas ideias.
+    </p>
+
+    <p class="story-handwriting">
+      Uma trilha de aprendizagem em desenvolvimento.
+    </p>
+    <%# Oferece um próximo passo acessível ao concluir a apresentação. %>
+    <%= link_to "Primeiras notas", notes_lesson_path, class: "story-button" %>
+    <% if user_signed_in? %>
+      <% if current_user.admin? %>
+        <%= link_to "Ir para o Bardian", dashboard_path, class: "story-button" %>
+      <% else %>
+        <%= link_to "Voltar ao início", root_path, class: "story-button" %>
+      <% end %>
+    <% else %>
+      <%= link_to "Entrar no Bardian", new_user_session_path, class: "story-button" %>
+    <% end %>
+  </div>
+</section>

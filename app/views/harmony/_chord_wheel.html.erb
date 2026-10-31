@@ -1,0 +1,21 @@
+<%# A faixa de opções usa os acordes calculados no domínio, sem duplicar regras musicais. %>
+<section class="harmony-wheel-section" aria-labelledby="harmony-wheel-title">
+  <div class="harmony-section-heading">
+    <h2 id="harmony-wheel-title">Ouça e escolha</h2>
+    <p class="harmony-wheel-instruction">Escolha um acorde para ouvir e ver uma explicação simples.</p>
+  </div>
+  <div class="harmony-wheel" data-harmony-target="wheel" aria-label="Acordes do campo harmônico">
+    <% options.each do |option| %>
+      <button type="button" class="harmony-chord is-<%= option.fetch("function") %>"
+        data-index="<%= option.fetch("index") %>" data-action="click->harmony#selectChord"
+        aria-label="Ouvir <%= option.fetch("symbol") %>. <%= option.fetch("explanation") %>">
+        <small><%= option.fetch("degree") %></small><strong><%= option.fetch("symbol") %></strong>
+      </button>
+    <% end %>
+  </div>
+  <div class="harmony-choice">
+    <p data-harmony-target="selection" role="status" aria-live="polite">Escolha um acorde para ouvir e ver o que ele pode trazer à música.</p>
+    <button type="button" class="product-button product-button-primary" data-harmony-target="addButton"
+      data-action="click->harmony#applySelected" disabled>Adicionar acorde</button>
+  </div>
+</section>

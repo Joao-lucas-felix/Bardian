@@ -1,0 +1,10 @@
+<%# Compõe a jornada com dados do controller e cenário sem regras de domínio. %>
+<% content_for :title, "Caminho do Bardo — Bardian" %>
+<% content_for :main_class, "music-page bard-journey-page" %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "bard_path", "data-turbo-track": "reload" %>
+<% end %>
+
+<div class="music-shell bard-journey">
+  <%= render "bard_path/map", entries: @trail_entries, last_slug: @last_visited_slug %>
+</div>

@@ -1,0 +1,13 @@
+<%# Filtra as entregas por texto e tag usando parâmetros de consulta verificáveis. %>
+<%= form_with url: dashboard_path, method: :get, local: true, class: "dashboard-filters" do %>
+  <div class="dashboard-filter-search">
+    <%= label_tag "report-query", "Buscar entrega" %>
+    <%= search_field_tag :q, query, id: "report-query", placeholder: "Buscar funcionalidade ou alteração" %>
+  </div>
+  <div class="dashboard-filter-tag">
+    <%= label_tag "report-tag", "Tag" %>
+    <%= select_tag :tag, options_for_select([["Todas as tags", ""]] + available_tags.map { |tag| [tag, tag] }, selected_tag), id: "report-tag" %>
+  </div>
+  <%= button_tag "Buscar", type: :submit, class: "dashboard-button dashboard-button-primary" %>
+  <%= link_to "Limpar filtros", dashboard_path, class: "dashboard-button dashboard-button-secondary" %>
+<% end %>

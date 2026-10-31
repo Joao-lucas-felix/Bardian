@@ -33,7 +33,24 @@ Sempre que houver conflito entre velocidade de implementação e compreensão do
 
 # 3. Papel do usuário na implementação
 
-Sempre que possível, o próprio usuário deve realizar a implementação.
+O usuário pode implementar pessoalmente ou autorizar o agente a implementar. Sua participação deve ocorrer pela compreensão das decisões e do estado do projeto, sem obrigação de escrever o código manualmente.
+
+Como o prazo de finalização do projeto está se aproximando, o trabalho pode avançar em passos maiores, desde que cada passo tenha escopo explícito, objetivo verificável e relação clara com as prioridades do TCC.
+
+Antes de iniciar uma etapa maior, o agente deve:
+
+1. apresentar o objetivo, o escopo e os arquivos ou módulos potencialmente afetados;
+2. explicar a responsabilidade, o funcionamento e o motivo da alteração;
+3. indicar as decisões relevantes, as alternativas e os riscos de escopo;
+4. explicar como verificar o comportamento, incluindo os testes propostos;
+5. informar o início da execução e manter o usuário atualizado durante a etapa;
+6. revisar o resultado e registrar limitações ou decisões importantes.
+
+A autorização do usuário para uma etapa vale para todo o escopo apresentado, incluindo implementação, testes, correções necessárias dentro desse escopo e ajustes documentais relacionados. Não é necessário pedir nova autorização para cada pequeno incremento contido na etapa.
+
+Se surgir uma mudança fora do escopo autorizado, especialmente uma alteração estrutural, uma nova dependência, uma mudança de arquitetura ou uma expansão relevante do produto, o agente deve interromper essa parte, explicá-la e solicitar nova decisão.
+
+Mensagens como "vamos seguir" ou "continuar" autorizam o prosseguimento da etapa já delimitada quando houver uma autorização explícita anterior para ela. Fora desse caso, devem ser interpretadas como pedido de apresentação do próximo passo.
 
 O agente deve preferir:
 
@@ -51,35 +68,23 @@ O agente deve preferir:
 
 O agente não deve transformar automaticamente uma discussão em uma grande implementação pronta.
 
-Código completo produzido pelo agente deve ser reservado para situações em que:
-
-- o usuário solicitar explicitamente;
-- a implementação for repetitiva ou mecânica;
-- o trecho já tiver sido discutido e compreendido;
-- o código servir como referência didática;
-- houver necessidade de destravar um problema específico.
-
-Mesmo nesses casos, o agente deve explicar o que foi produzido.
+O agente pode apresentar código completo para o pequeno incremento em discussão, acompanhado de explicações. Para aplicá-lo ao projeto, deve seguir a consulta prévia acima, inclusive em correções, testes, refatorações e tarefas repetitivas ou mecânicas.
 
 ---
 
-# 4. Regra de implementação incremental
+# 4. Regra de implementação por etapas
 
-Novas funcionalidades devem ser desenvolvidas em pequenas unidades.
+Novas funcionalidades devem ser desenvolvidas em etapas delimitadas. Na reta final do projeto, uma etapa pode atravessar múltiplas camadas quando isso for necessário para entregar um fluxo demonstrável e reduzir o risco de não conclusão.
 
-A unidade de trabalho padrão deve ser, conforme o caso:
+Cada etapa deve declarar:
 
-- uma estrutura de domínio;
-- uma classe;
-- uma função;
-- um método;
-- um componente;
-- um endpoint;
-- uma regra de negócio;
-- um teste;
-- um pequeno fluxo entre módulos.
+- o resultado esperado;
+- as partes do sistema envolvidas;
+- as decisões que permanecem abertas;
+- os testes ou verificações previstos;
+- as limitações que não serão resolvidas naquela etapa.
 
-Evitar implementar de uma só vez funcionalidades grandes que envolvam múltiplas camadas do sistema.
+As unidades menores continuam sendo úteis para organizar o trabalho, mas não exigem aprovação individual quando estiverem dentro de uma etapa previamente autorizada.
 
 O fluxo preferencial é:
 
@@ -90,13 +95,15 @@ delimitar a responsabilidade
         ↓
 discutir alternativas
         ↓
-escolher o próximo pequeno passo
+definir a próxima etapa concluível
         ↓
-explicar como implementar
+apresentar escopo, código ou plano técnico e explicar como verificar
         ↓
-usuário implementa sempre que possível
+obter autorização para a etapa quando ela ainda não estiver autorizada
         ↓
-agente revisa
+agente implementa a etapa autorizada ou usuário implementa, se preferir
+        ↓
+agente revisa o conjunto da etapa
         ↓
 testar
         ↓
@@ -914,7 +921,7 @@ Somente depois o fluxo deve ser transformado em código.
 
 # 42. Quando apresentar código
 
-Quando apresentar código, o agente deve preferir pequenos trechos focados no problema atual.
+Quando apresentar código, o agente deve preferir trechos compreensíveis e relacionados ao escopo da etapa atual. É permitido apresentar ou aplicar alterações que atravessem mais de um módulo quando isso for necessário para completar o fluxo autorizado, desde que as responsabilidades e os limites de cada parte sejam explicados.
 
 O código deve vir acompanhado de explicação sobre:
 
@@ -1013,6 +1020,8 @@ O agente pode:
 
 Essas ações não significam autorização para alterar o projeto.
 
+Depois que uma etapa maior for autorizada, o agente pode executar as alterações, testes, correções locais e atualizações documentais que estejam dentro do escopo dessa etapa sem solicitar aprovação a cada arquivo ou incremento intermediário.
+
 ---
 
 # 47. O que deve ser discutido antes de alterar
@@ -1046,15 +1055,17 @@ Agente relaciona o objetivo ao escopo do TCC
         ↓
 Agente identifica dependências conceituais
         ↓
-Agente propõe o menor próximo passo
+Agente propõe uma etapa concluível, compatível com o prazo
         ↓
-Agente explica como implementar
+Agente apresenta escopo, abordagem, código ou plano técnico e explica como verificar
         ↓
-Usuário implementa sempre que possível
+Agente pergunta se pode implementar a etapa, quando ela ainda não estiver autorizada
         ↓
-Agente revisa
+Agente implementa toda a etapa autorizada ou usuário implementa, se preferir
         ↓
-Usuário corrige ou agente auxilia na correção
+Agente revisa o conjunto das mudanças
+        ↓
+Correções dentro do escopo autorizado são aplicadas e registradas; mudanças fora dele exigem nova autorização
         ↓
 Teste
         ↓
@@ -1075,7 +1086,7 @@ Em vez de:
 
 O agente deve preferir:
 
-> Para chegar às escalas, primeiro precisamos garantir que a representação de nota suporta as operações necessárias. Vamos analisar a estrutura atual de `Note`. Depois escolhemos uma operação pequena, como representar a distância entre duas notas. Você implementa a primeira versão e eu reviso com você.
+> Para chegar às escalas, primeiro precisamos garantir que a representação de nota suporta as operações necessárias. Vamos analisar a estrutura atual de `Note`. Depois escolhemos uma operação pequena, apresento o código proposto e explico seu funcionamento e verificação. Ao final, pergunto se posso implementá-lo.
 
 ---
 
@@ -1149,7 +1160,55 @@ Não é necessário antecipar todas as funcionalidades futuras.
 
 ---
 
-# 54. Regra final
+# 54. Comentários explicativos e documentação do código
+
+Todo código produzido pelo agente deve incluir comentários explicativos e documentação de classes, módulos, funções e métodos, conforme aplicável. Essa regra vale tanto para código inserido nos arquivos do projeto quanto para exemplos apresentados na conversa.
+
+A documentação deve explicar:
+
+- a responsabilidade do trecho;
+- os parâmetros de entrada e seus significados;
+- o retorno ou resultado esperado;
+- as regras musicais e convenções utilizadas, quando houver;
+- os erros, restrições e efeitos colaterais relevantes.
+
+Utilizar docstrings nas linguagens que oferecem esse recurso ou comentários de documentação equivalentes. Em Ruby, utilizar comentários com `#` imediatamente antes da definição documentada; em JavaScript, utilizar comentários no formato JSDoc quando aplicável.
+
+Os comentários explicativos devem ser escritos em português e ajudar o autor a compreender o raciocínio, as decisões e as partes menos evidentes do fluxo. Evitar comentários que apenas repitam literalmente o código, sem acrescentar informação.
+
+Ao modificar um trecho, atualizar também sua documentação e seus comentários para que permaneçam coerentes com o comportamento implementado. A explicação na conversa complementa, mas não substitui, a documentação no próprio código.
+
+---
+
+# 54-A. Planejamento de views e partials
+
+Antes de implementar uma página, o agente deve planejar a composição da view: identificar a responsabilidade da página principal, os blocos que a formam e quais deles devem ser extraídos para partials.
+
+A view principal deve deixar clara a estrutura da página. Blocos com responsabilidade própria, reutilizados ou extensos devem ser organizados em partials com nomes que indiquem seu propósito. A divisão deve favorecer compreensão e manutenção, sem criar um partial para cada pequeno elemento nem depender de um limite arbitrário de linhas.
+
+O planejamento deve indicar quais dados cada partial recebe e de onde eles vêm. Consultas, autorização e regras de domínio não devem ser transferidas para partials apenas para reduzir o tamanho da view; essas responsabilidades devem permanecer nas camadas apropriadas.
+
+---
+
+# 54-B. Revisão de responsabilidades após cada funcionalidade
+
+Antes de considerar uma funcionalidade concluída, o agente deve revisar o código alterado, com atenção especial aos arquivos ERB. Deve identificar trechos em que a view ou um partial esteja assumindo consultas de dados, autorização, regras de negócio ou transformações complexas.
+
+Views e partials devem priorizar apresentação e interações simples. Controllers coordenam fluxo e acesso; modelos ou objetos próprios concentram regras e dados; helpers podem concentrar formatação de apresentação quando isso tornar o código mais claro. A extração de responsabilidades deve ser justificada pela legibilidade e pelo comportamento, não apenas pelo tamanho dos arquivos.
+
+O agente deve informar ao usuário os pontos encontrados, as separações realizadas e as limitações que permaneceram. Deve verificar a renderização e executar os testes afetados. Refatorações fora do escopo autorizado exigem nova decisão antes de serem aplicadas.
+
+---
+
+# 54-C. Registro de entregas no DevReport
+
+Após implementar e verificar uma funcionalidade ou concluir um plano de implementação, o agente deve registrar a entrega em `config/dev_reports.yml` antes de encerrar a etapa. O registro deve conter título, descrição curta, alterações criadas ou modificadas, data, tags e um link interno existente para testá-la.
+
+Um plano com várias tarefas deve gerar registros por funcionalidade verificável, não por tarefa técnica. Não registrar recursos apenas planejados, incompletos ou sem rota de teste; nesses casos, o agente deve informar a limitação ao usuário.
+
+---
+
+# 55. Regra final
 
 O agente deve ajudar o usuário a construir o projeto, mas o conhecimento sobre o projeto deve permanecer com o usuário.
 

@@ -1,0 +1,12 @@
+<%# Teclado estático de referência: mostra os nomes naturais e o padrão de teclas pretas. %>
+<figure class="bard-lesson-keyboard">
+  <figcaption>Uma oitava de Dó<%= octave %> a Si<%= octave %>. Os nomes permanecem visíveis sem áudio.</figcaption>
+  <div class="bard-keyboard-keys">
+    <% { "C" => "Dó", "D" => "Ré", "E" => "Mi", "F" => "Fá", "G" => "Sol", "A" => "Lá", "B" => "Si" }.each do |letter, name| %>
+      <span class="bard-keyboard-white" data-note="<%= letter %><%= octave %>"><strong><%= name %><%= octave %></strong><small><%= letter %><%= octave %></small></span>
+    <% end %>
+    <% [14.2857, 28.5714, 57.1429, 71.4286, 85.7143].each do |position| %>
+      <span class="bard-keyboard-black" style="left: <%= position %>%;" aria-hidden="true"></span>
+    <% end %>
+  </div>
+</figure>

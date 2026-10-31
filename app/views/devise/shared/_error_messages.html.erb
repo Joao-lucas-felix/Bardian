@@ -1,0 +1,11 @@
+<%# Apresenta erros de validação sem expor dados sensíveis da autenticação. %>
+<% if resource.errors.any? %>
+  <div class="auth-errors" role="alert">
+    <strong>Não foi possível concluir o cadastro.</strong>
+    <ul>
+      <% resource.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

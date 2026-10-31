@@ -1,0 +1,24 @@
+<%# Transporte e timbre ficam fora do frame, conservando áudio e documento durante a troca. %>
+<div class="harmony-toolbar">
+  <div class="harmony-lane-actions">
+    <span class="harmony-playback-indicator" data-harmony-target="playbackMeter" data-state="stopped" aria-hidden="true"><%= render "shared/sound_mark" %></span>
+    <button type="button" class="product-button product-button-primary" data-harmony-target="playButton" data-action="click->harmony#play" disabled>Ouvir harmonia</button>
+    <button type="button" class="product-button product-button-secondary" data-action="click->harmony#stop">Parar</button>
+  </div>
+  <div class="harmony-editor-actions">
+    <button type="button" class="product-button product-button-secondary" data-action="harmony#undoNotes">Desfazer</button>
+    <button type="button" class="product-button product-button-secondary" data-action="harmony#redoNotes">Refazer</button>
+  </div>
+  <label class="harmony-instrument">Timbre
+    <select aria-label="Timbre" data-harmony-target="instrument" data-action="change->harmony#changeInstrument">
+      <% catalogue.each do |item| %>
+        <option value="<%= item.fetch(:id) %>" <%= "selected" if item.fetch(:id) == instrument %>><%= item.fetch(:label) %><%= " · lo-fi" if item[:lofi] %></option>
+      <% end %>
+    </select>
+  </label>
+  <nav class="harmony-panel-nav" aria-label="Painéis da composição" data-turbo="true">
+    <% { "guided" => "Harmonia", "settings" => "Ajustes e sugestões", "editor" => "Piano roll" }.each do |panel, label| %>
+      <%= link_to label, panel_composition_harmony_path(composition, panel: panel), data: { turbo_frame: "harmony-panel", panel: panel, action: "click->harmony#selectPanel" }, class: "music-back #{'is-current' if panel == current_panel}", aria: (panel == current_panel ? { current: "page" } : {}) %>
+    <% end %>
+  </nav>
+</div>

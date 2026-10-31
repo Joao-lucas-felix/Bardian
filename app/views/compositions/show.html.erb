@@ -1,0 +1,19 @@
+<%# A entrada da música oferece as duas superfícies de edição sobre o mesmo documento. %>
+<% content_for :title, "#{@composition.name} — Bardian" %>
+<% content_for :main_class, "music-page" %>
+<div class="music-shell">
+  <%= link_to "Minhas composições", compositions_path, class: "music-back" %>
+  <header class="music-project-heading">
+    <%= render "cover", composition: @composition %>
+    <div><h1><%= @composition.name %></h1><%= link_to "Editar nome e capa", edit_composition_path(@composition), class: "music-back" %></div>
+  </header>
+  <section class="music-paths" aria-label="Como quer compor?">
+    <%= link_to composition_harmony_path(@composition), class: "music-path music-path-primary", data: { turbo: false } do %>
+      <%= bard_icon(:score) %><div><h2>Escrever harmonia</h2><p>Escolha acordes, ouça e monte sua sequência.</p></div><span aria-hidden="true"><%= bard_icon(:arrow) %></span>
+    <% end %>
+  </section>
+  <details class="music-more"><summary>Mais opções</summary>
+    <%= button_to "Excluir composição", composition_path(@composition), method: :delete,
+      form: { data: { turbo_confirm: "Excluir esta composição? Esta ação não pode ser desfeita." } }, class: "music-delete" %>
+  </details>
+</div>

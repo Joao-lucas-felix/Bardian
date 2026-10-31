@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="100" viewBox="0 0 400 100" preserveAspectRatio="xMidYMid meet" shape-rendering="crispEdges">  <defs>
+    <pattern id="grass" width="64" height="56" patternUnits="userSpaceOnUse">
+      <rect width="64" height="56" fill="#b5c77b"/>
+      <path d="M8 14h4v4H8zm36 22h6v2h-6zM24 48h2v4h-2z" fill="#a8be70"/>
+      <path d="M52 8h4v2h-4zM18 30h6v2h-6z" fill="#c1d087"/>
+    </pattern>
+    <pattern id="roof" width="24" height="36" patternUnits="userSpaceOnUse">
+      <rect width="24" height="36" fill="#92603f"/>
+      <path d="M0 0h3v36H0zm19 0h5v36h-5z" fill="#704a35"/>
+      <path d="M4 0h2v36H4zM6 3h11v2H6z" fill="#b08150"/>
+      <path d="M8 7h2v2H8zm7 22h2v2h-2z" fill="#d1b075"/>
+    </pattern>
+    <g id="tree">
+      <path d="M8 59h44v8H8z" fill="#93ac66"/>
+      <path d="M25 35h12v30H25z" fill="#7c6440"/>
+      <path d="M31 40h6v25h-6z" fill="#62583a"/>
+      <path d="M12 8h30v7h12v12h7v17h-9v10H12V46H3V27h9z" fill="#678b4b"/>
+      <path d="M17 4h22v6h10v10h7v15H44v9H13V34H7V21h10z" fill="#84a557"/>
+      <path d="M20 9h17v5H20zm-7 13h15v5H13zm24 8h12v5H37z" fill="#a2b966"/>
+      <path d="M15 45h12v5H15zm24-4h10v5H39z" fill="#587e44"/>
+    </g>
+    <g id="autumn">
+      <path d="M8 58h44v8H8z" fill="#97ae68"/>
+      <path d="M25 35h11v28H25z" fill="#7c6240"/>
+      <path d="M12 9h29v7h12v12h6v16H48v9H14v-8H4V25h8z" fill="#b9803e"/>
+      <path d="M17 5h22v8h12v18H40v10H12V30H7V19h10z" fill="#d29c48"/>
+      <path d="M19 10h17v5H19zM12 23h13v5H12zm24 8h12v5H36z" fill="#e0b45d"/>
+    </g>
+    <g id="flower">
+      <path d="M4 4h2v9H4z" fill="#789b51"/><path d="M2 2h6v6H2z" fill="#f5e7a0"/><path d="M4 4h2v2H4z" fill="#c9a558"/>
+    </g>
+    <g id="fence">
+      <path d="M0 8h70v5H0zm0 12h70v5H0z" fill="#b19961"/>
+      <path d="M3 2h7v32H3zm28 0h7v32h-7zm29 0h7v32h-7z" fill="#957b4e"/>
+      <path d="M3 2h3v29H3zm28 0h3v29h-3zm29 0h3v29h-3z" fill="#c3aa70"/>
+    </g>
+  </defs><rect width="400" height="100" fill="url(#grass)"/><path d="M200 0V100" stroke="#a2b66a" stroke-width="28"/><path d="M200 0V100" stroke="#c8b57c" stroke-width="22"/><path d="M200 0V100" stroke="#e4d29a" stroke-width="16"/><use href="#tree" transform="translate(15 5) scale(.7)"/><use href="#autumn" transform="translate(330 20) scale(.6)"/></svg>

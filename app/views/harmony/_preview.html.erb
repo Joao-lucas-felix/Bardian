@@ -1,0 +1,18 @@
+<%# A proposta não modifica a faixa até a ação explícita de aplicar. %>
+<section class="harmony-preview-section" aria-labelledby="harmony-preview-title">
+  <div class="harmony-section-heading">
+    <h2 id="harmony-preview-title">Sugestões de acordes</h2>
+    <p>Ouça antes de adicionar à sua sequência.</p>
+  </div>
+  <div class="harmony-preview-actions">
+    <button type="button" class="product-button product-button-secondary" data-harmony-target="generateButton" data-action="click->harmony#generate">Gerar 4 acordes</button>
+    <button type="button" class="product-button product-button-secondary" data-harmony-target="continueButton" data-action="click->harmony#continue" disabled>Continuar por 4 acordes</button>
+  </div>
+  <div class="harmony-preview" data-harmony-target="preview" aria-live="polite">
+    <p>Gere uma sugestão para experimentar.</p>
+  </div>
+  <div class="harmony-preview-actions">
+    <button type="button" class="product-button product-button-secondary" data-harmony-target="playPreviewButton" data-action="click->harmony#playPreview" disabled>Ouvir prévia</button>
+    <button type="button" class="product-button product-button-primary" data-harmony-target="applyPreviewButton" data-action="click->harmony#applyPreview" disabled>Adicionar sugestão</button>
+  </div>
+</section>

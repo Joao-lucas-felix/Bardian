@@ -1,0 +1,21 @@
+<%# Demonstração mínima para validar carregamento e reprodução do piano. %>
+<% content_for :title, "Bardian — Teste de áudio" %>
+<% content_for :main_class, "audio-demo-page" %>
+
+<section class="audio-demo-card" data-controller="audio-demo" aria-labelledby="audio-demo-title">
+  <h1 id="audio-demo-title">Teste de áudio</h1>
+  <p>Confira a reprodução de uma nota do piano.</p>
+  <button
+    id="play-note"
+    type="button"
+    disabled
+    data-audio-demo-target="button"
+    data-action="click->audio-demo#play"
+    class="product-button product-button-primary">
+    Tocar Lá
+  </button>
+
+  <p data-audio-demo-target="status" role="status">
+    Carregando piano…
+  </p>
+</section>

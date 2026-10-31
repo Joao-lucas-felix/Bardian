@@ -1,0 +1,115 @@
+/* Refinamento global: cores vêm dos tokens compartilhados; o tema claro continua disponível. */
+.product-brand-mark { color: var(--p-on-accent); border-radius: 8px; }
+.product-header { background: var(--p-bg); }
+.product-nav-link { font-weight: 600; border-radius: 6px; }
+.product-nav-link.is-current { color: var(--p-accent); }
+.product-button, .theme-toggle, .product-nav-link { transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease; }
+.product-button-secondary { background: var(--p-surface-alt); }
+.auth-card { box-shadow: none; border-color: var(--p-line); }
+.music-page .music-row:hover { background: var(--p-surface-alt); }
+.music-page .music-cover { background: var(--p-surface-alt); border: 1px solid var(--p-line); }
+.music-page .music-back, .harmony-page .music-back { text-underline-offset: 4px; }
+
+/* Transporte unificado em superfície própria; permanece fora do frame do editor. */
+.harmony-workspace .harmony-intro { padding-bottom: 16px; }
+.harmony-workspace .harmony-intro h1 { letter-spacing: -.025em; }
+.harmony-workspace .harmony-toolbar { padding: 12px 16px; background: var(--p-surface); border: 1px solid var(--p-line); border-radius: 10px; gap: 12px 20px; }
+.harmony-workspace .harmony-toolbar .harmony-editor-actions { margin: 0; }
+.harmony-workspace .harmony-lane-actions { align-items: center; }
+.harmony-workspace .harmony-panel-nav { gap: 4px; }
+/* Na coluna estreita de ajustes, as abas ocupam uma linha própria e começam à esquerda. */
+.harmony-workspace:has(.harmony-settings-panel) .harmony-panel-nav { flex-basis: 100%; margin-left: 0; }
+.harmony-workspace .harmony-panel-nav a { color: var(--p-muted); font-weight: 600; border-radius: 5px; }
+.harmony-workspace .harmony-panel-nav a:is(.is-current, [aria-current="page"]) { background: var(--p-accent-soft); color: var(--p-accent); box-shadow: inset 0 -2px var(--p-accent); }
+.harmony-workspace .harmony-panel-nav a:hover { background: var(--p-surface-alt); color: var(--p-ink); }
+.harmony-workspace .harmony-account-bar :is(.theme-toggle, .account-nav a, .account-nav button) { border-color: transparent; color: var(--p-muted); background: transparent; }
+.harmony-workspace .harmony-save { align-items: center; gap: 16px; }
+.harmony-workspace .harmony-save > span { color: var(--p-muted); font-size: 12px; }
+.harmony-workspace .harmony-instrument { color: var(--p-muted); }
+.harmony-workspace .harmony-instrument select { background: var(--p-bg); border-color: var(--p-line); color: var(--p-ink); border-radius: 5px; }
+.harmony-workspace .harmony-wheel-section { background: var(--p-surface); padding: 20px 20px 14px; border-radius: 12px; }
+.harmony-workspace .harmony-chord { background: var(--p-surface-alt); border-color: var(--p-line); border-radius: 14px; transition: background-color 140ms ease, border-color 140ms ease; }
+.harmony-workspace .harmony-chord:hover { background: var(--p-accent-soft); border-color: var(--p-accent); }
+.harmony-workspace .harmony-chord[aria-pressed="true"] { background: var(--p-accent); border-color: var(--p-accent); color: var(--p-on-accent); outline: 2px solid var(--p-accent); outline-offset: 3px; }
+.harmony-workspace .harmony-chord[aria-pressed="true"] :is(strong, small) { color: var(--p-on-accent); }
+.harmony-workspace .harmony-choice { padding-top: 12px; border-top: 1px solid var(--p-line); }
+.harmony-workspace .harmony-choice p { color: var(--p-muted); line-height: 1.6; }
+.harmony-workspace .harmony-beat { border-radius: 6px; background: var(--p-surface); border-color: var(--p-line); }
+.harmony-workspace .harmony-beat[aria-pressed="true"] { background: var(--p-accent-soft); border-color: var(--p-accent); }
+.harmony-workspace .harmony-ruler { color: var(--p-muted); }
+.harmony-workspace .harmony-status:not(:empty) { padding: 10px 12px; background: var(--p-surface-alt); color: var(--p-ink); border-radius: 5px; }
+
+/* Grade neutra e notas luminosas conservam a separação entre seleção, duração e altura. */
+:root[data-theme="dark"] .harmony-workspace .piano-roll-card {
+  --piano-roll-grid-bg: #0b0f12; --piano-roll-grid-row: #151c20;
+  --piano-roll-strong-line: #5b6c65; --piano-roll-line: #2b3732;
+  --piano-roll-measure-line: #748f80; --piano-roll-beat-line: #3b4b43;
+  --piano-roll-ruler-bg: #12191b; --piano-roll-ruler-text: #e5f2eb;
+  --piano-roll-beat-text: #bdcfc3; --piano-roll-velocity-bg: #101618;
+  --piano-roll-note: #8ce3bd; --piano-roll-note-border: #b6f4d7; --piano-roll-note-text: #081b12;
+  --piano-roll-selected-note: #f1c580; --piano-roll-selected-note-border: #ffe0af; --piano-roll-selected-note-text: #261a09;
+}
+
+/* O cenário de aventura mantém suas cores; as placas e a moldura acompanham o tema. */
+.product-app > .music-page.bard-journey-page { padding: 28px clamp(12px, 2vw, 28px) 0; }
+.music-page .bard-journey.music-shell { max-width: none; }
+.bard-journey-heading, .bard-journey-progress { max-width: 1100px; margin-inline: auto; }
+.bard-journey-map { width: 100%; }
+:root[data-theme="dark"] .bard-journey-sign { background: #161e18; color: #f0f4df; }
+:root[data-theme="dark"] .bard-journey-sign::before,
+:root[data-theme="dark"] .bard-journey-sign::after { background: #161e18; }
+:root[data-theme="dark"] .bard-journey-status,
+:root[data-theme="dark"] .bard-journey-note { color: #c7d5b5; }
+:root[data-theme="dark"] .bard-journey-lesson-link { color: #bce8a6; }
+:root[data-theme="dark"] .bard-journey-end { color: #d4dfc5; background: #1d2a20; }
+
+/* SVGs leves: indicação de reprodução e resposta breve ao foco/hover da marca. */
+.sound-mark { display: block; width: 32px; height: 26px; flex: 0 0 auto; }
+.sound-mark-bar { stroke: currentColor; stroke-width: 3; stroke-linecap: round; transform-box: fill-box; transform-origin: center; }
+.harmony-playback-indicator { display: inline-flex; color: var(--p-muted); align-items: center; padding-right: 4px; }
+.harmony-playback-indicator[data-state="playing"] { color: var(--p-accent); }
+.harmony-playback-indicator[data-state="playing"] .sound-mark-bar { animation: studio-sound-pulse 850ms ease-in-out infinite alternate; }
+.product-brand:is(:hover, :focus-visible) .sound-mark-bar { animation: studio-sound-pulse 600ms ease-in-out 2 alternate; }
+.sound-mark-bar:nth-child(2) { animation-delay: -180ms !important; }
+.sound-mark-bar:nth-child(3) { animation-delay: -400ms !important; }
+.sound-mark-bar:nth-child(4) { animation-delay: -260ms !important; }
+.sound-mark-bar:nth-child(5) { animation-delay: -100ms !important; }
+@keyframes studio-sound-pulse { from { transform: scaleY(.45); } to { transform: scaleY(1); } }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .sound-mark .sound-mark-bar { animation: none !important; transform: none; }
+  .product-button, .theme-toggle, .product-nav-link, .harmony-chord { transition: none; }
+}
+/* A barra quebra em linhas sem comprimir os controles nem afetar o canvas do piano roll. */
+@media (max-width: 1100px) {
+  .harmony-workspace:has(#harmony-panel) .harmony-toolbar { flex-wrap: wrap; }
+  .harmony-workspace .harmony-panel-nav { margin-left: 0; }
+}
+/* O menu móvel global aparece até 860px; a jornada reserva o mesmo espaço. */
+@media (max-width: 860px) {
+  .product-app > .music-page.bard-journey-page { padding: 86px 10px 0; }
+}
+@media (max-width: 700px) {
+  .harmony-workspace .harmony-toolbar { padding: 12px; }
+  .harmony-workspace .harmony-wheel-section { padding: 16px 10px 12px; }
+  .harmony-playback-indicator { display: none; }
+  .harmony-workspace .harmony-panel-nav { width: 100%; gap: 4px; }
+  .harmony-workspace .harmony-panel-nav a { min-height: 44px; padding-inline: 8px; }
+}
+
+/* A jornada ocupa uma tela; somente o viewport do mapa recebe rolagem. */
+html:has(.bard-journey-page), body.product-app:has(.bard-journey-page) { height: 100%; overflow: hidden; }
+.product-app > .music-page.bard-journey-page { height: var(--p-screen-height-dynamic); min-height: 0; padding: 16px; overflow: hidden; box-sizing: border-box; }
+.music-page .bard-journey.music-shell { height: 100%; min-height: 0; display: flex; flex-direction: column; padding: 0; }
+.bard-journey-page .bard-map-viewport { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.bard-journey-page .bard-journey-progress { flex: none; width: 100%; padding-bottom: 12px; }
+.bard-map-accessible-title { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 860px) {
+  .product-app > .music-page.bard-journey-page { padding: 70px 10px 10px; }
+}
+
+/* Campo de jogo sem cabeçalho ou margem externa; o menu móvel conserva seu espaço. */
+.product-app > .music-page.bard-journey-page { padding: 0; }
+@media (max-width: 860px) {
+  .product-app > .music-page.bard-journey-page { padding: 58px 0 0; }
+}

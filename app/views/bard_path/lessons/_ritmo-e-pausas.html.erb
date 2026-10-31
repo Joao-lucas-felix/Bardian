@@ -1,0 +1,34 @@
+<%# Aula 2: relaciona início, duração e silêncio à pulsação da primeira aula. %>
+<nav class="bard-lesson-outline" aria-label="Nesta aula"><a href="#ritmo-duracao">Duração</a><a href="#ritmo-pratica">Experimentar</a><a href="#ritmo-bardian">No Bardian</a><a href="#ritmo-revisao">Revisar</a></nav>
+<section id="ritmo-duracao">
+  <h2>1. Um passo pode carregar sons diferentes</h2>
+  <p>Na estrada, você mantém passos regulares. Um músico pode tocar em cada passo, sustentar um som por vários passos ou esperar em silêncio. Os passos continuam servindo de referência. O <strong>ritmo</strong> nasce da organização dos começos, das durações e dos silêncios em relação a ela.</p>
+  <aside class="bard-lesson-callout"><strong>Ao final, você poderá</strong><p>Localizar quando um som começa, comparar durações de meio, um e dois tempos e reconhecer uma pausa sem perder a contagem.</p></aside>
+  <p>Imagine quatro tempos a 90 BPM. Um Dó que começa no primeiro e termina quando o terceiro começa dura <strong>dois tempos</strong>. Dois Dós separados, um no primeiro e outro no segundo, ocupam os mesmos dois tempos, mas têm dois começos. Ouça essa diferença: sustentar uma nota e repetir a nota não são o mesmo gesto.</p>
+  <p>Uma nota pode começar depois do primeiro tempo e ainda durar um tempo completo. <strong>Posição</strong> indica quando ela entra; <strong>duração</strong> indica quanto permanece. Confundir as duas informações faria parecer que todo som precisa iniciar junto de uma batida.</p>
+</section>
+<section id="ritmo-pratica">
+  <h2>2. Escute o espaço entre os sons</h2>
+  <p>Compare os dois primeiros exemplos. Mantenha a contagem “1, 2, 3, 4” nas duas escutas. Na primeira, há um ataque e uma sustentação; na segunda, dois ataques. O desenho mostra blocos proporcionais aos quatro tempos, mesmo que o som termine antes do último.</p>
+  <%= render "bard_path/lessons/examples", examples: @examples, lesson_slug: @lesson.slug %>
+  <p>No padrão “som, som, pausa, som”, conte o terceiro tempo sem tocar. Essa ausência é uma <strong>pausa</strong> dentro da sequência, não o fim da música. No último exemplo, uma nota começa na metade do terceiro tempo. Dizer “três e quatro” pode ajudar: o “e” fica entre os números. Cada metade é uma subdivisão do tempo usado aqui.</p>
+  <ol class="bard-lesson-steps"><li>Conte quatro tempos antes de iniciar qualquer exemplo. Mantenha o mesmo andamento ao ouvir.</li><li>Compare a nota de dois tempos com duas notas de um tempo. Procure o instante em que a segunda nota é atacada.</li><li>Ouça “som, som, pausa, som”. Continue contando durante o terceiro tempo vazio e preveja quando o som volta.</li></ol>
+  <p>Sem áudio, use os blocos e as legendas para descrever a sequência. Você pode falar, marcar com o dedo ou apenas imaginar a contagem. A aula não avalia precisão nem exige movimento.</p>
+</section>
+<section>
+  <h2>3. O nome da figura depende da unidade escolhida</h2>
+  <p>Em uma partitura, figuras como semínima, mínima e colcheia ajudam a escrever durações relativas. Nos exemplos desta aula, escolhemos a semínima como um tempo: uma mínima ocupa dois tempos e uma colcheia, meio tempo. Isso descreve a nossa unidade de comparação; não obriga toda música a usar a mesma contagem.</p>
+  <p>O número de notas também não determina sozinho a duração total. Três sons com uma pausa podem ocupar quatro tempos. Um único som sustentado pode ocupar dois tempos. Quando comparar ritmos, observe a linha inteira: onde cada som entra, quanto dura e onde nada soa.</p>
+</section>
+<section id="ritmo-bardian">
+  <h2>4. Como enxergar isso no Bardian</h2>
+  <p>No editor temporal, ir para a direita representa avançar na composição. A posição horizontal de um evento indica quando ele começa; sua largura representa sua duração. Um espaço sem evento pode corresponder a uma pausa naquela faixa. A altura vertical de uma nota responde a outra pergunta: qual altura musical foi escolhida.</p>
+  <p>Os exemplos desta aula são locais: nenhum botão cria ou muda uma composição. Ao editar uma frase no Bardian, compare primeiro duas notas curtas com uma nota longa no mesmo espaço de tempo. Depois experimente deixar um intervalo vazio e ouça a frase novamente.</p>
+</section>
+<section id="ritmo-revisao">
+  <h2>5. Refaça a comparação com suas palavras</h2>
+  <details><summary>Uma nota de dois tempos equivale a duas notas de um tempo?</summary><p>Elas podem ocupar o mesmo intervalo total, mas não soam iguais: a primeira tem um ataque e continua; as duas notas têm dois ataques separados.</p></details>
+  <details><summary>O tempo 3 sem som desapareceu da contagem?</summary><p>Não. A pausa ocupa o terceiro tempo. Continuar contando ajuda a saber quando o som do quarto tempo deve entrar.</p></details>
+  <details><summary>Uma nota que começa no meio do tempo precisa durar só meio tempo?</summary><p>Não. Começo e duração são escolhas independentes dentro do espaço disponível. Nosso exemplo começa entre dois números e dura meio tempo, mas poderia sustentar por mais tempo.</p></details>
+  <p>Na próxima aula, vamos agrupar uma pulsação contínua em compassos e observar que um acento executado pode mudar sem apagar essa organização.</p>
+</section>

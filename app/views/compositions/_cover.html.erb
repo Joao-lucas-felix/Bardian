@@ -1,0 +1,8 @@
+<%# A capa tem rota autenticada; a ausência usa um símbolo neutro, sem imagem fictícia. %>
+<div class="music-cover" aria-hidden="true">
+  <% if composition.cover.attached? %>
+    <%= image_tag cover_composition_path(composition), alt: "", loading: "lazy" %>
+  <% else %>
+    <%= bard_icon(:score) %>
+  <% end %>
+</div>

@@ -1,0 +1,17 @@
+pt-BR:
+  devise:
+    failure:
+      invalid: "E-mail ou senha inválidos."
+      not_found_in_database: "E-mail ou senha inválidos."
+      unauthenticated: "Entre ou crie uma conta para continuar."
+    registrations:
+      signed_up: "Conta criada com sucesso."
+    sessions:
+      signed_in: "Entrada realizada com sucesso."
+      signed_out: "Sessão encerrada com sucesso."
+      already_signed_out: "Sessão encerrada com sucesso."
+  errors:
+    messages:
+      not_saved:
+        one: "Não foi possível salvar: 1 erro."
+        other: "Não foi possível salvar: %{count} erros."

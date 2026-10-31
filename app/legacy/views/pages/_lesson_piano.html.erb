@@ -1,0 +1,43 @@
+<%# Conduz uma comparação auditiva com o piano existente, sem alterar sua lógica sonora. %>
+<section class="lesson-section lesson-instrument" aria-labelledby="lesson-piano-title">
+  <div class="lesson-section-heading">
+    <h2 id="lesson-piano-title">Uma nota tem nome e altura</h2>
+    <p>
+      Uma <strong>nota</strong> é um som com nome, como Dó ou Ré. Algumas notas soam
+      mais <strong>graves</strong>; outras, mais <strong>agudas</strong>. Isso é a altura
+      do som, não o volume. No piano, as notas ficam mais agudas à medida que você
+      avança para a direita.
+    </p>
+  </div>
+
+  <p class="lesson-piano-guide">
+    Neste piano, as teclas brancas vão de <strong>Dó4 a Si4</strong>. Você verá nomes
+    como <strong>Dó4 (C4)</strong>: “Dó” e “C” são duas formas de nomear a mesma nota.
+    O número 4 indica a oitava. Por enquanto, use os nomes escritos nas teclas
+    para encontrá-las.
+  </p>
+
+  <%= render "pages/piano", octaves: [4] %>
+
+  <div class="lesson-piano-practice">
+    <h3>Experimente e compare</h3>
+    <ol>
+      <li>Toque <strong>Dó4 (C4)</strong> e depois <strong>Ré4 (D4)</strong>. Qual dos dois soa mais agudo?</li>
+      <li>Agora toque, nessa ordem, <strong>Dó4 (C4) → Ré4 (D4) → Mi4 (E4)</strong>. Os sons sobem ou descem?</li>
+      <li>Entre Dó4 e Ré4 há uma tecla preta, <strong>Dó♯4 (C#4)</strong>. Toque as três em ordem. Percebeu como Dó♯4 fica entre os outros dois sons?</li>
+    </ol>
+    <details>
+      <summary>Conferir o que você ouviu</summary>
+      <p>
+        Ré4 soa mais agudo que Dó4. Na sequência Dó4 → Ré4 → Mi4, os sons sobem.
+        A tecla preta Dó♯4 tem uma altura entre Dó4 e Ré4. Essa pequena diferença
+        entre teclas vizinhas se chama <strong>semitom</strong>; vamos estudá-la depois.
+      </p>
+    </details>
+  </div>
+
+  <p class="lesson-note">
+    O piano ajuda porque cada som tem uma tecla em uma posição fácil de ver.
+    Você pode tocar, ouvir e comparar antes de organizar as notas em uma música.
+  </p>
+</section>

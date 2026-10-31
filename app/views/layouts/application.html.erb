@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR" data-theme="dark">
   <head>
     <title><%= content_for(:title) || "Bardian" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -20,11 +20,35 @@
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "productivity", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "music_workspace", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "studio", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+  <body class="product-app<%= " product-app-harmony" if content_for?(:harmony_workspace) %>" <%= 'data-turbo=false' if content_for?(:full_navigation) %>>
+    <%= render "shared/icon_symbols" %>
+    <%= render "shared/product_navigation" unless content_for?(:harmony_workspace) %>
+    <%# Avisos de sucesso expiram; alertas permanecem até o fechamento manual. %>
+    <% if notice.present? || alert.present? %>
+      <div class="flash-messages">
+        <% if notice.present? %>
+          <div class="flash-message flash-notice" role="status" data-controller="flash" data-flash-auto-dismiss-value="true">
+            <p><%= notice %></p>
+            <button type="button" class="flash-dismiss" aria-label="Fechar notificação" data-action="flash#dismiss"></button>
+          </div>
+        <% end %>
+        <% if alert.present? %>
+          <div class="flash-message flash-alert" role="alert" data-controller="flash" data-flash-auto-dismiss-value="false">
+            <p><%= alert %></p>
+            <button type="button" class="flash-dismiss" aria-label="Fechar notificação" data-action="flash#dismiss"></button>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%# Permite que a apresentação ocupe a tela, mantendo o padrão das demais páginas. %>
+    <main class="<%= content_for?(:main_class) ? yield(:main_class) : "container mx-auto mt-28 px-5 flex" %>">
       <%= yield %>
     </main>
   </body>

@@ -1,0 +1,22 @@
+<%# Biblioteca própria: filtros no controller, apresentação em linhas e criação dedicada. %>
+<% content_for :title, "Composições — Bardian" %>
+<% content_for :main_class, "music-page" %>
+<div class="music-shell">
+  <header class="music-library-heading"><h1>Composições <span class="game-title-icon"><%= bard_icon(:score) %></span></h1><%= link_to "Nova composição", new_composition_path, class: "product-button product-button-primary" %></header>
+  <%= form_with url: compositions_path, method: :get, class: "music-filters" do |form| %>
+    <div class="music-search"><%= form.label :q, "Buscar", class: "visually-hidden" %><%= form.search_field :q, value: @query, placeholder: "Buscar composição", maxlength: 120 %></div>
+    <%= form.label :sort, "Ordenar", class: "visually-hidden" %>
+    <%= form.select :sort, [["Atualizadas recentemente", "recent"], ["Nome", "name"], ["Mais antigas", "oldest"]], selected: @sort %>
+    <%= form.submit "Filtrar", class: "product-button product-button-secondary" %>
+  <% end %>
+  <% if @compositions.any? %>
+    <div class="music-list" aria-label="Suas composições">
+      <% @compositions.each do |composition| %><%= render "composition_row", composition: composition %><% end %>
+    </div>
+  <% else %>
+    <div class="music-empty"><h2><%= @query.present? ? "Nenhuma composição encontrada" : "Sua próxima música começa aqui" %></h2>
+      <p><%= @query.present? ? "Tente outro nome ou limpe a busca." : "Crie uma composição para começar a escolher seus acordes." %></p>
+      <%= link_to "Limpar busca", compositions_path if @query.present? %>
+    </div>
+  <% end %>
+</div>

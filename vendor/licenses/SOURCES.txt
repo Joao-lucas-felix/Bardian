@@ -1,0 +1,23 @@
+Tone.js 15.1.22 — distribuição local
+
+Bundle obtido em 2026-10-06:
+https://esm.sh/tone@15.1.22/es2022/tone.bundle.mjs
+Destino: vendor/javascript/tone.js.
+Alteração: removida apenas a referência final ao source map não distribuído.
+SHA-256 do arquivo local:
+1fea7725d32bf166c5df8bfcf490e400ba2fadae1cc8250f70a2d412dc4c9c4b
+
+O bundle inclui Tone.js e suas dependências de execução, sem importações
+externas. A lista de pacotes foi conferida no source map do bundle:
+https://esm.sh/tone@15.1.22/es2022/tone.bundle.mjs.map
+
+Textos de licença preservados nesta pasta e suas fontes:
+- tone-LICENSE.txt: https://unpkg.com/tone@15.1.22/LICENSE.md
+- babel-runtime-LICENSE.txt: https://unpkg.com/@babel/runtime@7.29.7/LICENSE
+- automation-events-LICENSE.txt: https://unpkg.com/automation-events@7.1.19/LICENSE
+- standardized-audio-context-LICENSE.txt: https://unpkg.com/standardized-audio-context@25.3.77/LICENSE
+- tslib-LICENSE.txt: https://unpkg.com/tslib@2.8.1/LICENSE.txt
+
+As versões nas URLs das licenças identificam a origem desses textos;
+o source map não informa as versões resolvidas das dependências internas.
+O hash acima identifica o bundle efetivamente incluído no projeto.

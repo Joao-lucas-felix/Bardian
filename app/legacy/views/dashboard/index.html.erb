@@ -1,0 +1,22 @@
+<%# Compõe a área administrativa a partir da navegação e do relatório de entregas. %>
+<% content_for :title, "Bardian — Administração" %>
+<% content_for :main_class, "dashboard-page" %>
+
+<div class="dashboard-shell">
+  <%= render "sidebar" %>
+
+  <main class="dashboard-content" id="visao-geral" aria-label="Área de trabalho">
+    <section class="dashboard-reports" id="dev-reports" aria-labelledby="dev-reports-title">
+      <div class="dashboard-reports-heading">
+        <div>
+          <h2 id="dev-reports-title">Entregas do projeto</h2>
+          <p>Funcionalidades implementadas, documentadas e prontas para verificação.</p>
+        </div>
+        <span class="dashboard-report-count"><%= @reports.size %> <%= @reports.size == 1 ? "entrega" : "entregas" %></span>
+      </div>
+
+      <%= render "filters", available_tags: @available_tags, query: @query, selected_tag: @selected_tag %>
+      <%= render "reports_table", reports: @reports %>
+    </section>
+  </main>
+</div>

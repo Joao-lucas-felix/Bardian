@@ -1,0 +1,7 @@
+<%# Valores iniciais são neutros; Stimulus preenche o contexto atual, sem substituir o documento. %>
+<section class="harmony-settings-panel" aria-label="Ajustes e sugestões">
+  <h2>Tom e velocidade</h2>
+  <%= render "harmony/controls", tonics: tonics, context: { "tonic" => "C", "mode" => "major" }, bpm: 120, saved: true %>
+  <%= render "harmony/preview" %>
+  <%= render "harmony/recovery" %>
+</section>

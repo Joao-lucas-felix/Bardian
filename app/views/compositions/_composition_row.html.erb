@@ -1,0 +1,7 @@
+<%# Uma linha recebe somente um registro já autorizado e com capa pré-carregada. %>
+<%= link_to composition_path(composition), class: "music-row" do %>
+  <%= render "cover", composition: composition %>
+  <strong><%= composition.name %></strong>
+  <time datetime="<%= composition.updated_at.iso8601 %>"><%= composition.updated_at.strftime("%d/%m/%Y") %></time>
+  <span class="music-row-open">Abrir <span aria-hidden="true"><%= bard_icon(:arrow) %></span></span>
+<% end %>

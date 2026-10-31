@@ -1,0 +1,15 @@
+<%# A rota reúne protótipos de interface sem alterar a apresentação pública. %>
+<% content_for :title, "Bardian — Componentes" %>
+<% content_for :main_class, "components-page" %>
+
+<div class="components-shell">
+  <header class="components-header">
+    <div>
+      <h1>Experimente suas ideias</h1>
+      <p class="components-lead">Adicione notas à grade, ajuste sua duração e ouça o resultado. Este editor é um protótipo: suas ideias ainda não são salvas.</p>
+    </div>
+    <%= link_to "Aprender sobre o piano roll", notes_lesson_path(anchor: "lesson-roll-title"), class: "components-back-link" %>
+  </header>
+
+  <%= render "pages/piano_roll" %>
+</div>

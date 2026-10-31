@@ -1,0 +1,23 @@
+<%# Apresenta comparações finitas preparadas pelo controller, sem consultas ou regras de domínio. %>
+<section class="bard-examples" data-controller="lesson-examples" aria-labelledby="bard-examples-<%= lesson_slug %>">
+  <h3 id="bard-examples-<%= lesson_slug %>">Ouça e compare</h3>
+  <p>Os exemplos usam piano acústico e começam somente ao escolher um botão. Na comparação de timbres da aula de escuta, um exemplo usa som eletrônico senoidal. Cada faixa mostra sua duração total; os blocos mostram onde há som e os espaços vazios indicam silêncio.</p>
+  <div class="bard-examples-list">
+    <% examples.each do |example| %>
+      <div class="bard-example">
+        <h4><%= example.fetch(:title) %></h4>
+        <p><%= example.fetch(:caption) %></p>
+        <div class="bard-example-grid" style="--beat-width: <%= 100.0 / example.fetch(:beats) %>%;" role="img" aria-label="<%= example.fetch(:caption) %>">
+          <% example.fetch(:events).each do |event| %>
+            <span class="bard-example-event<%= ' bard-example-event--accent' if event[:accent] %>" style="--start: <%= 100.0 * event.fetch(:at) / example.fetch(:beats) %>%; --width: <%= 100.0 * event.fetch(:duration) / example.fetch(:beats) %>%;" aria-hidden="true"></span>
+          <% end %>
+        </div>
+        <progress max="100" value="0" aria-label="Progresso do exemplo <%= example.fetch(:title) %>" data-lesson-examples-target="progress"></progress>
+        <button type="button" class="product-button bard-example-play bard-audio-play" data-audio-state="idle" data-lesson-examples-target="play" data-action="lesson-examples#play" data-events="<%= example.fetch(:events).to_json %>" data-beats="<%= example.fetch(:beats) %>" data-bpm="<%= example.fetch(:bpm) %>" data-instrument="<%= example.fetch(:instrument, 'piano') %>" data-title="<%= example.fetch(:title) %>"><%= render "bard_path/lessons/play_guitar" %><span>Ouvir <%= example.fetch(:title) %></span></button>
+      </div>
+    <% end %>
+  </div>
+  <button type="button" class="product-button" data-lesson-examples-target="stop" data-action="lesson-examples#stop" disabled>Parar áudio</button>
+  <p role="status" data-lesson-examples-target="status">Pronto. Escolha um exemplo para ouvir.</p>
+  <p class="bard-lesson-caption">Se não puder ouvir, acompanhe as descrições e a duração dos blocos. A atividade não grava respostas nem altera suas composições.</p>
+</section>

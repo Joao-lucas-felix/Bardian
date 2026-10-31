@@ -1,0 +1,33 @@
+<%# Aula 3: distingue agrupamento métrico de acento executado. %>
+<nav class="bard-lesson-outline" aria-label="Nesta aula"><a href="#compasso-grupo">Agrupar</a><a href="#compasso-pratica">Comparar</a><a href="#compasso-bardian">No Bardian</a><a href="#compasso-revisao">Revisar</a></nav>
+<section id="compasso-grupo">
+  <h2>1. Conte sem interromper a caminhada</h2>
+  <p>Você já acompanhou passos regulares e colocou sons e pausas entre eles. Agora imagine que alguns passos marcam o começo de um grupo. Conte “1, 2, 3, 1, 2, 3” sem parar entre o último três e o próximo um. Cada grupo é um <strong>compasso</strong> no nosso exercício.</p>
+  <aside class="bard-lesson-callout"><strong>Ao final, você poderá</strong><p>Acompanhar dois compassos de três ou quatro tempos, localizar o retorno ao primeiro tempo e distinguir a posição do compasso de um som tocado mais forte.</p></aside>
+  <p>A barra que separa compassos na escrita marca um limite de organização. Ela não exige silêncio. Um som pode até atravessar a barra e continuar soando. O pulso regular segue durante a passagem de um grupo a outro.</p>
+</section>
+<section id="compasso-pratica">
+  <h2>2. Três e quatro no mesmo andamento</h2>
+  <p>Os dois primeiros exemplos usam 90 BPM e dois grupos. No primeiro, os começos aparecem nos tempos 1 e 4 de uma contagem contínua de seis; no segundo, nos tempos 1 e 5 de uma contagem de oito. O clique inicial de cada grupo está mais forte para facilitar a orientação, mas nem toda música precisa tocar esse instante mais alto.</p>
+  <%= render "bard_path/lessons/examples", examples: @examples, lesson_slug: @lesson.slug %>
+  <p>Conte “1, 2, 3” duas vezes e depois “1, 2, 3, 4” duas vezes. Repare que os intervalos entre cliques continuam iguais: mudou o agrupamento e, por isso, a duração total dos dois compassos. No terceiro exemplo, a grade segue em grupos de quatro, mas os cliques mais fortes estão no terceiro pulso de cada grupo. <strong>Acento tocado</strong> e <strong>posição métrica</strong> não são sinônimos.</p>
+  <ol class="bard-lesson-steps"><li>Antes de ouvir, marque mentalmente onde o segundo grupo começa.</li><li>Ouça os grupos de três e de quatro sem acelerar sua contagem.</li><li>Compare os dois exemplos de quatro: localize o começo do grupo mesmo quando o clique mais forte vem depois.</li></ol>
+  <p>Se não puder ouvir, as legendas e os blocos destacados mostram os pontos enfatizados. Eles são apoio visual para esta convenção, não uma partitura completa.</p>
+</section>
+<section>
+  <h2>3. O que dizem 3/4 e 4/4?</h2>
+  <p>Nos exemplos simples desta aula, <strong>3/4</strong> organiza três semínimas por compasso; <strong>4/4</strong> organiza quatro. O número de cima indica quantas unidades cabem no compasso; o de baixo, qual figura serve de unidade de escrita. Aqui, o 4 de baixo aponta para a semínima.</p>
+  <p>Essa leitura direta serve aos exemplos apresentados, mas não explica sozinha todos os tipos de compasso, como os compostos. Também não limita a quantidade de notas: quatro tempos podem conter oito eventos de meio tempo, uma nota sustentada ou pausas.</p>
+</section>
+<section id="compasso-bardian">
+  <h2>4. Encontre as divisões no Bardian</h2>
+  <p>A régua do editor separa o tempo em compassos e subdivisões para posicionar notas. O fluxo de composição atual usa 4/4; o exemplo de 3/4 nesta aula é uma comparação de escuta e não altera a fórmula de uma composição salva. Antes de editar, encontre na régua onde um compasso termina e o seguinte começa.</p>
+  <p>Quando a agulha atravessa essa divisão, a reprodução não precisa parar. A barra ajuda a localizar a posição, do mesmo modo que um marco na estrada ajuda a contar passos sem interromper a caminhada.</p>
+</section>
+<section id="compasso-revisao">
+  <h2>5. Confira o agrupamento</h2>
+  <details><summary>A barra de compasso exige um instante de silêncio?</summary><p>Não. Ela separa grupos na organização musical. O pulso continua, e uma nota pode inclusive atravessá-la.</p></details>
+  <details><summary>Quatro tempos exigem exatamente quatro notas?</summary><p>Não. É possível tocar mais de uma nota por tempo, sustentar uma nota por vários tempos ou incluir pausas.</p></details>
+  <details><summary>Se o terceiro pulso soar mais forte, ele vira o primeiro do compasso?</summary><p>Não necessariamente. No terceiro exemplo, a contagem de quatro continua; apenas deslocamos o acento executado para ouvir a diferença.</p></details>
+  <p>Depois de contar grupos, vamos ouvir com mais atenção as qualidades dos sons e os silêncios que ocupam esse tempo.</p>
+</section>

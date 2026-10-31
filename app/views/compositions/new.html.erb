@@ -1,0 +1,10 @@
+<%# A página coordena o formulário; criação e validação pertencem ao controller/modelo. %>
+<% content_for :title, "Nova composição — Bardian" %>
+<% content_for :main_class, "music-page" %>
+<div class="music-shell music-form-shell music-starter-shell">
+  <%= link_to "Voltar às composições", compositions_path, class: "music-back" %>
+  <p class="music-step">Etapa 1 de 2</p>
+  <h1>Nova composição</h1>
+  <p class="music-form-intro">Dê um nome à sua ideia e escolha uma capa. Depois você poderá experimentar os primeiros sons ou ir direto à harmonia.</p>
+  <%= render "metadata_form", composition: @composition, url: compositions_path, starter_values: @starter_values %>
+</div>

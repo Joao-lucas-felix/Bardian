@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="240" viewBox="0 0 400 240" shape-rendering="crispEdges">
+<title>Estrada de terra e taverna entre árvores</title>
+  <style>
+    /* Movimento curto de chegada: termina em quatro segundos e não distrai durante a leitura. */
+    .tavern-banner { transform-origin: 376px 31px; animation: banner-arrival 2s ease-in-out 2; }
+    .chimney-smoke { animation: smoke-arrival 4s ease-out both; }
+    @keyframes banner-arrival { 0%, 100% { transform: skewY(0); } 50% { transform: skewY(3deg); } }
+    @keyframes smoke-arrival { 0% { opacity: 0; transform: translate(0, 0); } 25% { opacity: .55; } 100% { opacity: 0; transform: translate(7px, -20px); } }
+    @media (prefers-reduced-motion: reduce) { .tavern-banner, .chimney-smoke { animation: none; } .chimney-smoke { display: none; } }
+  </style>  <defs>
+    <pattern id="grass" width="64" height="56" patternUnits="userSpaceOnUse">
+      <rect width="64" height="56" fill="#b5c77b"/>
+      <path d="M8 14h4v4H8zm36 22h6v2h-6zM24 48h2v4h-2z" fill="#a8be70"/>
+      <path d="M52 8h4v2h-4zM18 30h6v2h-6z" fill="#c1d087"/>
+    </pattern>
+    <pattern id="roof" width="24" height="36" patternUnits="userSpaceOnUse">
+      <rect width="24" height="36" fill="#92603f"/>
+      <path d="M0 0h3v36H0zm19 0h5v36h-5z" fill="#704a35"/>
+      <path d="M4 0h2v36H4zM6 3h11v2H6z" fill="#b08150"/>
+      <path d="M8 7h2v2H8zm7 22h2v2h-2z" fill="#d1b075"/>
+    </pattern>
+    <g id="tree">
+      <path d="M8 59h44v8H8z" fill="#93ac66"/>
+      <path d="M25 35h12v30H25z" fill="#7c6440"/>
+      <path d="M31 40h6v25h-6z" fill="#62583a"/>
+      <path d="M12 8h30v7h12v12h7v17h-9v10H12V46H3V27h9z" fill="#678b4b"/>
+      <path d="M17 4h22v6h10v10h7v15H44v9H13V34H7V21h10z" fill="#84a557"/>
+      <path d="M20 9h17v5H20zm-7 13h15v5H13zm24 8h12v5H37z" fill="#a2b966"/>
+      <path d="M15 45h12v5H15zm24-4h10v5H39z" fill="#587e44"/>
+    </g>
+    <g id="autumn">
+      <path d="M8 58h44v8H8z" fill="#97ae68"/>
+      <path d="M25 35h11v28H25z" fill="#7c6240"/>
+      <path d="M12 9h29v7h12v12h6v16H48v9H14v-8H4V25h8z" fill="#b9803e"/>
+      <path d="M17 5h22v8h12v18H40v10H12V30H7V19h10z" fill="#d29c48"/>
+      <path d="M19 10h17v5H19zM12 23h13v5H12zm24 8h12v5H36z" fill="#e0b45d"/>
+    </g>
+    <g id="flower">
+      <path d="M4 4h2v9H4z" fill="#789b51"/><path d="M2 2h6v6H2z" fill="#f5e7a0"/><path d="M4 4h2v2H4z" fill="#c9a558"/>
+    </g>
+    <g id="fence">
+      <path d="M0 8h70v5H0zm0 12h70v5H0z" fill="#b19961"/>
+      <path d="M3 2h7v32H3zm28 0h7v32h-7zm29 0h7v32h-7z" fill="#957b4e"/>
+      <path d="M3 2h3v29H3zm28 0h3v29h-3zm29 0h3v29h-3z" fill="#c3aa70"/>
+    </g>
+  </defs><rect width="400" height="240" fill="url(#grass)"/>
+<!-- Entradas verticais ultrapassam as bordas para conectar os trechos sem cortes. -->
+<path d="M200 -16 V20 L165 70 L200 140 L240 195 L200 220 V256 M200 140 H300 V132" fill="none" stroke="#a2b66a" stroke-width="28" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M200 -16 V20 L165 70 L200 140 L240 195 L200 220 V256 M200 140 H300 V132" fill="none" stroke="#c8b57c" stroke-width="22" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M200 -16 V20 L165 70 L200 140 L240 195 L200 220 V256 M200 140 H300 V132" fill="none" stroke="#e4d29a" stroke-width="16" stroke-linejoin="round" stroke-linecap="round"/>
+<use href="#tree" transform="translate(12 8) scale(0.65)"/>
+<use href="#tree" transform="translate(49 13) scale(0.7)"/>
+<use href="#autumn" transform="translate(98 5) scale(0.6)"/>
+<use href="#tree" transform="translate(6 66) scale(0.65)"/>
+<use href="#autumn" transform="translate(63 117) scale(0.72)"/>
+<use href="#tree" transform="translate(12 166) scale(0.8)"/>
+<use href="#tree" transform="translate(104 189) scale(0.65)"/>
+<use href="#tree" transform="translate(330 164) scale(0.75)"/>
+<use href="#autumn" transform="translate(361 110) scale(0.65)"/>
+<use href="#tree" transform="translate(353 5) scale(0.7)"/>
+<use href="#tree" transform="translate(279 191) scale(0.55)"/>
+<use href="#fence" transform="translate(225 43) scale(.55)"/>  <g transform="translate(87.6 25) scale(.6)">
+  <path d="M258 177h190v14H258z" fill="#92a667"/>
+  <path d="M268 110h168v68H268z" fill="#dfc28c"/>
+  <path d="M268 116h10v62h-10zm158 0h10v62h-10z" fill="#826341"/>
+  <path d="M278 166h148v8H278z" fill="#b19867"/>
+  <path d="M267 174h170v9H267z" fill="#a29a76"/>
+  <path d="M274 176h24v4h-24zm30 0h19v4h-19zm73 0h20v4h-20zm26 0h25v4h-25z" fill="#c6bd91"/>
+  <path d="M340 128h28v50h-28z" fill="#6a5138"/>
+  <path d="M345 133h18v43h-18z" fill="#514635"/>
+  <path d="M358 154h4v5h-4z" fill="#d7bd73"/>
+  <path d="M289 130h29v27h-29zm101 0h26v27h-26z" fill="#8a6b44"/>
+  <path d="M293 134h21v18h-21zm101 0h18v18h-18z" fill="#efd18a"/>
+  <path d="M302 134h3v18h-3zm100 0h3v18h-3z" fill="#ad8b55"/>
+  <path d="M293 142h21v3h-21zm101 0h18v3h-18z" fill="#ad8b55"/>
+  <path d="M270 32h164v10h10v78H254V42h16z" fill="#654730"/>
+  <path d="M273 36h155v9h10v69H260V45h13z" fill="url(#roof)"/>
+  <path d="M273 33h155v4H273zM257 113h184v6H257z" fill="#b08654"/>
+  <path d="M360 37h67v76h-67z" fill="#52372d" opacity=".35"/>
+  <path d="M398 48h20v32h-20z" fill="#9b8c6d"/>
+  <path d="M395 45h26v8h-26z" fill="#c3b28b"/>
+  <path d="M400 46h16v4h-16z" fill="#6c6b58"/>
+  <g class="chimney-smoke" fill="#e9e0c3"><path d="M402 33h12v7h-12zM407 22h9v6h-9zM403 13h7v5h-7z"/></g>
+  <!-- Bandeira original da guilda, com motivo de cordas musicais. -->
+  <path d="M374 28h4v92h-4z" fill="#766042"/>
+  <g class="tavern-banner">
+    <path d="M378 31h14v5h17v6h15v7h13v17h7v78l-17-10-15-5-14-8-20-6V98h5v-8h-5V75h5v-8h-5V51h5v-8h-5z" fill="#237554"/>
+    <path d="M383 35h9v5h16v6h14v8h10v72l-18-7-16-8-15-3z" fill="#36906a"/>
+    <path d="M427 53h8v75l-8-4z" fill="#195e46"/>
+    <path d="M395 60h5v24h4V61h4v25h4V65h5v27h-5v5h-12v-6h-5z" fill="#e1d8a8"/>
+    <path d="M399 54h17v5h-17zm5 43h5v7h-5z" fill="#e1d8a8"/>
+  </g>
+  <path d="M334 178h40v8h-40zm-6 8h52v6h-52z" fill="#b4a57c"/>
+  <!-- Placa sem texto: permanece decorativa e não sugere um botão. -->
+  <path d="M453 135h6v51h-6zm-18 0h24v5h-24z" fill="#806943"/>
+  <path d="M432 142h22v20h-22z" fill="#b39153"/>
+  <path d="M435 145h16v14h-16z" fill="#d8bc75"/>
+  <path d="M442 147h3v9h-3zm-3 6h5v4h-5z" fill="#74663c"/>
+  <!-- Banco e barril dão escala à paisagem. -->
+  <path d="M294 190h28v8h-28zm3 8h4v6h-4zm18 0h4v6h-4z" fill="#927248"/>
+  <path d="M246 146h16v28h-16z" fill="#a88650"/>
+  <path d="M246 151h16v4h-16zm0 15h16v4h-16z" fill="#6e6748"/>
+  <!-- Caixas e barris reforçam a escala da fachada sem acrescentar ações. -->
+  <path d="M218 158h24v23h-24z" fill="#796040"/>
+  <path d="M221 161h18v17h-18z" fill="#a27c49"/>
+  <path d="M221 161h4v4h4v4h4v4h6v5h-4v-3h-5v-4h-4v-4h-5z" fill="#c19a61"/>
+  <path d="M249 179h18v22h-18zm18 7h18v22h-18z" fill="#b18a51"/>
+  <path d="M249 182h18v3h-18zm0 12h18v3h-18zm18-5h18v3h-18zm0 12h18v3h-18z" fill="#786b4c"/>
+  </g>
+<use href="#flower" x="120" y="75"/><use href="#flower" x="140" y="160"/><use href="#flower" x="264" y="174"/><use href="#flower" x="329" y="38"/><use href="#flower" x="45" y="100"/><use href="#flower" x="370" y="210"/><use href="#flower" x="268" y="7"/>
+</svg>

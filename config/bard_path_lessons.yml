@@ -1,0 +1,37 @@
+# As prévias aparecem no mapa; publicação exige o corpo completo da aula.
+lessons:
+  - slug: tempos
+    title: Sentindo os tempos da música
+    summary: Descubra como acompanhar a batida de uma música e perceber os tempos, mesmo sem saber tocar um instrumento.
+    position: 1
+    published: true
+  - slug: ritmo-e-pausas
+    title: Duração, pausas e ritmo
+    summary: Experimente sons curtos, sons longos e silêncios. Descubra como combinar essas durações para criar um ritmo.
+    position: 2
+    published: true
+  - slug: compassos
+    title: Compassos e acentos
+    summary: Aprenda a agrupar os tempos e reconhecer o começo de um compasso, acompanhando contagens de três e quatro pulsações.
+    position: 3
+    published: true
+  - slug: escuta
+    title: Som, silêncio e escuta
+    summary: Compare sons graves e agudos, fortes e suaves. Descubra como duração, intensidade e timbre mudam o que você ouve.
+    position: 4
+    published: true
+  - slug: notas
+    title: As notas têm nomes
+    summary: Conheça Dó, Ré, Mi, Fá, Sol, Lá e Si, encontre essas notas no teclado e entenda as letras usadas no Bardian.
+    position: 5
+    published: true
+  - slug: oitavas
+    title: Oitavas e registros
+    summary: Explore regiões graves e agudas e ouça a mesma ideia em oitavas diferentes, relacionando o teclado à posição das notas na tela.
+    position: 6
+    published: true
+  - slug: primeira-ideia
+    title: Minha primeira ideia musical
+    summary: Combine notas, durações e pausas em uma frase curta. Ouça, mude uma escolha e perceba como sua ideia se transforma.
+    position: 7
+    published: true

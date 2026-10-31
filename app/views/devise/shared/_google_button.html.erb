@@ -1,0 +1,6 @@
+<%# Inicia OAuth por POST com CSRF; recebe rótulo e intenção opcional de vínculo. %>
+<% if google_oauth_configured? %>
+  <%= button_to label, user_google_oauth2_omniauth_authorize_path,
+    method: :post, params: (local_assigns.fetch(:link, false) ? { link: "1" } : {}),
+    class: "auth-google-button", form: { data: { turbo: false } } %>
+<% end %>

@@ -1,0 +1,65 @@
+<%# Coordena editor e referência; domínio, projeção e autorização ficam fora da view. %>
+<% content_for :title, "#{@composition&.name || 'Harmonia'} — Bardian" %>
+<% content_for :harmony_workspace, "true" if @composition %>
+<% content_for :main_class, @composition ? "harmony-page harmony-workspace" : "harmony-page" %>
+
+<% if @composition %>
+  <% content_for :head do %><meta name="turbo-visit-control" content="reload"><% end %>
+  <% content_for :full_navigation, "true" %>
+<% end %>
+<div class="harmony-shell" data-controller="harmony" data-harmony-context="C major"
+  data-action="turbo:before-frame-render->harmony#beforePanelRender turbo:frame-load->harmony#panelLoaded turbo:frame-missing->harmony#panelFailed piano-roll:seek->harmony#editorSeek piano-roll:ready->harmony#editorReady piano-roll:request-note-id->harmony#provideNoteId piano-roll:notes-changed->harmony#notesChanged piano-roll:notes-committed->harmony#notesCommitted"
+  data-harmony-document-value="<%= @document.to_json %>"
+  data-harmony-state-value="<%= @state.to_json %>"
+  data-harmony-assist-url-value="<%= @assist_url %>"
+  <% if @composition %>
+    data-harmony-save-url-value="<%= @save_url %>"
+    data-harmony-lock-version-value="<%= @composition.lock_version %>"
+    data-harmony-catalogue-value="<%= @catalogue.to_json %>"
+  <% end %>>
+  <% if @composition %>
+    <div class="harmony-account-bar">
+      <div data-controller="theme"><button type="button" class="theme-toggle" data-theme-target="toggle" data-action="theme#toggle" aria-pressed="false" aria-label="Ativar tema escuro"><%= bard_icon(:moon) %><span data-theme-target="label">Tema escuro</span></button></div>
+      <%= render "shared/account_navigation" %>
+    </div>
+  <% end %>
+  <header class="harmony-intro">
+    <div>
+      <% if @composition %><%= link_to @composition.name, composition_path(@composition), class: "music-back" %><% end %>
+      <h1>Harmonia <span class="game-title-icon"><%= bard_icon(:score) %></span></h1>
+      <% if @composition %><%= link_to "Minhas composições", compositions_path, class: "music-back" %><% end %>
+    </div>
+    <% if @composition %>
+      <div class="harmony-save"><span data-harmony-target="saveStatus" role="status">Salvo</span><button type="button" class="product-button product-button-primary" data-harmony-target="saveButton" data-action="click->harmony#save" disabled>Salvar</button><%= link_to "Próximo passo", next_step_composition_path(@composition), class: "product-button product-button-secondary", data: { turbo: false } %></div>
+    <% else %>
+      <p class="harmony-session-note">Rascunho temporário: ao sair ou recarregar, você perde os acordes desta página.</p>
+    <% end %>
+  </header>
+
+  <% if @composition %>
+    <%= render "harmony/toolbar", composition: @composition, catalogue: @catalogue, instrument: @document.dig("tracks", 0, "instrument_id"), current_panel: @initial_panel %>
+    <section class="harmony-recovery-summary" data-harmony-target="recoverySummary" hidden aria-live="polite">
+      <p data-harmony-target="recoverySummaryText"></p>
+      <%= link_to "Revisar proposta", panel_composition_harmony_path(@composition, panel: "settings"), data: { turbo: true, turbo_frame: "harmony-panel", panel: "settings", action: "click->harmony#selectPanel" }, class: "product-button product-button-secondary" %>
+    </section>
+    <turbo-frame id="harmony-panel" data-turbo="true" data-panel="<%= @initial_panel %>" data-harmony-target="panel">
+      <% if @initial_panel == "editor" %>
+        <%= render "harmony/editor_panel" %>
+      <% else %>
+        <%= render "harmony/guided_panel", options: @state.fetch("options"), saved: true %>
+      <% end %>
+    </turbo-frame>
+  <% else %>
+  <div class="harmony-composer-controls">
+    <details class="harmony-settings">
+      <summary>Tom e velocidade</summary>
+      <%= render "harmony/controls", tonics: @tonics, context: @document.fetch("context"), saved: @composition.present?, bpm: @document.fetch("bpm") %>
+    </details>
+    <details class="harmony-suggestions"><summary>Sugerir acordes</summary><%= render "harmony/preview" %></details>
+  </div>
+
+  <%= render "harmony/chord_wheel", options: @state.fetch("options") %>
+  <%= render "harmony/lane" %>
+  <% end %>
+  <p class="harmony-status" data-harmony-target="status" role="status" aria-live="polite"></p>
+</div>

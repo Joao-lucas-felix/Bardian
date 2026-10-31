@@ -1,0 +1,34 @@
+<%# Aula 6: relaciona nomes repetidos, registro e direção vertical no editor. %>
+<nav class="bard-lesson-outline" aria-label="Nesta aula"><a href="#oitavas-registro">Registro</a><a href="#oitavas-pratica">Comparar</a><a href="#oitavas-bardian">No Bardian</a><a href="#oitavas-revisao">Revisar</a></nav>
+<section id="oitavas-registro">
+  <h2>1. O nome volta em outro lugar do teclado</h2>
+  <p>Ao caminhar pelo teclado para a direita, você encontra novamente o grupo de duas teclas pretas e um novo Dó antes dele. O nome se repete, mas o som está mais <strong>agudo</strong>. À esquerda, o mesmo desenho aparece em um registro mais <strong>grave</strong>.</p>
+  <aside class="bard-lesson-callout"><strong>Ao final, você poderá</strong><p>Reconhecer dois Dós em registros diferentes, comparar uma frase transposta de oitava e localizar grave, agudo e avanço no tempo no piano roll.</p></aside>
+  <p>Chamamos de <strong>oitava</strong> a relação entre alturas separadas por esse ciclo de nomes. Não é apenas uma posição qualquer na tela: há uma relação sonora entre os dois Dós. A numeração ajuda a distingui-los. Nos exemplos do Bardian, Dó3 soa uma oitava abaixo de Dó4. Outros programas podem numerar a mesma altura de modo diferente; aqui usamos a convenção da interface e dos eventos apresentados.</p>
+  <%= render "bard_path/lessons/keyboard", octave: 3 %>
+  <%= render "bard_path/lessons/keyboard", octave: 4 %>
+</section>
+<section id="oitavas-pratica">
+  <h2>2. Uma mudança de registro por vez</h2>
+  <p>Compare Dó3 e Dó4 mantendo a intensidade. Depois ouça Dó–Mi–Ré em dois registros. As notas começam nos mesmos tempos e duram igualmente; só o registro muda. Você pode achar um registro mais brilhante ou mais pesado, mas esses adjetivos descrevem sua percepção, não uma regra universal.</p>
+  <%= render "bard_path/lessons/examples", examples: @examples, lesson_slug: @lesson.slug %>
+  <ol class="bard-lesson-steps"><li>Antes de tocar Dó4, preveja se ele soará mais grave ou mais agudo que Dó3.</li><li>Ouça a frase grave e conte três entradas. Repita com a frase uma oitava acima.</li><li>Explique o que permaneceu: ordem Dó–Mi–Ré, posição no tempo e duração. Explique o que mudou: registro.</li></ol>
+  <p>Sem áudio, leia os rótulos das duas frases. O número menor indica o registro mais grave nesta convenção; o maior, o mais agudo. Isso descreve a comparação, embora não substitua a escuta.</p>
+</section>
+<section>
+  <h2>3. Registro não é volume nem ritmo</h2>
+  <p>Uma nota aguda pode ser tocada suavemente e uma grave pode ser forte. Da mesma forma, mudar todos os sons de uma frase uma oitava acima não precisa alterar seus começos, durações ou pausas. Para perceber o efeito de uma escolha, compare a frase antes e depois mantendo o resto igual.</p>
+  <p>O número de oitava completa o nome de uma nota quando precisamos localizar uma altura específica. “Dó” pode indicar vários pontos do teclado; “Dó4” restringe a posição dentro da convenção adotada.</p>
+</section>
+<section id="oitavas-bardian">
+  <h2>4. Duas direções no piano roll</h2>
+  <p>No piano roll, subir na tela corresponde a subir a altura musical. Deslocar para a direita corresponde a avançar no tempo. Mover uma nota para cima, mantendo início e largura, muda sua altura. Mover para a direita, mantendo a linha e a largura, muda quando ela começa.</p>
+  <p>Ao comparar duas frases no Bardian, observe se a mudança está no eixo vertical ou horizontal. Esta aula não altera nenhuma frase salva; ela prepara sua leitura do editor.</p>
+</section>
+<section id="oitavas-revisao">
+  <h2>5. Confira o que se repetiu</h2>
+  <details><summary>Dois Dós são sempre o mesmo som?</summary><p>Não. Compartilham o nome, mas Dó3 e Dó4 ocupam registros diferentes e soam em alturas diferentes.</p></details>
+  <details><summary>Subir uma oitava muda necessariamente o ritmo?</summary><p>Não. Podemos manter os mesmos inícios e durações e alterar somente as alturas.</p></details>
+  <details><summary>Ir para a direita no piano roll torna a nota mais aguda?</summary><p>Não. A direita indica avanço no tempo; a direção vertical indica altura.</p></details>
+  <p>Na última parada desta sequência, você usará nomes, duração e pausa para entender uma pequena ideia musical e imaginar uma mudança.</p>
+</section>

@@ -1,0 +1,36 @@
+<%# Recebe @composition da página; edita apenas metadados e conserva o documento MIDI em memória. %>
+<%= form_with url: composition_path(@composition), method: :patch, scope: :composition,
+  data: { composition_timeline_target: "form", action: "input->composition-timeline#changeMetadata change->composition-timeline#changeMetadata submit->composition-timeline#save" },
+  class: "compositions-details-form" do |form| %>
+  <%= hidden_field_tag :lock_version, @composition.lock_version %>
+  <div class="compositions-field">
+    <%= form.label :name, "Nome" %>
+    <%= form.text_field :name, value: @composition.name, maxlength: 120, required: true, data: { composition_timeline_target: "name" } %>
+  </div>
+  <div class="compositions-field">
+    <%= form.label :bpm, "BPM" %>
+    <%= form.number_field :bpm, value: @composition.document["bpm"], min: 1, step: 1, required: true, data: { composition_timeline_target: "bpm" } %>
+  </div>
+  <div class="compositions-field">
+    <%= form.label :numerator, "Batidas" %>
+    <%= form.number_field :numerator, value: @composition.document.dig("time_signature", "numerator"), min: 1, step: 1, required: true, data: { composition_timeline_target: "numerator" } %>
+  </div>
+  <div class="compositions-field">
+    <%= form.label :denominator, "Valor" %>
+    <%= form.select :denominator, Music::Composition::VALID_DENOMINATORS,
+      { selected: @composition.document.dig("time_signature", "denominator") }, data: { composition_timeline_target: "denominator" } %>
+  </div>
+  <div class="compositions-field">
+    <%= form.label :tonic, "Tonalidade declarada" %>
+    <%= form.select :tonic, [["Sem contexto", ""]] + Music::MusicalContext::TONICS.map { |tonic| [tonic, tonic] },
+      { selected: @composition.document.dig("context", "tonic") }, data: { composition_timeline_target: "tonic" } %>
+  </div>
+  <div class="compositions-field">
+    <%= form.label :mode, "Modo" %>
+    <%= form.select :mode, [["Maior", "major"], ["Menor natural", "natural_minor"]],
+      { selected: @composition.document.dig("context", "mode") || "major" }, data: { composition_timeline_target: "mode" } %>
+  </div>
+  <p class="compositions-save-state" role="status" data-composition-timeline-target="status">Carregando composição…</p>
+  <noscript><p class="compositions-save-state">Sem JavaScript, este formulário salva nome, andamento, compasso e contexto. A timeline requer JavaScript.</p></noscript>
+  <%= form.submit "Salvar composição", class: "product-button product-button-primary", data: { composition_timeline_target: "saveButton" } %>
+<% end %>

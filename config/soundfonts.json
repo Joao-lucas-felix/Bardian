@@ -1,0 +1,15 @@
+{
+  "fluid_r3": {
+    "name": "FluidR3 GM",
+    "version": "3.1",
+    "source_url": "https://deb.debian.org/debian/pool/main/f/fluid-soundfont/fluid-soundfont_3.1.orig.tar.gz",
+    "archive_sha256": "2621acaa1c78e4abdb24bdd163230cc577e61276936d6aa6e3180582142f0343",
+    "archive_entry": "fluid-soundfont-3.1/FluidR3_GM.sf2",
+    "sha256": "74594e8f4250680adf590507a306655a299935343583256f3b722c48a1bc1cb0",
+    "size": 148398306,
+    "uuid": "74594e8f-4250-580a-9f59-0507a306655a",
+    "path": "/audio/soundfonts/74594e8f4250680adf590507a306655a299935343583256f3b722c48a1bc1cb0/FluidR3_GM.sf2",
+    "license": "MIT",
+    "credits": "Frank Wen, 2000–2002, 2008; colaboradores no README original."
+  }
+}

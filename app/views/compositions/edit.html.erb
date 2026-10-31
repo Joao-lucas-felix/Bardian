@@ -1,0 +1,9 @@
+<%# Edita apresentação sem exigir configurações musicais nem alterar notas. %>
+<% content_for :title, "Editar composição — Bardian" %>
+<% content_for :main_class, "music-page" %>
+<div class="music-shell music-form-shell">
+  <%= link_to @return_to_setup ? "Voltar aos primeiros sons" : "Voltar à composição",
+    @return_to_setup ? setup_composition_path(@composition) : composition_path(@composition), class: "music-back" %>
+  <h1>Editar composição</h1>
+  <%= render "metadata_form", composition: @composition, url: composition_path(@composition), return_to_setup: @return_to_setup %>
+</div>

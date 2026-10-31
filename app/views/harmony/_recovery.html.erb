@@ -1,0 +1,15 @@
+<%# A proposta vem do domínio; o shell conserva escolhas locais até confirmação explícita. %>
+<section class="harmony-recovery" data-harmony-target="recovery" hidden aria-labelledby="recovery-title">
+  <h2 id="recovery-title">Identificar os acordes da sequência</h2>
+  <p>Confira os acordes e separe as notas que os realizam das notas adicionais. Confirmar altera apenas o rascunho; use Salvar para guardar.</p>
+  <div data-harmony-target="recoveryBlocks"></div>
+  <div class="harmony-editor-actions">
+    <button type="button" class="product-button product-button-secondary" data-action="harmony#addRecoveryBlock">Acrescentar declaração</button>
+    <button type="button" class="product-button product-button-secondary" data-action="harmony#removeRecoveryBlock">Retirar última declaração</button>
+  </div>
+  <details><summary>Conferir a camada de cada nota</summary><div class="harmony-recovery-notes" data-harmony-target="recoveryNotes"></div></details>
+  <div class="harmony-editor-actions">
+    <button type="button" class="product-button product-button-primary" data-action="harmony#confirmRecovery">Confirmar separação</button>
+    <button type="button" class="product-button product-button-secondary" data-action="harmony#cancelRecovery">Descartar ajustes da proposta</button>
+  </div>
+</section>

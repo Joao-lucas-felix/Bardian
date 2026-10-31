@@ -1,0 +1,33 @@
+<%# Recebe opções declaradas do controller; não consulta nem altera a composição. %>
+<section class="harmony-controls" aria-label="Contexto da harmonia">
+  <% if saved %>
+    <div class="harmony-control-group">
+      <label for="harmony-bpm">Velocidade (BPM)</label>
+      <input id="harmony-bpm" type="number" min="30" max="240" value="<%= bpm %>" data-harmony-target="bpm" data-action="change->harmony#changeBpm">
+    </div>
+  <% end %>
+  <div class="harmony-control-group">
+    <label for="harmony-tonic">Tonalidade</label>
+    <select id="harmony-tonic" data-harmony-target="tonic" data-action="change->harmony#changeContext">
+      <% tonics.each do |tonic| %>
+        <option value="<%= tonic %>" <%= "selected" if tonic == context.fetch("tonic") %>><%= tonic %></option>
+      <% end %>
+    </select>
+  </div>
+  <div class="harmony-control-group">
+    <label for="harmony-mode">Modo</label>
+    <select id="harmony-mode" data-harmony-target="mode" data-action="change->harmony#changeContext">
+      <option value="major" <%= "selected" if context.fetch("mode") == "major" %>>Maior</option>
+      <option value="natural_minor" <%= "selected" if context.fetch("mode") == "natural_minor" %>>Menor natural</option>
+    </select>
+  </div>
+  <% unless saved %>
+  <div class="harmony-control-group">
+    <label for="harmony-instrument">Instrumento</label>
+    <select id="harmony-instrument" data-harmony-target="instrument" data-action="change->harmony#changeInstrument">
+      <option value="piano" selected>Piano</option>
+    </select>
+  </div>
+  <% end %>
+  <p class="harmony-controls-note">Mudar o tom altera as opções, não os acordes já adicionados.</p>
+</section>

@@ -1,0 +1,26 @@
+<%# Página da primeira lição; coordena os blocos sem concentrar regras musicais. %>
+<% content_for :title, "Bardian — Primeiras notas" %>
+<% content_for :main_class, "bard-lesson-page" %>
+
+<div class="bard-lesson-shell">
+  <header class="lesson-header">
+    <%= link_to "O Caminho do Bardo", presentation_path, class: "lesson-back-link" %>
+    <h1>Primeiras notas</h1>
+    <p class="lesson-lead">
+      Uma pequena experiência para começar: ouça três notas, perceba como elas
+      mudam e veja como organizá-las no tempo. Não é preciso saber teoria musical.
+    </p>
+  </header>
+
+  <nav class="lesson-section-nav" aria-label="Nesta lição">
+    <a href="#lesson-intro-title">O Bardian</a>
+    <a href="#lesson-piano-title">Ouça e compare</a>
+    <a href="#lesson-roll-title">Veja no piano roll</a>
+    <a href="#lesson-next-title">Próximos passos</a>
+  </nav>
+
+  <%= render "pages/lesson_intro" %>
+  <%= render "pages/lesson_piano" %>
+  <%= render "pages/lesson_piano_roll" %>
+  <%= render "pages/lesson_next_steps" %>
+</div>

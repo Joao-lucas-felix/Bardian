@@ -7,8 +7,9 @@
 # Ignore bundler config.
 /.bundle
 
-# Ignore all environment files.
+# Ignora arquivos de ambiente locais, mas mantém o modelo sem credenciais.
 /.env*
+!/.env.example
 
 # Ignore all logfiles and tempfiles.
 /log/*
@@ -29,6 +30,8 @@
 !/tmp/storage/.keep
 
 /public/assets
+/public/audio-engine
+/node_modules
 
 # Ignore key files for decrypting credentials and more.
 /config/*.key
@@ -36,3 +39,7 @@
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
+
+# Banco instalado por bin/setup-soundfonts; conteúdo não versionado no Git.
+/public/audio/soundfonts/*/
+/.superpowers/

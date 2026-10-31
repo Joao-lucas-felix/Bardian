@@ -1,0 +1,29 @@
+<%# Experimento de pulsação sem dados da conta: opções locais, oito tempos e áudio sob comando. %>
+<section class="bard-pulse-practice" data-controller="lesson-pulse" aria-labelledby="pulse-practice-title">
+  <h3 id="pulse-practice-title">Experimente: acompanhe oito tempos</h3>
+  <p>Conte “1, 2, 3, 4” duas vezes. Cada número destacado representa um tempo. As notas curtas de piano têm o mesmo timbre e volume para você comparar apenas sua organização no tempo.</p>
+  <div class="bard-pulse-controls">
+    <label for="pulse-tempo">Andamento
+      <select id="pulse-tempo" data-lesson-pulse-target="tempo" data-action="change->lesson-pulse#stop">
+        <option value="60">60 BPM · um tempo por segundo</option>
+        <option value="90">90 BPM · um pouco mais rápido</option>
+        <option value="120">120 BPM · dois tempos por segundo</option>
+      </select>
+    </label>
+    <label><input type="checkbox" data-lesson-pulse-target="silent" data-action="change->lesson-pulse#stop"> Praticar sem som</label>
+    <label><input type="checkbox" data-lesson-pulse-target="subdivide" data-action="change->lesson-pulse#stop"> Ouvir duas batidas por tempo</label>
+  </div>
+  <ol class="bard-pulse-beats" aria-label="Contagem de quatro tempos">
+    <% (1..4).each do |beat| %>
+      <li data-lesson-pulse-target="beat" data-active="false"><%= beat %></li>
+    <% end %>
+  </ol>
+  <%# A contagem não usa região viva para evitar anúncios incessantes no leitor de tela. %>
+  <p class="bard-pulse-counter" data-lesson-pulse-target="counter">1 · 2 · 3 · 4</p>
+  <div class="bard-pulse-actions">
+    <button type="button" class="product-button product-button-primary bard-audio-play" data-audio-state="idle" data-lesson-pulse-target="start" data-action="lesson-pulse#start"><%= render "bard_path/lessons/play_guitar" %><span>Iniciar oito tempos</span></button>
+    <button type="button" class="product-button" data-lesson-pulse-target="stop" data-action="lesson-pulse#stop" disabled>Parar</button>
+  </div>
+  <p role="status" data-lesson-pulse-target="status">O som só começa quando você iniciar. Use um volume confortável.</p>
+  <p class="bard-lesson-caption">Ao mudar uma opção, a experiência para. Inicie novamente para comparar. Sem áudio, acompanhe os números; sem interação, use a sequência descrita no exercício abaixo.</p>
+</section>

@@ -1,0 +1,39 @@
+<%# Compõe a primeira experiência de criação; cada camada contém uma frase do mesmo trecho. %>
+<% content_for :title, "Bardian — Criar música" %>
+<% content_for :main_class, "creation-page" %>
+
+<div class="creation-shell" data-controller="creation" data-action="piano-roll:notes-changed->creation#notesChanged">
+  <header class="creation-intro">
+    <div>
+      <h1>Monte sua música por partes</h1>
+      <p>Comece com uma camada, coloque algumas notas e depois passe para a próxima. Cada frase ocupa o mesmo trecho da música.</p>
+    </div>
+    <p class="creation-save-note">Suas frases ainda não são salvas. Elas ficam nesta página até você sair ou recarregar.</p>
+  </header>
+
+  <section class="creation-segment" aria-labelledby="creation-segment-title">
+    <div class="creation-segment-heading">
+      <div>
+        <h2 id="creation-segment-title">Trecho 1</h2>
+        <p>Quatro compassos em 4/4 · Todas as camadas começam juntas</p>
+      </div>
+      <span>Um trecho, quatro camadas</span>
+    </div>
+    <div class="creation-ruler-row" aria-label="Régua de quatro compassos">
+      <span class="creation-ruler-label">Camadas</span>
+      <div class="creation-ruler-viewport" data-creation-target="timeline" data-action="scroll->creation#syncTimeline">
+        <div class="creation-ruler">
+          <% (1..4).each do |beat| %><span data-beat="<%= beat %>"><%= beat %></span><% end %>
+        </div>
+      </div>
+    </div>
+    <div class="creation-layers">
+      <% @creation_layers.each do |layer| %>
+        <%= render "pages/creation_layer", layer: layer, segment: 1 %>
+      <% end %>
+    </div>
+  </section>
+
+  <%# O template não conecta o Stimulus até que um card seja aberto. %>
+  <template data-creation-target="template"><%= render "pages/piano_roll" %></template>
+</div>

@@ -1,0 +1,32 @@
+<%# Aula 4: compara uma característica sonora por vez e valoriza a escuta. %>
+<nav class="bard-lesson-outline" aria-label="Nesta aula"><a href="#escuta-atencao">Ouvir</a><a href="#escuta-comparar">Comparar</a><a href="#escuta-bardian">No Bardian</a><a href="#escuta-revisao">Revisar</a></nav>
+<section id="escuta-atencao">
+  <h2>1. O que você percebe na taverna?</h2>
+  <p>Uma porta fecha, alguém conversa ao fundo e por um momento ninguém toca. Você pode ouvir tudo isso sem prestar atenção em cada detalhe. <strong>Escutar</strong>, nesta aula, é escolher uma característica e perceber como ela muda. O silêncio também ocupa tempo e pode mudar a sensação de continuidade.</p>
+  <aside class="bard-lesson-callout"><strong>Ao final, você poderá</strong><p>Comparar duração, altura, intensidade e timbre em exemplos curtos e descrever um silêncio sem confundi-lo com falha do áudio.</p></aside>
+  <p>Uma descrição ajuda mais quando muda apenas uma coisa por vez. “O segundo som ficou mais agudo” fala de altura; “ficou mais forte” fala de intensidade. Nenhuma das duas expressões substitui a outra.</p>
+</section>
+<section id="escuta-comparar">
+  <h2>2. Quatro perguntas para o ouvido</h2>
+  <p><strong>Duração:</strong> o som breve termina após meio tempo; o longo permanece por dois. <strong>Altura:</strong> o Dó grave e o agudo têm o mesmo nome de nota, mas ocupam registros diferentes. <strong>Intensidade:</strong> compare suave e mais forte com volume confortável no aparelho. <strong>Timbre:</strong> as duas últimas versões usam a mesma altura, duração e intensidade; uma soa como piano acústico e a outra como sintetizador senoidal.</p>
+  <%= render "bard_path/lessons/examples", examples: @examples, lesson_slug: @lesson.slug %>
+  <ol class="bard-lesson-steps"><li>Escolha um par e ouça cada exemplo uma vez. Antes de repetir, diga qual aspecto parece ter mudado.</li><li>Leia as legendas e ouça novamente. Compare apenas a característica indicada; outras impressões são possíveis, mas não são a regra do exemplo.</li><li>Depois de um som terminar, conte mais um tempo em silêncio. A ausência de som também tem lugar na sequência.</li></ol>
+  <p>O desenho da faixa mostra início e duração, mas não revela sozinho altura, intensidade nem timbre. A legenda informa esses aspectos para quem não pode ouvir. A representação visual ajuda a comparar; ela não substitui a experiência sonora.</p>
+</section>
+<section>
+  <h2>3. Uma pausa pode mudar a frase</h2>
+  <p>Diga “som, som, silêncio, som” em quatro tempos. Depois diga “som, silêncio, som, som”, mantendo os mesmos quatro passos. Há três sons nas duas versões, mas a continuidade percebida pode mudar porque o espaço vazio mudou de posição. Essa diferença é uma escolha musical, não uma resposta certa ou errada.</p>
+  <p>Não confunda pausa escrita com defeito de reprodução. Aqui a pausa é intencional e aparece na descrição. Se um botão não produzir áudio, a mensagem de estado do experimento indicará o problema; você ainda poderá ler o exemplo.</p>
+</section>
+<section id="escuta-bardian">
+  <h2>4. Ouça de novo no Bardian</h2>
+  <p>Na composição, os controles de tocar e parar permitem repetir uma frase após uma mudança. Observe os eventos na tela enquanto escuta. Para entender o efeito de uma edição, mude uma propriedade por vez: posição ou duração de uma nota, registro, instrumento ou intensidade quando o controle estiver disponível na parte usada.</p>
+  <p>Os botões desta aula não mudam uma composição. Eles oferecem referências curtas para nomear diferenças antes de editar.</p>
+</section>
+<section id="escuta-revisao">
+  <h2>5. O que você ouviu?</h2>
+  <details><summary>Um som mais forte precisa ser mais agudo?</summary><p>Não. Intensidade descreve o quanto o som é forte; altura descreve a relação entre grave e agudo. Podemos mudar uma sem mudar a outra.</p></details>
+  <details><summary>Uma pausa deixa de fazer parte da música?</summary><p>Não. O silêncio pode ocupar um intervalo planejado e organizar a expectativa do próximo som.</p></details>
+  <details><summary>A forma do bloco mostra o timbre?</summary><p>Não. O bloco mostra início e duração neste exercício. A diferença de timbre precisa de escuta ou de uma descrição adicional.</p></details>
+  <p>Na próxima parada, vamos dar nomes a algumas alturas e encontrá-las no teclado.</p>
+</section>

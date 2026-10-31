@@ -1,0 +1,1052 @@
+# Cada entrega concluída possui uma descrição verificável e uma rota interna de teste.
+reports:
+  - slug: login-google-vinculacao-explicita
+    title: Login Google com vinculação explícita
+    description: Permite criar conta e entrar com Google, preservando as contas locais e exigindo vínculo iniciado pelo usuário autenticado.
+    changes:
+      - Identifica a conta pelo ID estável do Google e exige e-mail verificado.
+      - Recusa associação automática a uma conta por senha com e-mail igual e impede uso do mesmo Google em duas contas.
+      - Mantém o login local quando o OAuth não está configurado e valida o fluxo simulado em testes.
+    delivered_on: "2026-10-31"
+    tags: [Autenticação, Google, Interface, Segurança]
+    test_path: /users/sign_in
+  - slug: motion-play-violao-aulas
+    title: Play musical animado nas aulas
+    description: Transformou os controles de áudio das aulas em um Play que monta um violão SVG durante o carregamento e move as cordas durante a reprodução.
+    changes:
+      - Compartilhou o desenho SVG entre os exemplos de escuta e a prática de pulsação, preservando os rótulos dos botões.
+      - Ligou a animação aos estados reais de preparação, reprodução, parada, falha e prática sem som.
+      - Ofereceu versão com movimento reduzido e verificou os controles em testes e no navegador em largura móvel.
+      - Suavizou o Play e o violão com contornos e cantos arredondados; os botões de exemplo receberam superfície discreta.
+    delivered_on: "2026-10-30"
+    tags: [Aprendizagem, Interface, Áudio, Acessibilidade]
+    test_path: /caminho-do-bardo/ritmo-e-pausas
+  - slug: piano-acustico-caminho-bardo
+    title: Piano acústico nos exemplos do Caminho do Bardo
+    description: Aplicou o piano Salamander existente aos exemplos das aulas e à prática de pulsação.
+    changes:
+      - Reutilizou o instrumento de piano do editor e aguardou a amostra local antes de tocar cada exemplo.
+      - Ajustou o ganho apenas nas aulas e liberou o instrumento ao parar, navegar ou ocorrer falha.
+      - Manteve uma onda senoidal identificada para a comparação didática de timbre na aula de escuta.
+      - Verificou agendamento, carregamento, falhas, cancelamento e renderização das aulas em testes.
+    delivered_on: "2026-10-30"
+    tags: [Aprendizagem, Áudio, Interface]
+    test_path: /caminho-do-bardo/ritmo-e-pausas
+  - slug: audibilidade-exemplos-caminho-bardo
+    title: Volume audível nos exemplos do Caminho do Bardo
+    description: Ajustou o nível do sintetizador dos exemplos das aulas 2 a 7 após relato de ausência de som na aula de ritmo.
+    changes:
+      - Mediu o sinal da primeira nota da aula 2 em torno de −33 dB com o contexto ativo e a saída sem mute.
+      - Elevou apenas o ganho nominal do sintetizador, preservando as intensidades relativas de cada exemplo.
+      - Confirmou sinal em torno de −20 dB no navegador e incluiu teste para impedir retorno ao nível anterior.
+    delivered_on: "2026-10-30"
+    tags: [Aprendizagem, Áudio, Interface]
+    test_path: /caminho-do-bardo/ritmo-e-pausas
+  - slug: aula-ritmo-pausas-publicada
+    title: Aula — Duração, pausas e ritmo
+    description: Publicou a comparação entre duração, ataques e pausas com quatro exemplos de escuta.
+    changes:
+      - Explicou início e duração separadamente, subdivisão binária e pausa dentro da contagem.
+      - Comparou uma nota sustentada, duas notas curtas e padrões com silêncio em grade temporal.
+      - Preservou conclusão manual e leitura livre da trilha.
+    delivered_on: "2026-10-29"
+    tags: [Aprendizagem, Áudio, Ritmo, Interface]
+    test_path: /caminho-do-bardo/ritmo-e-pausas
+  - slug: aula-compassos-publicada
+    title: Aula — Compassos e acentos
+    description: Publicou a comparação de grupos de três e quatro tempos no mesmo andamento.
+    changes:
+      - Explicou 3/4 e 4/4 no limite dos exemplos simples e distinguiu acento executado de posição métrica.
+      - Incluiu dois compassos por comparação e uma versão com acento deslocado.
+    delivered_on: "2026-10-29"
+    tags: [Aprendizagem, Áudio, Ritmo, Interface]
+    test_path: /caminho-do-bardo/compassos
+  - slug: aula-escuta-publicada
+    title: Aula — Som, silêncio e escuta
+    description: Publicou pares de comparação de duração, altura, intensidade e timbre.
+    changes:
+      - Organizou oito exemplos com legenda textual e reprodução iniciada por botão.
+      - Relacionou silêncio à estrutura temporal sem confundir volume e altura.
+    delivered_on: "2026-10-29"
+    tags: [Aprendizagem, Áudio, Acessibilidade, Interface]
+    test_path: /caminho-do-bardo/escuta
+  - slug: aula-nomes-notas-publicada
+    title: Aula — As notas têm nomes
+    description: Publicou os sete nomes naturais, suas letras e um teclado de referência.
+    changes:
+      - Mostrou a correspondência Dó–C até Si–B e os grupos de teclas pretas.
+      - Adicionou escuta das notas naturais e da sequência Dó–Mi–Ré.
+    delivered_on: "2026-10-29"
+    tags: [Aprendizagem, Áudio, Notas, Interface]
+    test_path: /caminho-do-bardo/notas
+  - slug: aula-oitavas-publicada
+    title: Aula — Oitavas e registros
+    description: Publicou comparação de Dó3 e Dó4 e de uma mesma frase em dois registros.
+    changes:
+      - Representou duas oitavas no teclado e explicou a convenção de numeração do Bardian.
+      - Separou deslocamento vertical de altura e deslocamento horizontal no tempo.
+    delivered_on: "2026-10-29"
+    tags: [Aprendizagem, Áudio, Notas, Interface]
+    test_path: /caminho-do-bardo/oitavas
+  - slug: aula-primeira-ideia-publicada
+    title: Aula — Minha primeira ideia musical
+    description: Publicou uma frase de dois compassos com variações de oitava e ritmo.
+    changes:
+      - Relacionou notas, duração, pausa e posição temporal em uma mesma ideia.
+      - Ofereceu comparação guiada de duas mudanças antes da edição livre na composição.
+    delivered_on: "2026-10-29"
+    tags: [Aprendizagem, Áudio, Composição, Interface]
+    test_path: /caminho-do-bardo/primeira-ideia
+  - slug: escala-global-noventa-por-cento
+    title: Escala visual global de 90%
+    description: Aplica em todas as páginas a proporção visual da referência capturada com o navegador em 90%.
+    changes:
+      - Aplicou a escala de 90% ao documento para manter proporções entre navegação, textos e controles.
+      - Compensou unidades de viewport nas páginas de entrada, harmonia, piano roll e Caminho do Bardo para ocupar toda a tela.
+      - Verificou no navegador a largura da sidebar, o cartão de entrada, a altura do editor e do mapa, sem rolagem horizontal em desktop.
+    delivered_on: "2026-10-27"
+    tags:
+      - Interface
+      - Responsividade
+    test_path: /users/sign_in
+  - slug: alinhamento-abas-ajustes-harmonia
+    title: Alinhamento das abas no painel de ajustes da harmonia
+    description: Organiza as abas na coluna estreita de ajustes e mantém apenas o painel aberto destacado.
+    changes:
+      - Alinhou as abas ao início da barra, em uma linha própria no painel de ajustes.
+      - Sincronizou a classe de destaque com aria-current após a troca de painéis.
+      - Verificou a navegação com testes Rails e JavaScript do controller de harmonia.
+    delivered_on: "2026-10-27"
+    tags:
+      - Harmonia
+      - Interface
+    test_path: /compositions
+  - slug: avisos-transitorios-com-fechamento
+    title: Avisos de navegação com fechamento
+    description: Avisos de sucesso desaparecem após cinco segundos e todas as notificações podem ser fechadas manualmente.
+    changes:
+      - Acrescentou temporizador aos avisos de sucesso no layout compartilhado.
+      - Manteve alertas de erro visíveis até o fechamento manual.
+      - Cancelou temporizadores ao sair da página para evitar efeitos após a navegação.
+      - Verificou o aviso de criação no navegador e cobriu temporização, fechamento e marcação acessível em testes.
+    delivered_on: "2026-10-27"
+    tags:
+      - Interface
+      - Acessibilidade
+    test_path: /compositions/new
+  - slug: criacao-composicao-em-etapas
+    title: Criação de composição em duas páginas
+    description: Separa nome e capa dos primeiros sons e permite entrar na harmonia sem configurar controles.
+    changes:
+      - Salvou nome e capa na primeira etapa e abriu uma página própria para BPM, instrumento, tônica, modo e propostas.
+      - Ofereceu pular a configuração sem modificar o documento musical vazio.
+      - Permitiu voltar aos metadados e retornar à segunda etapa após salvar.
+      - Protegeu a configuração por proprietário, versão e ausência de faixas para evitar sobrescrita.
+      - Verificou fluxo no navegador e testes Rails e JavaScript.
+    delivered_on: "2026-10-27"
+    tags:
+      - Composição
+      - Harmonia
+      - Interface
+    test_path: /compositions/new
+  - slug: primeiros-sons-composicao
+    title: Primeiros sons na criação da composição
+    description: Permite configurar andamento, timbre e tonalidade, ouvir propostas harmônicas e iniciar a música com uma delas.
+    changes:
+      - Reutilizou o gerador harmônico existente para três propostas transitórias de quatro acordes.
+      - Regenerou as propostas ao mudar tônica ou modo; BPM e instrumento alteram a escuta sem descartar a escolha.
+      - Salvou a proposta escolhida como blocos harmônicos declarados e notas MIDI, ou iniciou a harmonia vazia.
+      - Validou entradas no servidor e verificou criação, escuta e edição no navegador.
+    delivered_on: "2026-10-25"
+    tags:
+      - Composição
+      - Harmonia
+      - Interface
+      - Áudio
+    test_path: /compositions/new
+  - slug: proximo-passo-harmonia
+    title: Próximo passo após a harmonia
+    description: Abre a escolha da próxima parte musical e dá acesso direto ao piano roll para ornamentar acordes.
+    changes:
+      - Acrescentou navegação ao final da harmonia sem aumentar a altura do cabeçalho em desktop.
+      - Apresentou baixo, batida e melodia como etapas futuras, sem simular ferramentas ainda não implementadas.
+      - Protegeu a nova tela pela conta dona da composição e verificou a abertura direta do piano roll.
+    delivered_on: "2026-10-25"
+    tags:
+      - Composição
+      - Harmonia
+      - Interface
+      - Piano roll
+    test_path: /compositions
+  - slug: primeira-aula-tempos-publicada
+    title: Primeira aula — Sentindo os tempos da música
+    description: Publicou a primeira aula completa do Caminho do Bardo, com leitura, prática sonora e visual, revisão e conclusão individual.
+    changes:
+      - Desenvolveu sete seções sobre pulsação, andamento, BPM e diferença entre pulso e ritmo, com prática guiada e respostas explicadas.
+      - Adicionou experiência de oito tempos a 60, 90 ou 120 BPM, subdivisão opcional e modo sem som usando o Tone.js existente.
+      - Incluiu parada, interrupção ao sair da aba, limpeza ao navegar e compensação visual da antecedência do relógio de áudio.
+      - Publicou somente a primeira taverna; as outras seis continuam em preparação.
+      - Verificou 180 testes Rails com 1208 asserções e seis testes JavaScript da prática. Escuta e inspeção visual em navegador permanecem pendentes.
+    delivered_on: "2026-10-25"
+    tags:
+      - Interface
+      - Aprendizagem
+      - Áudio
+      - Acessibilidade
+    test_path: /caminho-do-bardo/tempos
+  - slug: caminhada-fluida-tavernas
+    title: Caminhada mais ágil e curvas suaves
+    description: Ajustou a animação do bardo para distribuir o tempo pela distância e suavizar mudanças de direção.
+    changes:
+      - Substituiu tempos iguais por trecho por offsets proporcionais ao percurso, eliminando a desaceleração artificial nas curvas curtas.
+      - Arredondou discretamente os cantos mantendo partida e chegada exatas.
+      - Reduziu a duração das viagens e limitou percursos longos a dois segundos.
+      - Verificou dez testes JavaScript, incluindo velocidade uniforme, chegada e pontos repetidos.
+    delivered_on: "2026-10-25"
+    tags:
+      - Interface
+      - Aprendizagem
+    test_path: /caminho-do-bardo
+  - slug: resumo-taverna-modal
+    title: Resumo da taverna em modal
+    description: A chegada à taverna abre uma janela modal com a descrição e o acesso à aula, sem inserir o resumo no terreno.
+    changes:
+      - Utilizou dialog nativo para sobreposição e contenção de foco, sem dependências novas.
+      - Adicionou fechamento por Escape e botão com retorno do foco ao seletor.
+      - Preservou a caminhada, a visita na conta e o estado de preparação das aulas.
+    delivered_on: "2026-10-25"
+    tags:
+      - Interface
+      - Acessibilidade
+    test_path: /caminho-do-bardo
+  - slug: sete-tavernas-fundamentos
+    title: Sete tavernas na trilha de fundamentos
+    description: Ampliou o mapa com as próximas seis paradas do roteiro de aprendizagem.
+    changes:
+      - Adicionou prévias sobre ritmo, compassos, escuta, notas, oitavas e primeira ideia musical após a aula de tempos.
+      - Apresentou títulos e resumos próprios, com tavernas alternadas ao longo da estrada.
+      - Separou prévias editoriais das aulas publicadas; conteúdos em preparação não permitem leitura, conclusão ou visita persistida.
+    delivered_on: "2026-10-24"
+    tags:
+      - Aprendizagem
+      - Interface
+    test_path: /caminho-do-bardo
+  - slug: cantos-arredondados-mapa
+    title: Cantos arredondados no mapa interativo
+    description: Aplicou raio de 16 pixels ao campo do mapa, preservando o recorte do cenário e a rolagem interna.
+    changes:
+      - Arredondou os quatro cantos do mapa sem alterar suas interações.
+    delivered_on: "2026-10-24"
+    tags:
+      - Interface
+    test_path: /caminho-do-bardo
+  - slug: remocao-placa-jornada
+    title: Remoção da placa do Caminho do Bardo
+    description: Removeu a placa de título e progresso do cenário, mantendo as interações das tavernas.
+    changes:
+      - Removeu o partial e os estilos exclusivos da placa.
+      - Preservou os estados de conclusão e os links das aulas nas paradas.
+    delivered_on: "2026-10-24"
+    tags:
+      - Interface
+    test_path: /caminho-do-bardo
+  - slug: mapa-integral-placa-jornada
+    title: Mapa integral com textos na placa do cenário
+    description: A jornada ocupa toda a área disponível e apresenta seus textos dentro do mapa.
+    changes:
+      - Removeu o título e o painel de progresso externos ao campo interativo.
+      - Integrou título, progresso e acesso à próxima aula em uma placa de madeira com texto acessível.
+      - Retirou as margens externas, preservando espaço para o menu móvel e rolagem interna.
+      - Verificou nove testes Rails da trilha com 82 asserções; inspeção visual pendente.
+    delivered_on: "2026-10-24"
+    tags:
+      - Interface
+      - Acessibilidade
+    test_path: /caminho-do-bardo
+  - slug: estrada-continua-rolagem-interna
+    title: Estrada contínua e rolagem interna no mapa
+    description: Reconstruiu as emendas da estrada e limitou a navegação vertical ao campo do mapa.
+    changes:
+      - Removeu o cabeçalho visual e a placa inicial, preservando o título acessível.
+      - Redesenhou conexões verticais e o acesso à taverna com bordas uniformes; reposicionou árvores cortadas.
+      - Limitou a página à altura disponível e manteve a rolagem por teclado e ponteiro dentro do mapa.
+      - Verificou nove testes Rails da trilha e sete testes JavaScript, incluindo o enquadramento interno do resumo.
+    delivered_on: "2026-10-24"
+    tags:
+      - Interface
+      - Responsividade
+      - Acessibilidade
+    test_path: /caminho-do-bardo
+  - slug: escala-camera-e-proporcao-trilha
+    title: Câmera mais afastada e proporções corrigidas na trilha
+    description: Corrigiu o achatamento das árvores na entrada e reduziu a escala do cenário preservando a pixel art.
+    changes:
+      - Substituiu a altura fixa da entrada pela proporção original do SVG e alinhou as bordas da estrada entre os trechos.
+      - Reduziu a largura máxima do cenário de 1100 para 680 pixels, mantendo gramado ao redor e alvos de seleção com 44 pixels.
+      - Ajustou a posição inicial do bardo à escala e realinhou o personagem ao redimensionar o mapa.
+    delivered_on: "2026-10-24"
+    tags:
+      - Interface
+      - Responsividade
+    test_path: /caminho-do-bardo
+  - slug: restauracao-cenario-pixel-art-trilha
+    title: Cenário pixel art restaurado na trilha
+    description: Restaurou o terreno, a vegetação e a taverna da arte anterior ao redor do novo trajeto interativo.
+    changes:
+      - Reutilizou a taverna com bandeira, árvores, cercas e gramado em um cenário amplo de jogo.
+      - Transformou o esquema em estrada de terra em zigue-zague com seletores circulares, preservando o resumo após a chegada.
+      - Ajustou as coordenadas da caminhada e da porta à escala responsiva do cenário.
+      - Verificou nove testes Rails da trilha e cinco testes JavaScript; a abertura da prévia local foi bloqueada pela política do navegador integrado.
+    delivered_on: "2026-10-24"
+    tags:
+      - Aprendizagem
+      - Interface
+    test_path: /caminho-do-bardo
+  - slug: detalhes-svg-jogo-e-acoes-sugestoes
+    title: Detalhes SVG de jogo e ações visíveis nas sugestões
+    description: A interface ganhou símbolos de partitura, mapa e brilho com cantos suaves, mantendo a paleta atual; o painel de sugestões deixa as ações acessíveis após gerar acordes.
+    changes:
+      - Ampliou o sprite SVG compartilhado e aplicou seus detalhes à navegação, autenticação, biblioteca, composição, harmonia e Caminho do Bardo.
+      - Preservou as cores, fontes, dimensões e comportamento dos controles existentes, com símbolos decorativos ocultos aos leitores de tela.
+      - Corrigiu o corte dos botões Ouvir prévia e Adicionar sugestão com rolagem no painel de ajustes e ações visíveis no rodapé.
+      - Conferiu visualmente temas claro e escuro, desktop e 390 px; a ação Adicionar sugestão foi executada no navegador de teste.
+      - Verificou 179 testes Rails com 1182 asserções, 19 arquivos de testes JavaScript, Zeitwerk e git diff --check.
+    delivered_on: "2026-10-24"
+    tags:
+      - Interface
+      - Harmonia
+      - Responsividade
+    test_path: /compositions
+
+  - slug: trilha-superior-visita-na-conta
+    title: Mapa compacto com visita salva na conta
+    description: O Caminho do Bardo apresenta estradas em zigue-zague, tavernas alternadas e um único viajante.
+    changes:
+      - Adicionou seleção circular e caminhada até a taverna antes de abrir o resumo.
+      - Salvou a última aula publicada visitada na conta, sem alterar sua conclusão.
+      - Restaurou a posição válida e manteve leitura livre, foco de teclado e movimento reduzido.
+      - Apresentou a primeira aula em preparação como prévia interativa, sem publicar conteúdo incompleto ou salvar visita fictícia.
+      - Verificou nove testes Rails da trilha e quatro testes JavaScript; inspeção visual em navegador ainda pendente.
+    delivered_on: "2026-10-24"
+    tags:
+      - Aprendizagem
+      - Interface
+      - Acessibilidade
+    test_path: /caminho-do-bardo
+  - slug: viajante-caminho-do-bardo
+    title: Bardo viajante na trilha de aprendizagem
+    description: Um pequeno personagem em SVG percorre a estrada até a taverna ao abrir uma aula.
+    changes:
+      - Adicionou caminhada de boas-vindas à primeira parada enquanto as aulas estão em preparação.
+      - Preservou links nativos, atalhos de nova aba e acesso imediato com movimento reduzido.
+      - Cancelou a navegação pendente quando a parada sai da página, sem alterar progresso ou conclusão.
+      - Verificou navegação por testes JavaScript e renderização da trilha por testes Rails; a inspeção visual em navegador permanece pendente.
+    delivered_on: "2026-10-24"
+    tags:
+      - Aprendizagem
+      - Interface
+      - Acessibilidade
+    test_path: /caminho-do-bardo
+  - slug: resposta-instrumentos-proporcao-ajustes
+    title: Reprodução mais pronta e ajustes na proporção da referência
+    description: A harmonia reutiliza unidades de instrumento enquanto o timbre permanece em uso e apresenta o painel de ajustes com largura próxima à captura enviada.
+    changes:
+      - Conservou até duas unidades do grafo openDAW entre edições e prévias, recriando somente a unidade cujo timbre mudou.
+      - Preparou o timbre escolhido em segundo plano e fez a escuta aguardar a preparação já iniciada, sem reprodução automática.
+      - Limitou o painel de ajustes a 780 px no desktop e manteve cabeçalho e botão Salvar dentro da viewport móvel.
+      - Verificou 18 arquivos de testes JavaScript, 177 testes Rails com 1166 asserções, carregamento Zeitwerk e build de áudio.
+      - Confirmou largura de 780 px em 1280 px e ausência de rolagem horizontal em 390 px; latência auditiva real ainda não foi medida após esta mudança.
+    delivered_on: "2026-10-24"
+    tags:
+      - Áudio
+      - Harmonia
+      - Interface
+      - Responsividade
+    test_path: /compositions
+
+  - slug: tema-estudio-contraste-e-movimento
+    title: Tema de estúdio e harmonia com mais contraste
+    description: As páginas ganharam fundos quase pretos, controles mais legíveis e uma apresentação de estúdio para a composição de harmonias.
+    changes:
+      - Atualizou os tokens compartilhados e adotou o tema escuro como padrão, preservando escolhas salvas e a alternância para claro.
+      - Refinou transporte, seleção de acordes, abas e piano roll sem mudar regras musicais ou persistência.
+      - Adicionou SVG decorativo à navegação e indicador animado somente durante reprodução, respeitando movimento reduzido.
+      - Verificou 163 testes JavaScript e 177 testes Rails; os pares principais de texto do tema escuro superam contraste 9 para 1.
+      - Inspeção visual em navegador permanece pendente pelas limitações dos navegadores instalados no ambiente.
+    delivered_on: "2026-10-24"
+    tags:
+      - Interface
+      - Harmonia
+      - Acessibilidade
+    test_path: /compositions
+
+  - slug: mapa-aventura-ampliado
+    title: Mapa ampliado com tavernas e animações SVG
+    description: O Caminho do Bardo ocupa mais largura e apresenta tavernas maiores inspiradas na referência visual enviada pelo autor.
+    changes:
+      - Removeu o limite de largura do mapa e reduziu margens para valorizar o cenário com rolagem vertical.
+      - Detalhou telhados de madeira, bandeira musical, caixas e barris com desenho SVG original.
+      - Acrescentou movimento de chegada na bandeira e fumaça por até quatro segundos, desativado com movimento reduzido.
+      - Preservou o catálogo vazio, a leitura livre e as conclusões reais; a revisão visual em navegador permanece pendente.
+    delivered_on: "2026-10-24"
+    tags:
+      - Interface
+      - Aprendizagem
+    test_path: /caminho-do-bardo
+
+  - slug: caminho-do-bardo-cenario-aventura
+    title: Trilha de aventura no Caminho do Bardo
+    description: A aba ganhou um cenário vertical em pixel art com estrada, tavernas e vegetação, integrado ao catálogo e ao progresso da conta.
+    changes:
+      - Criou cenário SVG local e estilos responsivos, com links nativos e leitura livre sem dependências adicionais.
+      - Separou cenário decorativo e parada de aula em partials, mantendo consultas e resumo de progresso no controller.
+      - Exibe preparação sem aulas fictícias quando o catálogo está vazio; aulas publicadas recebem paradas com conclusão individual.
+      - Verificou a renderização ERB, 177 testes Rails com 1162 asserções e o carregamento Zeitwerk.
+      - A inspeção visual desktop e mobile permanece pendente porque os navegadores disponíveis não executaram no ambiente restrito.
+    delivered_on: "2026-10-23"
+    tags:
+      - Aprendizagem
+      - Interface
+    test_path: /caminho-do-bardo
+
+  - slug: soundfonts-fluidr3-harmonia
+    title: Instrumentos FluidR3 na harmonia
+    description: A harmonia oferece 11 timbres FluidR3, incluindo sugestões para lo-fi, com banco servido pela aplicação e cache no navegador.
+    changes:
+      - Preservou os quatro instrumentos sintéticos e acrescentou pianos, violão, guitarras, órgão, cordas, coral, pad e vibrafone.
+      - Fixou origem, licença MIT, créditos e checksums do banco completo; adicionou instalador local e estágio Docker.
+      - Implementou progresso, espera do worklet, cancelamento, recuperação de cache corrompido e nova tentativa após falhas.
+      - Verificou testes focados Rails e JavaScript, build de áudio e saída de sinal dos 11 timbres no navegador.
+      - Registrou custo de memória e preparação do banco de 148 MB; Docker de produção e avaliação auditiva humana permanecem pendentes.
+    delivered_on: "2026-10-23"
+    tags:
+      - Interface
+      - Harmonia
+      - Áudio
+    test_path: /compositions
+
+  - slug: caminho-do-bardo-estrutura-inicial
+    title: Estrutura inicial do Caminho do Bardo
+    description: A trilha autenticada prepara aulas versionadas e registra a conclusão de cada usuário sem bloquear a leitura das aulas publicadas.
+    changes:
+      - Criou um catálogo versionado que só oferece aulas publicadas com conteúdo disponível.
+      - Vinculou conclusões individuais à conta e protegeu a primeira data contra envios repetidos.
+      - Adicionou rotas autenticadas para trilha, aula e conclusão, com testes de acesso, leitura livre e isolamento entre usuários.
+      - Manteve o catálogo sem aulas publicadas até a preparação do primeiro conteúdo.
+    delivered_on: "2026-10-22"
+    tags:
+      - Aprendizagem
+      - Interface
+    test_path: /caminho-do-bardo
+
+  - slug: espacamento-roda-acordes-botao
+    title: Espaço entre a roda de acordes e a seleção
+    description: A roda compacta reserva espaço abaixo dos rótulos de recomendação antes de exibir a explicação e o botão de adicionar acorde.
+    changes:
+      - Aumentou a área vertical da roda de acordes nas telas compactas para evitar que o botão avance sobre a área dos acordes.
+      - "Registrou a limitação de validação visual: o servidor Rails não pôde ser iniciado neste ambiente por falta do executável Ruby."
+    delivered_on: "2026-10-22"
+    tags:
+      - Interface
+      - Harmonia
+      - Responsividade
+    test_path: /compositions
+
+  - slug: assistencia-simples-composicao-harmonia
+    title: Explicações simples e espaço fixo no compositor
+    description: A escolha de acordes explica em linguagem direta o que cada opção pode trazer à música, e a página mantém a edição dentro da janela.
+    changes:
+      - Passou a explicar opções de acorde de acordo com sua função e com o acorde anterior, mantendo as regras no domínio musical.
+      - Simplificou orientações do piano roll para falar de tempo, duração e intensidade sem exigir nomes rítmicos prévios.
+      - Confinou a rolagem à sequência e ao painel em janelas baixas, sem rolagem da página inteira.
+      - Validou a explicação do domínio, a resposta da página e a apresentação da seleção com testes Rails e JavaScript.
+    delivered_on: "2026-10-22"
+    tags:
+      - Aprendizagem
+      - Composição
+      - Harmonia
+      - Interface
+      - Piano roll
+      - Responsividade
+    test_path: /compositions
+
+  - slug: correcoes-revisao-edicao-audio
+    title: Correções na edição, busca e inicialização de áudio
+    description: A edição restaura controles e análise após desfazer, cancelar gestos ou alterar BPM e timbre; a busca trata curingas literalmente e o áudio reabre com contexto novo.
+    changes:
+      - Sincronizou BPM, tonalidade, modo e timbre após desfazer/refazer; cancelamentos de edição agora publicam o estado restaurado e solicitam análise.
+      - Reanalisa após mudar BPM ou timbre para substituir solicitações anteriores invalidadas.
+      - Declarou o caractere de escape no LIKE SQLite para buscar nomes com sublinhado e sinal de porcentagem literalmente.
+      - Registra o processador WASM em cada novo AudioContext depois da inicialização compartilhada e revalida binários de URL estável após atualização.
+      - Atualizou a documentação da integração de áudio e validou as suítes JavaScript e Rails.
+    delivered_on: "2026-10-22"
+    tags:
+      - Interface
+      - Composição
+      - Harmonia
+      - Busca
+      - Áudio
+    test_path: /compositions
+
+  - slug: harmonia-redimensionamento-proporcional
+    title: Notas acompanham proporcionalmente a duração do acorde
+    description: Alterar a duração de um bloco escala os inícios relativos e as durações de suas notas, preservando o desenho rítmico editado no piano roll.
+    changes:
+      - Substituiu o ajuste apenas das sustentações no limite pela escala proporcional de todas as notas da realização do bloco, incluindo ornamentos e caudas.
+      - Preservou alturas, intensidades e identidades, deslocou sucessores e manteve notas adicionais no tempo absoluto.
+      - Arredondou tempos ao tick inteiro mais próximo, com duração mínima de um tick e início dentro do bloco; reduções podem perder precisão, enquanto desfazer restaura o snapshot.
+      - Verificou os 16 arquivos JavaScript e 14 testes Rails de harmonia e DevReport, incluindo renderização; o teste de integração cobre piano roll, redimensionamento e eventos enviados ao motor, sem validação auditiva no navegador.
+      - Atualizou a especificação da harmonia para registrar a opção proporcional escolhida pelo autor.
+    delivered_on: "2026-10-21"
+    tags:
+      - Interface
+      - Harmonia
+      - Piano roll
+      - Áudio
+    test_path: /compositions
+
+  - slug: harmonia-piano-roll-tela-inteira
+    title: Piano roll em tela inteira
+    description: O editor MIDI pode cobrir a janela e voltar ao card sem recriar notas, seleção, zoom ou histórico.
+    changes:
+      - Adicionou Expandir e Restaurar ao cabeçalho do piano roll salvo, mantendo a mesma instância de Canvas.
+      - Isolou o foco da interface ao fundo, ofereceu Esc para fechar e restaurou foco, rolagem e estados anteriores ao sair.
+      - Recalculou a largura dos Canvas ao entrar e sair do modo ampliado e liberou o estado visual ao desmontar o painel.
+      - Verificou o controle por teste de renderização, os 16 arquivos JavaScript, 14 testes Rails e revisão de whitespace.
+    delivered_on: "2026-10-21"
+    tags:
+      - Interface
+      - Harmonia
+      - Piano roll
+      - Acessibilidade
+    test_path: /compositions
+
+  - slug: harmonia-grade-ampliada-duracao-acorde
+    title: Grade MIDI ampliada e sustentações alinhadas aos acordes
+    description: O piano roll reserva mais altura para editar notas e as sustentações que terminam junto ao bloco acompanham seu redimensionamento.
+    changes:
+      - Reduziu cabeçalho, seletor de camada, ferramentas, régua e faixa de velocity apenas no editor desktop para priorizar a grade de notas.
+      - Fez notas da realização que terminam no limite antigo acompanharem o novo fim do bloco, preservando ornamentos, caudas, identidades e a faixa adicional.
+      - Atualizou a especificação musical e cobriu crescimento e redução do acorde com teste de regressão.
+      - Verificou os 16 arquivos de testes JavaScript e 15 testes Rails afetados; a suíte Rails completa ainda apresenta três falhas independentes em seeds e criação de composição.
+    delivered_on: "2026-10-21"
+    tags:
+      - Interface
+      - Harmonia
+      - Piano roll
+    test_path: /compositions
+
+  - slug: harmonia-controles-piano-roll-proporcionais
+    title: Controles proporcionais no piano roll
+    description: A barra interna do piano roll ocupa menos altura no desktop e deixa mais espaço para a grade MIDI, sem repetir desfazer e refazer.
+    changes:
+      - Reduziu a altura, a tipografia e os espaçamentos dos controles de grade, duração, velocity, ajuste e zoom no editor desktop.
+      - Compactou a escolha da camada editada e removeu os comandos de desfazer e refazer duplicados, preservando as ações equivalentes na barra principal.
+      - Manteve as dimensões móveis dos controles e conferiu os testes JavaScript e de renderização da harmonia.
+    delivered_on: "2026-10-21"
+    tags:
+      - Interface
+      - Harmonia
+      - Piano roll
+    test_path: /compositions
+
+  - slug: harmonia-editor-area-visivel
+    title: Harmonia visível e piano roll ampliado
+    description: A vista guiada mostra seletor, ações e sequência sem rolagem vertical em uma janela de 1280 por 720; o editor usa quase toda a largura, ganha altura e mantém a rolagem dentro da grade.
+    changes:
+      - Restaurou o semicírculo de acordes e ajustou a escala da vista guiada para mostrar oito blocos e as ações do acorde selecionado na mesma janela.
+      - Reduziu a medida visual dos tempos da timeline salva de 136 para 108 pixels, preservando os ticks e a posição da agulha.
+      - Alargou o card do piano roll, estendeu os Canvas à largura visível e limitou o editor à altura da janela.
+      - Definiu a paleta Canvas para os temas claro e escuro e conferiu a troca de tema no navegador.
+      - Abriu o editor salvo em zoom de 75%, reduziu a altura das linhas MIDI para 18 px, o botão Adicionar acorde e a faixa de controles, ampliando a altura útil da grade para 286 px em janela de 1280 por 720.
+      - Aplicou proporção compacta de desktop à biblioteca, aos formulários, à navegação, à autenticação e ao painel de ajustes, mantendo os alvos móveis originais.
+      - Validou visualmente as duas vistas em 1280 por 720 sem rolagem externa e com oito acordes na composição de teste.
+    delivered_on: "2026-10-21"
+    tags:
+      - Interface
+      - Harmonia
+      - Piano roll
+      - Responsividade
+    test_path: /compositions
+
+  - slug: harmonia-largura-sequencia
+    title: Harmonia centralizada com timeline contida
+    description: Sequências longas não alargam a página nem deslocam o seletor de acordes.
+    changes:
+      - Limitou a coluna do painel guiado à largura disponível e manteve a rolagem horizontal dentro da timeline.
+      - Impediu a quebra do rótulo do botão de tema sem reduzir sua área de toque.
+      - Conferiu oito acordes em janela de 1265 px; página com largura de 1265 px, timeline com 1072 px visíveis e conteúdo rolável de 1220 px, seletor centralizado.
+    delivered_on: "2026-10-21"
+    tags:
+      - Interface
+      - Harmonia
+      - Responsividade
+    test_path: /compositions
+
+  - slug: identidade-visual-interface-musical
+    title: Interface musical e sistema visual compartilhado
+    description: Um menu superior troca a área principal entre Harmonia, Ajustes e sugestões e Piano roll; as superfícies ativas compartilham a paleta verde-musical nos temas claro e escuro.
+    changes:
+      - Moveu recuperação para Ajustes e sugestões, mantendo um aviso curto na página principal e preservando a proposta durante a troca de painéis.
+      - Moveu seletor e timeline para o painel Harmonia; Ajustes e Piano roll substituem esse conteúdo na mesma área, sem visualizações paralelas.
+      - Conservou duração, reordenação e remoção do acorde selecionado fora da área alternada; as duas faixas compartilham instrumento.
+      - Centralizou cores semânticas de shell, autenticação e área musical em tokens globais de floresta e menta; elevou os controles principais a alvos de toque de 44 px.
+      - Removeu altura fixa e rolagem interna da página de harmonia; aumentou o espaço entre acordes, ações e navegação, preservando alvos de toque de 44 px.
+      - Verificou 23 testes Rails de harmonia, biblioteca, autenticação e DevReport (195 assertions), suíte JavaScript completa (28 testes de harmonia) e Zeitwerk.
+      - Revisou em viewport de 720 px e confirmou que os três itens do menu substituem o conteúdo do painel, com o destino ativo indicado e sem seletor ou timeline sob o Piano roll; ajustou o espaçamento do seletor, do menu e das ações de conta.
+    delivered_on: "2026-10-21"
+    tags:
+      - Interface
+      - Acessibilidade
+      - Composição
+      - Tema
+    test_path: /compositions
+
+  - slug: harmonia-declaracao-faixas-agulha
+    title: Harmonia declarada, duas faixas e cursor compartilhado
+    description: Blocos harmônicos separados da realização podem ser recuperados, editados e reproduzidos sem perder notas adicionais ou outras faixas.
+    changes:
+      - Persistiu blocos harmônicos com IDs, tempos e acordes escritos, mantendo o formato legado e a lista explicitamente vazia distintos.
+      - Recuperou sequências antigas somente quando a partição era única e deixou casos ambíguos para decisão manual.
+      - Separou declaração, realização e notas adicionais; edição, remoção e desfazer mantêm as identidades e os tempos definidos pelo contrato.
+      - Adicionou histórico integral, troca de camada, régua de posição, pausa, seek e pré-escuta sobre o transporte openDAW.
+      - Validou 155 testes Rails/992 assertions, 136 testes JavaScript, zeitwerk, build do motor e revisão local da tela.
+    delivered_on: "2026-10-21"
+    tags:
+      - Interface
+      - Composição
+      - Aprendizagem
+      - MIDI
+      - Áudio
+    test_path: /compositions
+
+  - slug: resumo-sequencia-edicao-livre
+    title: Resumo da sequência em edição livre
+    description: A timeline continua informando o conteúdo musical quando as notas não formam blocos guiados.
+    changes:
+      - Preservou a seção Sua sequência após a edição livre no piano roll.
+      - Exibiu a quantidade de notas e a duração da região sem inventar acordes ou graus.
+      - Cobriu a regressão com teste do controller de harmonia.
+    delivered_on: "2026-10-20"
+    tags:
+      - Interface
+      - Composição
+    test_path: /compositions
+
+  - slug: simplificacao-superficie-ativa
+    title: Superfície ativa reduzida ao CRUD e à harmonia
+    description: Rotas, navegação, assets e controllers históricos foram isolados do produto ativo.
+    changes:
+      - Reduziu o root e as rotas públicas ao CRUD de composições, harmonia persistida, autenticação e health check.
+      - Preservou apresentação, painel administrativo, criação experimental, harmonia temporária e editor antigo em app/legacy e docs/legacy.
+      - Simplificou a navegação para início, minhas composições, tema e conta.
+      - Separou o partial de piano roll usado pela harmonia dos templates antigos.
+      - Excluiu controllers e módulos JavaScript legados do importmap e separou os estilos históricos.
+      - Verificou 151 testes Rails, 15 arquivos JavaScript e zeitwerk:check.
+    delivered_on: "2026-10-20"
+    tags:
+      - Interface
+      - Composição
+    test_path: /compositions
+
+  - slug: harmonia-editavel-timbres-locais
+    title: Harmonia editável e catálogo local de timbres
+    description: Durações variáveis, edição de notas e painéis contextuais com reprodução openDAW.
+    changes:
+      - Permitiu acordes de meio, um, dois ou quatro tempos, reposicionando os seguintes sem perder suas notas.
+      - Abriu o piano roll pelo botão Editar composição, com desfazer e refazer sobre o documento musical compartilhado.
+      - Preservou notas em edição livre e desativou operações guiadas incompatíveis, sem conversão destrutiva.
+      - Compartilhou quatro presets sintéticos locais entre validação Rails e motor de áudio.
+      - Substituiu painéis por Turbo Frames, mantendo documento e transporte, com destaque discreto para sugestões.
+      - Verificou 183 testes Rails, 19 arquivos JavaScript, build de áudio e dimensões desktop e celular.
+    delivered_on: "2026-10-20"
+    tags:
+      - Interface
+      - Composição
+      - Aprendizagem
+      - MIDI
+      - Áudio
+    test_path: /compositions
+
+  - slug: compositor-harmonia-timeline-horizontal
+    title: Compositor de harmonia com timeline reorganizável
+    description: Harmonia salva com openDAW local, acordes em arco e sequência horizontal conforme o diagrama do autor.
+    changes:
+      - Vinculou a harmonia à composição com salvamento versionado, preservando as outras faixas e o loop.
+      - Integrou reprodução por sintetizador openDAW e binários WASM locais, com cancelamento de escutas pendentes e isolamento de origem.
+      - Organizou acordes em arco, reprodução junto à timeline e ajustes ou sugestões recolhidos.
+      - Implementou reordenação por arrasto de mouse, Antes/Depois e Alt com setas, preservando identidades e alturas das notas.
+      - Incluiu remoção contextual e piano roll recolhido somente de leitura sobre os mesmos eventos MIDI.
+      - Verificou salvamento e reabertura da nova ordem, reprodução, rolagem horizontal, desktop e celular.
+    delivered_on: "2026-10-19"
+    tags:
+      - Interface
+      - Composição
+      - Aprendizagem
+      - MIDI
+      - Áudio
+    test_path: /compositions
+
+  - slug: biblioteca-composicoes-nome-capa
+    title: Nova biblioteca e criação de composições
+    description: Fluxo dedicado para criar, encontrar e abrir músicas com nome e capa opcional, sem expor controles técnicos na criação.
+    changes:
+      - Criou formulário de nome e capa opcional, edição de metadados e biblioteca em linhas com busca e ordenação.
+      - Validou capas JPEG, PNG ou WebP de até 5 MB e restringiu sua rota de leitura ao proprietário.
+      - Separou Escrever harmonia de Composição avançada na entrada de cada música.
+      - Preservou a timeline anterior em /compositions/:id/legacy e o protótipo de criação em /referencias/criar.
+      - Revisou as views em partials de apresentação e verificou autorização, persistência e comportamento responsivo.
+    delivered_on: "2026-10-19"
+    tags:
+      - Interface
+      - Composição
+      - Tema
+    test_path: /compositions
+
+  - slug: harmonia-guiada-temporaria
+    title: Harmonia guiada por acordes e tempos
+    description: Uma interface pública e temporária para ouvir tríades, montar uma faixa MIDI e explorar progressões procedurais sem perder o controle das escolhas.
+    changes:
+      - Criou /harmonia com roda dos sete acordes do campo, seletor de tonalidade maior ou menor natural e escolha de instrumento tonal.
+      - Cada acorde aplicado ocupa o próximo tempo de 480 ticks; a faixa e os rótulos qualitativos são derivados das notas MIDI reais.
+      - Separou ouvir, gerar ou continuar uma prévia e aplicá-la explicitamente, sem salvar nem substituir acordes automaticamente.
+      - Reutilizou a representação musical e o transporte de áudio existentes, com limite de 32 acordes e aviso de perda ao sair.
+      - Verificou domínio, JSON, interface responsiva, temas claro e escuro, reprodução e ausência de persistência.
+    delivered_on: "2026-10-18"
+    tags:
+      - Composição
+      - Aprendizagem
+      - Interface
+      - MIDI
+    test_path: /harmonia
+
+  - slug: assistencia-composicao-contexto-harmonico
+    title: Assistência contextual à composição
+    description: Composições podem declarar tonalidade maior ou menor natural e explorar campo harmônico e acordes possíveis sem alterar notas automaticamente.
+    changes:
+      - Adicionou contexto musical opcional ao JSON versão 1, preservando documentos antigos e a representação MIDI da reprodução.
+      - Derivou tríades, graus, notas e funções simplificadas no domínio, com seleção real e identificação de notas fora da escala.
+      - Apresentou campo e sugestões acessíveis nos temas claro e escuro, distinguindo bateria de composição sem contexto.
+      - Aplicou sugestões somente após clique, acrescentando notas sem substituir as existentes e respeitando o histórico de edição.
+      - Cobriu domínio, persistência, autorização, editor e JavaScript com testes e revisão visual.
+    delivered_on: "2026-10-18"
+    tags:
+      - Composição
+      - Aprendizagem
+      - Interface
+    test_path: /compositions/:id
+
+  - slug: paleta-piano-roll-interface
+    title: Paleta do piano roll alinhada à interface
+    description: A grade MIDI da página de composições usa os tokens de superfície, linhas e acento da interface global nos temas claro e escuro.
+    changes:
+      - Substituiu o fundo azul-esverdeado da grade e da área vazia pelos neutros da interface de composições.
+      - Tornou notas rosa claro, seleção, velocity, agulha e marcadores coerentes com o acento coral e os tons secundários atuais.
+      - Centralizou as cores do Canvas em tokens CSS por tema, preservando layout, reprodução, loop e edição.
+      - Verificou o lint de diff, os testes JavaScript, os testes Rails e a checagem Zeitwerk.
+    delivered_on: "2026-10-18"
+    tags:
+      - Interface
+      - Composição
+      - MIDI
+      - Tema
+    test_path: /compositions/:id
+
+  - slug: navegacao-lateral-polimento-visual
+    title: Navegação lateral e polimento visual
+    description: A interface global ganhou uma sidebar compacta, um tratamento visual de jornada musical e microinterações sóbrias com suporte a telas pequenas.
+    changes:
+      - Substituiu a barra superior fixa por uma sidebar esquerda com estado ativo e navegação por ícones.
+      - Adicionou menu lateral móvel com botão, fundo de proteção, fechamento por Escape e fechamento ao navegar.
+      - Reuniu tema e conta no rodapé da sidebar, preservando as permissões e rotas existentes.
+      - Adicionou um medidor visual decorativo, sem XP, pontos ou progresso persistido.
+      - Aplicou transições curtas a botões, cards e regiões e respeitou prefers-reduced-motion.
+      - Verificou navegação pública, temas, responsividade estrutural, testes JavaScript e testes Rails.
+    delivered_on: "2026-10-18"
+    tags:
+      - Interface
+      - Acessibilidade
+      - Tema
+    test_path: /
+
+  - slug: controles-reproducao-compactos
+    title: Controles compactos de reprodução
+    description: A composição usa um único controle principal para tocar, retomar e parar, mantendo loop e escuta isolada separados.
+    changes:
+      - Substituiu Tocar composição, Pausar e Parar por um botão Play/Stop com estados acessíveis.
+      - Preservou a retomada interna após pausa e o retorno ao início ao parar.
+      - Manteve marcadores de loop, alternância de loop, status de áudio e Ouvir faixa como controles independentes.
+      - Adicionou ícone SVG, rótulo textual e estados de carregamento sem alterar o transporte musical.
+      - Verificou a alternância do controle, a suíte JavaScript e os testes Rails.
+    delivered_on: "2026-10-18"
+    tags:
+      - Interface
+      - Composição
+      - Áudio
+    test_path: /compositions/:id
+
+  - slug: catalogo-instrumentos-ampliado
+    title: Catálogo ampliado de instrumentos
+    description: A timeline passou a oferecer oito instrumentos organizados por família, combinando samples locais licenciados e síntese procedural.
+    changes:
+      - Criou um catálogo único com IDs estáveis, rótulos, categorias e origem sonora.
+      - Manteve piano, cordas e bateria nos samples locais já documentados.
+      - Adicionou teclado elétrico, guitarra limpa, baixo elétrico, sopro e pad sintetizado com Tone.PolySynth.
+      - Agrupou o seletor de instrumentos por família sem alterar notas MIDI ou o formato persistido das faixas.
+      - Verificou carregamento sob demanda, descarte de fontes, reprodução e falhas isoladas por faixa.
+    delivered_on: "2026-10-17"
+    tags:
+      - Áudio
+      - Composição
+      - MIDI
+      - Interface
+    test_path: /compositions/:id
+
+  - slug: orientacao-contextual-autosave
+    title: Orientação MIDI contextual e autosave
+    description: A composição explica a seleção MIDI atual e persiste alterações automaticamente após uma breve pausa.
+    changes:
+      - Publicou do piano roll a seleção de notas com nome, pitch MIDI, posição, duração e velocity.
+      - Mostrou a distância cromática entre a primeira e a última nota selecionada, sem inferir tonalidade ou função harmônica.
+      - Reutilizou o salvamento JSON versionado para autosave um segundo após a última edição, agrupando alterações sucessivas.
+      - Preservou edições locais em conflito, falha de rede e resposta tardia; adicionou aviso ao sair com alterações pendentes.
+      - Verificou seleção, autosave persistido, responsividade, suíte Rails e testes JavaScript.
+    delivered_on: "2026-10-17"
+    tags:
+      - Composição
+      - Aprendizagem
+      - MIDI
+      - Interface
+    test_path: /compositions
+
+  - slug: piano-roll-regiao-ampliado
+    title: Piano roll ampliado por região
+    description: A região MIDI selecionada pode ocupar a janela para edição sem trocar de faixa nem perder alterações pendentes.
+    changes:
+      - Adicionou Ampliar editor e Voltar à composição ao painel da região selecionada em composições salvas.
+      - Reutilizou a instância do piano roll, preservando notas, seleção e histórico durante a alternância visual.
+      - Permitiu fechar com Esc antes de o atalho da grade limpar a seleção; isolou o foco e restaurou a rolagem da página ao sair.
+      - Ajustou a altura da grade e da área de velocity em desktop e celular, nos temas escuro e claro.
+      - Verificou a interação autenticada no navegador de teste e as suítes Rails e JavaScript.
+    delivered_on: "2026-10-17"
+    tags:
+      - Composição
+      - Interface
+      - MIDI
+    test_path: /compositions
+
+  - slug: editor-composicoes-densidade-tema
+    title: Faixas compactas e tema escuro no editor de composições
+    description: A composição salva mostra várias faixas ao lado de uma grade MIDI coerente com o tema visual ativo.
+    changes:
+      - Organizou os controles de cada faixa em duas linhas, preservando nome, instrumento, volume, mute, solo e ações acessíveis.
+      - Reequilibrou timeline e piano roll; em 1440 × 900 são visíveis três faixas completas sem rolar a página.
+      - Moveu a ajuda da timeline para um painel recolhível e manteve a grade MIDI disponível abaixo das faixas.
+      - Aplicou as cores do tema ao Canvas do piano roll e o redesenhou quando o tema muda, sem alterar o rascunho em /criar.
+      - Em janelas baixas ou estreitas, permitiu rolagem da página para preservar a edição de notas e os controles.
+      - Verificou ambos os temas e tamanhos de janela no navegador local, além das suítes Rails e JavaScript.
+    delivered_on: "2026-10-17"
+    tags:
+      - Composição
+      - Interface
+      - MIDI
+      - Tema
+    test_path: /compositions
+
+  - slug: editor-composicoes-janela-mvp1
+    title: Área de trabalho compacta para composições salvas
+    description: A timeline e o piano roll compartilham a janela no desktop, com rolagem interna e controles de composição sempre próximos.
+    changes:
+      - Extraiu o formulário de metadados para partial de apresentação e reuniu navegação, salvamento e exclusão em um cabeçalho compacto.
+      - Organizou timeline e editor MIDI como painéis flexíveis sem rolagem da página no desktop.
+      - Manteve faixas e grade MIDI roláveis dentro dos painéis e limitou a altura do editor em telas estreitas ou baixas.
+      - Preservou a página /criar, o documento musical, o áudio e as ações já existentes.
+      - Conferiu desktop e telefone em navegador local autenticado de teste; executou testes Rails e JavaScript, RuboCop e Zeitwerk.
+    delivered_on: "2026-10-17"
+    tags:
+      - Composição
+      - Interface
+      - MIDI
+    test_path: /compositions
+
+  - slug: reproducao-composicao-loop-mvp1
+    title: Reprodução contínua da composição com loop
+    description: A timeline toca faixas juntas ou isoladas e incorpora edições futuras sem parar a agulha.
+    changes:
+      - Persistiu marcadores opcionais de loop no documento musical versionado, preservando documentos antigos.
+      - Extraiu eventos em ticks absolutos e separou transporte, fontes sonoras por faixa e apresentação.
+      - Adicionou Play, pausa, retomada, Stop, isolamento por faixa e marcadores editáveis por número, arraste e teclado.
+      - Aplicou alterações à frente da agulha na passagem atual e alterações já percorridas na próxima, sem interromper o áudio.
+      - Verificou 143 testes Rails, 12 arquivos de testes JavaScript, RuboCop e Zeitwerk; as rotas públicas abriram no navegador local.
+      - Registrou que a composição autenticada e a escuta real ainda requerem conferência manual em sessão autenticada.
+    delivered_on: "2026-10-16"
+    tags:
+      - Composição
+      - Áudio
+      - Interface
+    test_path: /compositions
+
+  - slug: piano-roll-regioes-persistidas
+    title: Piano roll persistido por região
+    description: Composições salvas permitem editar notas MIDI da região ativa, ouvir a faixa e reabrir o resultado após salvar.
+    changes:
+      - Reutilizou o piano roll existente com duração e compasso da região, preservando pitches MIDI de 0 a 127.
+      - Converteu notas relativas sem alterar outras regiões e gerou IDs únicos na composição inteira.
+      - Incluiu velocity editável e histórico de desfazer/refazer por região durante a sessão.
+      - Manteve o salvamento JSON versionado e os fluxos de /criar e Caminho do Bardo.
+      - Verificou testes Rails e JavaScript, carregamento, estilo e o fluxo manual de criar, mover, salvar e reabrir no navegador de teste.
+      - Ajustou a prévia ao BPM salvo e bloqueou a edição de regiões MIDI inválidas sem truncar o documento.
+      - Registrou que não há reprodução multifaixa nem mesclagem automática de conflitos.
+    delivered_on: "2026-10-15"
+    tags:
+      - Composição
+      - Interface
+      - MIDI
+    test_path: /compositions
+
+  - slug: timeline-composicoes-mvp1
+    title: Timeline editável de composições
+    description: Faixas e regiões podem ser organizadas visualmente em ticks musicais e salvas no mesmo documento dos metadados.
+    changes:
+      - Adicionou controles de faixa para nome, instrumento, volume, mute, solo, ordem e remoção.
+      - Permitiu criar, mover, redimensionar e excluir regiões com snap musical, zoom visual e alternativa por teclado.
+      - Unificou metadados e timeline no salvamento JSON versionado, preservando edições locais em conflitos e respostas tardias.
+      - Manteve o formulário HTML de metadados, a página de criação e o início do Caminho do Bardo.
+      - Registrou limites da etapa e verificou contrato musical, interface e operações de ticks.
+    delivered_on: "2026-10-15"
+    tags:
+      - Composição
+      - Interface
+      - MIDI
+    test_path: /compositions
+
+  - slug: composicoes-persistidas-mvp1
+    title: Composições persistidas por usuário
+    description: Contas autenticadas podem criar, listar, abrir, renomear, salvar e excluir composições validadas pelo contrato musical.
+    changes:
+      - Criou uma tabela de documentos JSON associados ao usuário, com ID musical estável e versão de salvamento.
+      - Adicionou rotas HTML e JSON para reabrir e salvar metadados, faixas, regiões, notas e instrumentos.
+      - Impediu acesso a composições de terceiros, rejeitou documentos inválidos e informou conflitos de versão sem sobrescrever dados.
+      - Criou telas de catálogo e detalhes com salvamento manual, indicação de alterações pendentes e confirmação de exclusão.
+      - Verificou testes Rails e JavaScript; a timeline e o piano roll ainda não editam o documento persistido.
+    delivered_on: "2026-10-15"
+    tags:
+      - Composição
+      - Interface
+      - MIDI
+    test_path: /compositions
+
+  - slug: arranjo-canvas-instrumentos-iniciais
+    title: Frases alinhadas e instrumentos iniciais
+    description: A criação reúne quatro frases no mesmo trecho, com prévias ilustrativas em Canvas, editor compacto e timbres locais de piano, cordas e bateria.
+    changes:
+      - Alinhou as quatro camadas numa régua comum de quatro compassos e desenhou prévias derivadas das notas MIDI, sem representar áudio gravado.
+      - Reduziu a altura visível do piano roll na criação e mostrou a Bateria em três linhas próprias para bumbo, caixa e chimbal.
+      - Permitiu escolher piano acústico ou cordas em cada frase melódica sem alterar as notas; a Bateria usa um kit fixo.
+      - Reproduziu as frases individualmente com amostras locais e registrou origem e licença CC0 das novas amostras em SOURCE.txt.
+      - Corrigiu o ataque quase inaudível das cordas em notas curtas, ajustando as cinco amostras e o volume do instrumento sem alterar o MIDI.
+      - Verificou testes Rails e JavaScript, RuboCop, formatos MP3 e os fluxos de abertura, troca de som e reprodução no navegador.
+      - Manteve as frases apenas na memória da página; não há salvamento nem reprodução simultânea das camadas.
+    delivered_on: "2026-10-15"
+    tags:
+      - Composição
+      - Interface
+      - Áudio
+    test_path: /criar
+
+  - slug: criacao-camadas-frases
+    title: Criação musical por camadas e frases
+    description: A página de criação organiza um trecho de quatro compassos em frases independentes de Harmonia, Baixo, Melodia e Bateria.
+    changes:
+      - Adicionou /criar como destino principal de criação, preservando o protótipo em /componentes.
+      - Criou cards de frase com prévia das notas reais e expansão de um piano roll por vez.
+      - Mantém as notas de cada camada separadas enquanto a página está aberta, sem salvamento ao recarregar.
+      - Reutiliza o editor MIDI existente e desabilita reprodução na Bateria enquanto não há timbre de percussão.
+      - Verificou navegação, troca de frases, restauração de notas, tema escuro e testes Rails e JavaScript.
+    delivered_on: "2026-10-15"
+    tags:
+      - Composição
+      - Interface
+      - MIDI
+    test_path: /criar
+
+  - slug: interface-produtividade-aprendizagem
+    title: Interface unificada para criação e aprendizagem
+    description: Reorganizou a navegação e o visual do Bardian para apresentar os caminhos de aprender e criar com clareza a quem está começando.
+    changes:
+      - Criou navegação global com destinos reais e ícones SVG consistentes, respeitando o acesso administrativo.
+      - Substituiu a tipografia manuscrita das superfícies de produto por uma família sem serifa e definiu cores compartilhadas para os temas claro e escuro.
+      - Reorganizou a página inicial, a apresentação, a lição, o editor, os formulários, a área administrativa e a demonstração de áudio.
+      - Ajustou rótulos e ajuda do piano roll para orientar iniciantes e indicar que o protótipo ainda não salva composições.
+    delivered_on: "2026-10-14"
+    tags:
+      - Interface
+      - Acessibilidade
+    test_path: /
+
+  - slug: caminho-do-bardo-primeiras-notas
+    title: Primeira lição do Caminho do Bardo
+    description: Criou uma página própria e uma sequência didática para apresentar o Bardian, comparar notas no piano e ler a mesma ideia musical no piano roll.
+    changes:
+      - Adicionou a rota /caminho-do-bardo/notas e a composição da primeira lição em partials de apresentação.
+      - Configurou o piano existente para exibir uma oitava de Dó4 a Si4 sem duplicar a lógica de áudio.
+      - Explicou visualmente altura, tempo e duração no piano roll e definiu os próximos passos sobre notas, oitavas, acidentes e intervalos.
+      - Ligou a seção O Caminho do Bardo da apresentação à nova lição.
+      - Reorganizou a explicação em conceito, experiência guiada, conferência e aplicação; usa Dó4, Ré4 e Mi4 do piano ao piano roll com linguagem simples e teclas identificadas.
+    delivered_on: "2026-10-15"
+    tags:
+      - Aprendizagem
+      - Notas
+      - Interface
+    test_path: /caminho-do-bardo/notas
+
+  - slug: tema-visual-bardian
+    title: Base visual e modo escuro do Bardian
+    description: Criou uma base de tokens visuais, alternância persistente de tema e ajustes de contraste para aproximar as superfícies públicas da ferramenta de produtividade e aprendizagem.
+    changes:
+      - Adicionou alternância manual entre tema claro e escuro com preferência salva no navegador.
+      - Aplicou cores compartilhadas à apresentação, à lição, aos componentes e às superfícies administrativas existentes.
+      - Revisou hierarquia, espaçamento, responsividade, foco visível e estados do novo fluxo educacional.
+    delivered_on: "2026-10-14"
+    tags:
+      - Interface
+      - Acessibilidade
+      - Tema
+    test_path: /caminho-do-bardo/notas
+
+  - slug: piano-roll-webmusic-score
+    title: Editor piano roll inspirado no BandLab
+    description: Evoluiu o protótipo para um editor MIDI em Canvas, com viewport navegável e estado musical em ticks baseado no @webmusic/score.
+    changes:
+      - Adicionou teclado virtual de quatro oitavas, régua de compassos, zoom, rolagem e lane de velocity.
+      - Permitiu criar, selecionar, mover, redimensionar e excluir notas com snap musical configurável.
+      - Integrou playhead e reprodução temporária ao Tone.js sem persistência de composição.
+      - Corrigiu a rolagem sincronizada da grade, teclado, régua e velocity, incluindo navegação pelo wheel.
+      - Limitou a criação ao último compasso e ativou Delete após selecionar uma nota com o mouse.
+      - Alinhou os quatro compassos da grade ao Score e fez o botão Parar interromper o sintetizador.
+      - Tornou as alças de redimensionamento visíveis e ampliou sua área de captura; acrescentou um menu de duração para notas selecionadas.
+      - Incluiu seleção por área com Shift e movimento em grupo que preserva os intervalos temporais entre notas.
+      - Estendeu a agulha de reprodução à altura completa da grade, inclusive durante a rolagem vertical.
+      - Adicionou marcadores móveis de início e fim do loop na régua, com repetição ligada inicialmente e ajuste por ponteiro ou teclado.
+      - Fez Espaço alternar reprodução e parada fora dos controles, com agendamento antecipado no Tone.js e corte de notas no fim do intervalo.
+      - Reservou o Espaço duplo em até 300 ms para pausar e devolver a agulha ao início do loop, sem mover os marcadores; o Espaço simples mantém a posição ao pausar.
+      - Corrigiu a retomada pelo Espaço para continuar áudio e agulha do tick pausado, incluindo o restante de notas em andamento; clique direito exclui somente a nota atingida.
+    delivered_on: "2026-10-14"
+    tags:
+      - Interface
+      - Composição
+      - MIDI
+    test_path: /componentes
+
+  - slug: dashboard-dev-reports
+    title: Dashboard administrativa e DevReports
+    description: A dashboard administrativa passou a apresentar as entregas verificáveis do Bardian.
+    changes:
+      - Criou o catálogo versionado e o objeto DevReport para registrar entregas.
+      - Reorganizou a dashboard em partials com busca, filtro por tag e detalhes expansíveis.
+      - Aproximou o painel da referência visual com navegação lateral escura e tabela clara.
+    delivered_on: "2026-10-13"
+    tags:
+      - Administração
+      - Interface
+    test_path: /dashboard#dev-reports

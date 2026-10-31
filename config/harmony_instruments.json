@@ -1,0 +1,122 @@
+{
+  "synth": {
+    "label": "Sintetizador suave",
+    "waveform": "triangle",
+    "attack": 0.012,
+    "decay": 0.2,
+    "sustain": 0.55,
+    "release": 0.18,
+    "cutoff": 4000,
+    "gain_db": -9,
+    "source": "vaporisateur"
+  },
+  "harmony_pad": {
+    "label": "Pad sintético",
+    "waveform": "saw",
+    "attack": 0.25,
+    "decay": 0.4,
+    "sustain": 0.65,
+    "release": 0.8,
+    "cutoff": 1800,
+    "gain_db": -15,
+    "source": "vaporisateur"
+  },
+  "harmony_pluck": {
+    "label": "Dedilhado sintético",
+    "waveform": "triangle",
+    "attack": 0.005,
+    "decay": 0.18,
+    "sustain": 0.15,
+    "release": 0.2,
+    "cutoff": 5000,
+    "gain_db": -9,
+    "source": "vaporisateur"
+  },
+  "harmony_organ": {
+    "label": "Órgão sintético",
+    "waveform": "square",
+    "attack": 0.008,
+    "decay": 0.1,
+    "sustain": 0.8,
+    "release": 0.12,
+    "cutoff": 2400,
+    "gain_db": -18,
+    "source": "vaporisateur"
+  },
+  "fluid_piano": {
+    "label": "Piano acústico",
+    "source": "fluid_r3",
+    "bank": 0,
+    "program": 0
+  },
+  "fluid_electric_piano": {
+    "label": "Piano elétrico",
+    "source": "fluid_r3",
+    "bank": 0,
+    "program": 4,
+    "lofi": true
+  },
+  "fluid_soft_electric_piano": {
+    "label": "Piano elétrico suave",
+    "source": "fluid_r3",
+    "bank": 0,
+    "program": 5,
+    "lofi": true
+  },
+  "fluid_nylon_guitar": {
+    "label": "Violão de nylon",
+    "source": "fluid_r3",
+    "bank": 0,
+    "program": 24,
+    "lofi": false
+  },
+  "fluid_clean_guitar": {
+    "label": "Guitarra limpa",
+    "source": "fluid_r3",
+    "bank": 0,
+    "program": 27,
+    "lofi": false
+  },
+  "fluid_muted_guitar": {
+    "label": "Guitarra abafada",
+    "source": "fluid_r3",
+    "bank": 0,
+    "program": 28,
+    "lofi": true
+  },
+  "fluid_organ": {
+    "label": "Órgão",
+    "source": "fluid_r3",
+    "bank": 0,
+    "program": 16,
+    "lofi": false
+  },
+  "fluid_strings": {
+    "label": "Cordas suaves",
+    "source": "fluid_r3",
+    "bank": 0,
+    "program": 49,
+    "lofi": false
+  },
+  "fluid_choir": {
+    "label": "Coral suave",
+    "source": "fluid_r3",
+    "bank": 0,
+    "program": 52,
+    "lofi": false
+  },
+  "fluid_pad": {
+    "label": "Pad suave",
+    "source": "fluid_r3",
+    "bank": 0,
+    "program": 89,
+    "lofi": true
+  },
+  "fluid_vibraphone": {
+    "label": "Vibrafone",
+    "source": "fluid_r3",
+    "bank": 0,
+    "program": 11,
+    "lofi": true
+  }
+}

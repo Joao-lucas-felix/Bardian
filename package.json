@@ -1,0 +1,8 @@
+{
+  "name": "bardian-audio",
+  "private": true,
+  "type": "module",
+  "scripts": { "build:audio": "vite build --config vite.audio.config.js", "test:audio": "node --test test/javascript/opendaw*.mjs" },
+  "dependencies": { "@opendaw/studio-sdk": "0.0.174" },
+  "devDependencies": { "vite": "7.3.7" }
+}
