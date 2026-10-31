@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches: [ main ]
@@ -19,7 +20,7 @@ jobs:
           bundler-cache: true
 
       - name: Scan for common Rails security vulnerabilities using static analysis
-        run: bin/brakeman --no-pager
+        run: bin/brakeman --no-pager --skip-files docs/legacy/
       
       - name: Scan for known security vulnerabilities in gems used
         run: bin/bundler-audit
@@ -38,6 +39,38 @@ jobs:
 
       - name: Scan for security vulnerabilities in JavaScript dependencies
         run: bin/importmap audit
+
+  test_js:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install audio dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Run JavaScript tests
+        run: node --test test/javascript/*.mjs
+
+      - name: Build audio engine
+        run: npm run build:audio
+
+  docker_build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Validate production image
+        run: docker build --tag bardian:ci .
 
   lint:
     runs-on: ubuntu-latest

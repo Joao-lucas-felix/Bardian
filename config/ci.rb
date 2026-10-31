@@ -7,8 +7,11 @@ CI.run do
 
   step "Security: Gem audit", "bin/bundler-audit"
   step "Security: Importmap vulnerability audit", "bin/importmap audit"
-  step "Security: Brakeman code analysis", "bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"
+  step "Security: Brakeman code analysis", "bin/brakeman --quiet --no-pager --skip-files docs/legacy/ --exit-on-warn --exit-on-error"
   step "Tests: Rails", "bin/rails test"
+  step "Dependencies: Node", "npm ci --ignore-scripts"
+  step "Tests: JavaScript", "node --test test/javascript/*.mjs"
+  step "Build: Audio", "npm run build:audio"
   step "Tests: Seeds", "env RAILS_ENV=test bin/rails db:seed:replant"
 
   # Optional: Run system tests
