@@ -1,116 +1,139 @@
-# README
+# Bardian
 
-## Documentação do projeto
+O Bardian é uma aplicação de criação e aprendizagem musical voltada a pessoas
+que estão começando a compor. A proposta é experimentar uma ideia, ouvir o
+resultado e compreender as relações musicais envolvidas no mesmo ambiente.
+Este repositório faz parte de um Trabalho de Conclusão de Curso (TCC).
 
-- [Convenções do domínio musical](docs/dominio-musical.md)
-- [Integração de áudio e harmonia](docs/harmonia-opendaw.md)
-- [Estado atual do projeto](docs/estado-atual.md)
-- [Contrato musical do MVP 1](docs/contrato-musical-mvp1.md)
-- [Persistência de composições](docs/persistencia-composicoes-mvp1.md)
-- [Timeline de composições](docs/timeline-composicoes-mvp1.md)
+## O que já é possível fazer
 
-Em `/compositions`, crie uma música com nome e capa opcional. Abra **Escrever
-harmonia** para escolher acordes, editar notas, ouvir e salvar a sequência. A
-interface ativa não expõe dashboard, apresentação ou editores experimentais; as
-versões anteriores ficam preservadas em `app/legacy/` e `docs/legacy/` apenas para
-referência acadêmica.
+- **Gerenciar composições:** criar uma música com nome e capa opcional, buscar,
+  ordenar, abrir, renomear e excluir as próprias composições. O acesso à
+  biblioteca exige uma conta.
+- **Começar pelos primeiros sons:** escolher andamento, tônica, modo e timbre;
+  ouvir propostas de quatro acordes e decidir se alguma delas inicia a música.
+  Também é possível começar com a harmonia vazia.
+- **Escrever harmonia:** ouvir os sete acordes do campo harmônico, montar e
+  reorganizar uma sequência, ajustar a duração dos acordes, editar notas no
+  piano roll, desfazer/refazer e salvar. A interface apresenta sugestões e
+  explicações simples de função harmônica sem aplicar mudanças automaticamente.
+- **Ouvir a composição:** reproduzir a harmonia salva e trocar entre os timbres
+  disponíveis. A reprodução usa eventos musicais do documento da composição.
+- **Aprender no Caminho do Bardo:** acessar sete aulas publicadas sobre pulsação,
+  ritmo e pausas, compassos, escuta, nomes das notas, oitavas e construção de
+  uma primeira ideia musical. As aulas incluem exemplos sonoros; quem possui
+  conta pode marcar a conclusão.
 
-## Motor de áudio da harmonia salva
+## Representação musical
+
+O núcleo distingue a **grafia musical** da **altura MIDI**. `Note`, `Interval`,
+`Scale` e `Chord` representam notas, relações intervalares, escalas e acordes.
+O contexto tonal declarado (tônica e modo maior ou menor natural) permite
+derivar sete tríades, seus graus e funções didáticas simplificadas.
+
+Cada composição salva contém andamento, fórmula de compasso, faixas, regiões
+MIDI e eventos de nota com posição, duração, altura e intensidade. A harmonia
+também registra blocos de acordes em ordem temporal. O editor, a assistência
+e a reprodução trabalham a partir dessa estrutura; as sugestões são projeções
+temporárias e só entram na composição por uma ação explícita da pessoa.
+Consulte [convenções do domínio](docs/dominio-musical.md) e
+[contrato musical do MVP](docs/contrato-musical-mvp1.md) para os detalhes.
+
+## Páginas em funcionamento
+
+| Página | Endereço | O que oferece |
+| --- | --- | --- |
+| Biblioteca de composições | `/compositions` | Lista, busca, criação e acesso às músicas da conta. |
+| Primeiros sons | `/compositions/:id/setup` | Configuração inicial e prévias de harmonia para uma composição nova. |
+| Editor de harmonia | `/compositions/:id/harmony` | Acordes, sequência, sugestões, piano roll, reprodução e salvamento. |
+| Caminho do Bardo | `/caminho-do-bardo` | Mapa das aulas publicadas e acesso aos conteúdos. |
+| Aula publicada | `/caminho-do-bardo/:slug` | Texto, exemplos para ouvir e conclusão individual. |
+
+As telas abaixo foram capturadas da aplicação em execução, com uma composição
+de demonstração no ambiente de teste.
+
+### Biblioteca de composições
+
+![Biblioteca com uma composição de demonstração](docs/images/readme/composicoes.jpg)
+
+### Editor de harmonia
+
+![Editor com campo harmônico e sequência de quatro acordes](docs/images/readme/harmonia.jpg)
+
+### Aula “As notas têm nomes”
+
+![Aula sobre os nomes das notas no Caminho do Bardo](docs/images/readme/aula-notas.jpg)
+
+## Próximas melhorias
+
+Estas frentes estão planejadas; ainda não são recursos entregues:
+
+- ornamentar harmonias com assistência contextual, preservando a escolha da
+  pessoa sobre cada sugestão;
+- ampliar as aulas com ornamentação, arpejos, formação de acordes e outros
+  conceitos de harmonia;
+- evoluir a edição de arranjos e a manipulação das faixas da composição.
+
+Exportação de áudio, mixer e análise de arquivos de áudio também não fazem
+parte do fluxo atual. A análise de áudio permanece um estudo experimental.
+
+## Executar localmente
+
+O projeto usa Ruby on Rails, SQLite e Node 22. Para preparar o banco, as
+dependências do motor de áudio e iniciar a aplicação:
 
 ```bash
-# Prepara persistência de capas e compila o SDK local, sem CDN em execução.
-mise exec -- bin/rails db:migrate
+mise exec -- bundle install
+mise exec -- bin/rails db:prepare
 npm ci --ignore-scripts
 node bin/setup-soundfonts
 npm run build:audio
 mise exec -- bin/rails server
 ```
 
-Requer Node 22 e navegador com AudioWorklet, WebAssembly e isolamento de origem.
-Em produção, use HTTPS; localhost é aceito para desenvolvimento. Os artefatos
-ficam em `public/audio-engine` e não são versionados. O Dockerfile inclui o build,
-mas a imagem completa ainda precisa ser validada no ambiente de deploy.
+Acesse `http://localhost:3000`, crie uma conta e abra **Minhas composições**.
+O áudio no navegador requer AudioWorklet, WebAssembly e isolamento de origem;
+em produção, use HTTPS. O build gera `public/audio-engine`, que não é
+versionado. O banco de timbres FluidR3 é instalado localmente e validado antes
+do uso; o primeiro carregamento de um timbre pode exigir download no navegador.
+Veja [integração de áudio e limites](docs/harmonia-opendaw.md).
 
-A harmonia salva usa openDAW local com quatro presets sintéticos e 11 timbres
-FluidR3. A instalação baixa e valida o banco completo (148 MB); a primeira escuta
-usa download sob demanda e cache OPFS no navegador. Consulte
-[integração e limites](docs/harmonia-opendaw.md) antes de publicar.
+### Autenticação e configuração opcional
 
-## Autenticação
+O cadastro por e-mail e senha funciona sem Google. Para habilitar o login com
+Google, configure `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET` no ambiente. No
+cliente OAuth Web, cadastre a URI
+`http://localhost:3000/users/auth/google_oauth2/callback` para desenvolvimento
+ou a URI HTTPS equivalente do domínio final. Uma conta criada por senha só é
+associada ao Google quando a pessoa entra com a senha e escolhe **Vincular
+Google** no menu da conta.
 
-O Bardian usa Devise para autenticar usuários por e-mail e senha ou por Google.
-O cadastro público cria usuários comuns. O Google só aparece nas telas quando
-`GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET` estão configurados. Para criar o
-cliente OAuth Web, cadastre no Google Cloud a URI de redirecionamento
-`https://SEU_DOMINIO/users/auth/google_oauth2/callback` (ou
-`http://localhost:3000/users/auth/google_oauth2/callback` no desenvolvimento).
-Use as variáveis do processo ou `.env` local; nunca versione os valores reais.
+Para criar o administrador local via seed, copie `.env.example` para `.env`,
+preencha `ADMIN_EMAIL` e `ADMIN_PASSWORD` e execute
+`mise exec -- bin/rails db:seed`. Não versione o `.env` real.
 
-Uma conta criada por senha não é associada automaticamente pelo e-mail Google.
-Entre com a senha e escolha **Vincular Google** no menu da conta. Uma identidade
-Google já vinculada não pode ser ligada a outra conta. Contas novas pelo Google
-recebem o perfil comum e mantêm uma senha aleatória não divulgada. A opção de
-desvincular e a recuperação de senha ainda não fazem parte desta versão.
-
-Em desenvolvimento, copie o exemplo para `.env`, substitua o e-mail e defina
-uma senha local antes de executar o seed. O Rails carrega essas variáveis por
-meio de `dotenv-rails`; o `.env` real não deve ser versionado:
+### Verificação
 
 ```bash
-cp .env.example .env
-# Edite .env e preencha ADMIN_EMAIL e ADMIN_PASSWORD antes do comando abaixo.
-mise exec -- bin/rails db:seed
+PARALLEL_WORKERS=1 mise exec -- bin/rails test
+node --test test/javascript/*.mjs
+mise exec -- bin/rubocop
+npm run build:audio
 ```
 
-Em outros ambientes, forneça `ADMIN_EMAIL` e `ADMIN_PASSWORD` como variáveis do
-processo, sem depender de `.env`.
+O CI também constrói a imagem Docker. Antes de publicar, ainda é necessário
+configurar domínio HTTPS, segredos, callback OAuth, volume persistente para
+SQLite e Active Storage e backup desse volume. `config/deploy.yml` contém
+endereços de exemplo e precisa ser ajustado para um ambiente real.
 
-As rotas de conta são `/users/sign_in` e `/users/sign_up`. Após o login, qualquer
-perfil é encaminhado para a biblioteca em `/compositions`.
+## Documentação do projeto
 
-## Verificação da versão candidata
+- [Convenções do domínio musical](docs/dominio-musical.md)
+- [Contrato musical do MVP 1](docs/contrato-musical-mvp1.md)
+- [Persistência de composições](docs/persistencia-composicoes-mvp1.md)
+- [Timeline de composições](docs/timeline-composicoes-mvp1.md)
+- [Integração de áudio e harmonia](docs/harmonia-opendaw.md)
 
-Execute `PARALLEL_WORKERS=1 mise exec -- bin/rails test`,
-`node --test test/javascript/*.mjs`, `mise exec -- bin/rubocop` e
-`npm run build:audio`. O CI também constrói a imagem Docker. Os artefatos
-`public/audio-engine` e o banco de timbres são produzidos no build e não entram
-nos commits. Antes de publicar, configure um servidor e domínio HTTPS, os
-segredos Rails e Google no ambiente, o callback OAuth do domínio final, volume
-persistente para SQLite e Active Storage e backup desse volume. O
-`config/deploy.yml` ainda contém endereços de exemplo e não deve ser usado
-para deploy real sem essa definição.
-
-## Relatórios de desenvolvimento
-
-As entregas continuam registradas em `config/dev_reports.yml` para o TCC, mas não
-há uma dashboard pública no produto ativo. Cada entrada contém título, descrição,
-alterações, data, tags e um caminho de verificação. Quatro caminhos históricos
-(`/harmonia`, `/criar`, `/componentes` e `/dashboard`) foram preservados no
-catálogo para rastreabilidade, embora não estejam ativos nesta versão.
-
-O catálogo reúne as entregas verificadas do projeto. Cada nova funcionalidade
-deve receber um relatório com uma rota existente para teste; planos e recursos
-ainda não implementados não são registrados como entregas.
-
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+As entregas verificadas do TCC são registradas em `config/dev_reports.yml`.
+Páginas e experimentos antigos preservados em `app/legacy/` e `docs/legacy/`
+servem apenas como referência acadêmica.
